@@ -13,5 +13,7 @@ namespace SubRed
     /// </summary>
     public partial class App : Application
     {
+        public App()
+            => Exit += (s, e) => SubRed.Properties.Settings.Default.Save();
     }
 }

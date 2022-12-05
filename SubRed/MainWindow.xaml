@@ -5,8 +5,61 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        xmlns:vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Menu Height="25" VerticalAlignment="Top">
+                <MenuItem Header="Файл">
+                    <MenuItem Header="Новый проект" ></MenuItem>
+                    <MenuItem Header="Открыть проект" >
+                        <MenuItem Header="WinForms"></MenuItem>
+                        <MenuItem Header="WPF" ></MenuItem>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Выход" ></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Изменить" >
+                    <MenuItem Header="Субтитры" ></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Обработка" >
+                    <MenuItem Header="Извлечь встроенные субтитры" Click="ExtractSubsFromFile_Click"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Помощь" >
+                    <MenuItem Header="О программе" ></MenuItem>
+                </MenuItem>
+            </Menu>
+        </Grid>
+        <Grid Grid.Row="1">
+            <vlc:VlcControl x:Name="player" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Value, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0" Width="{Binding ActualWidth, ElementName=textBlock, Mode=OneWay}"/>
+            <Slider Grid.Column="1" x:Name="slider" Maximum="0.1"
+                    Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"/>
+            <TextBlock x:Name="textBlock" Grid.Column="2" Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Загрузить" Click="Load_Click"/>
+            <Button x:Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="1" Click="StartPausePlay_Click"/>
+            <Button Content="Стоп" Grid.Column="2" Click="Stop_Click"/>
+        </Grid>
 
     </Grid>
 </Window>
