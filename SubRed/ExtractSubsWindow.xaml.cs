@@ -20,8 +20,12 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Ocl;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using Microsoft.Win32;
 using static System.Net.Mime.MediaTypeNames;
+using System.Configuration;
+using System.Web;
+using Tesseract;
 
 namespace SubRed
 {
@@ -110,31 +114,129 @@ namespace SubRed
             }
             finally { DeleteObject(handle); }
         }
+        public static byte[] ImageToByte(System.Drawing.Image img)
+        {
+            ImageConverter converter = new ImageConverter();
+            return (byte[])converter.ConvertTo(img, typeof(byte[]));
+        }
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
             Mat img = CvInvoke.Imread(filePath);
+            FindTextInFrame(img);
+        }
+
+        private async void FindTextInFrame(Mat img)
+        {
+            Image<Bgr, Byte> origImage = img.ToImage<Bgr, Byte>();
             Image<Gray, Byte> grayFrame = img.ToImage<Gray, Byte>();
 
-            //Emgu.CV.Util.VectorOfVectorOfPoint countouts = new Emgu.CV.Util.VectorOfVectorOfPoint();
-            //Mat heir = new Mat();
-            //CvInvoke.FindContours(grayFrame, countouts, heir, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+            var imH = grayFrame.Height;
+            var imW = grayFrame.Width;
+            var minHeight = 0.01 * imH;
+            var minWidth = 0.01 * imW;
+            var maxHeight = 100;
 
-            //CvInvoke.GaussianBlur(grayFrame, grayFrame, new System.Drawing.Size(5, 5), 1.5);
             grayFrame = grayFrame.SmoothMedian(3);
             grayFrame = grayFrame.SmoothGaussian(3);
 
-            CvInvoke.Threshold(grayFrame, grayFrame, 150, 255, ThresholdType.ToZero);
+            var laplacian = grayFrame.Laplace(3);
+            CvInvoke.ConvertScaleAbs(laplacian, grayFrame, 1, 0);
 
-            grayFrame = grayFrame.InRange(new Gray(1), new Gray(255));
+            CvInvoke.Threshold(grayFrame, grayFrame, 170, 255, ThresholdType.Binary);
 
-            Mat kernel1 = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(3, 3), new System.Drawing.Point(1, 1));
+            Mat kernel1 = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(5, 5), new System.Drawing.Point(1, 1));
             grayFrame = grayFrame.MorphologyEx(MorphOp.Gradient, kernel1, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
-            grayFrame = grayFrame.Dilate(1);
-            grayFrame = grayFrame.Erode(1);
+            int k1 = imH / 30;
+            int k2 = imW / 70;
+            Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
+            CvInvoke.Dilate(grayFrame, grayFrame, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
-            image.Source = ImageSourceFromBitmap(grayFrame.ToBitmap<Gray, Byte>());
+
+            k1 = imH / 20;
+            k2 = imW / 65;
+            element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
+            CvInvoke.Erode(grayFrame, grayFrame, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+
+
+            Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+            Mat hier = new Mat();
+            CvInvoke.FindContours(grayFrame, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+
+            var rois = new List<System.Drawing.Rectangle>(); // List of rois
+            if (contours.Size > 0)
+            {
+                for (int i = 0; i < contours.Size; i++)
+                {
+                    System.Drawing.Rectangle rect = CvInvoke.BoundingRectangle(contours[i]);
+
+                    Image<Gray, Byte> tempImg = img.ToImage<Gray, Byte>();
+                    grayFrame.CopyTo(tempImg);
+
+                    int countWhitePixels = 0;
+                    for (int i1 = 0; i1 < tempImg.Rows; i1++)
+                    {
+                        for (int j1 = 0; j1 < tempImg.Cols; j1++)
+                        {
+                            if (tempImg.Data[i1, j1, 0] == 255)
+                                countWhitePixels++;
+                        }
+                    }
+
+
+                    if (!(rect.Height < minHeight ||
+                        rect.Width < minWidth ||
+                        rect.Width / rect.Height < 1.3 ||
+                        countWhitePixels < (rect.Width * rect.Height * 0.1)))
+                    {
+                        if (rect.X > 10 && (rect.X + rect.Width + 20) < imW)
+                        {
+                            rect.X -= 10;
+                            rect.Width += 20;
+                        }
+                        if (rect.Y > 10 && (rect.Y + rect.Height + 20) < imW)
+                        {
+                            rect.Y -= 10;
+                            rect.Height += 20;
+                        }
+                        rois.Add(rect);
+                    }
+                }
+            }
+
+            Image<Gray, Byte> tempPartImage = img.ToImage<Gray, Byte>();
+            CvInvoke.ConvertScaleAbs(laplacian, tempPartImage, 1, 0);
+            var imageParts = new List<Image<Gray, byte>>(); // List of extracted image parts
+            foreach (var roi in rois)
+            {
+                tempPartImage.ROI = roi;
+                imageParts.Add(tempPartImage.Copy());
+            }
+            
+            foreach(var imagePart in imageParts)
+            {
+                CvInvoke.Threshold(imagePart, tempPartImage, 170, 255, ThresholdType.Binary);
+                k1 = 1;
+                k2 = 1;
+                element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
+                CvInvoke.Dilate(tempPartImage, tempPartImage, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+
+                var ocrengine = new TesseractEngine(@".\tessdata", "eng", EngineMode.TesseractAndLstm);
+                var imgPix = Pix.LoadFromMemory(ImageToByte(origImage.ToBitmap<Bgr, Byte>()));
+                var res = ocrengine.Process(imgPix);
+                textBlock.Text = res.GetText();
+
+            }
+            foreach (var rectangle in rois)
+            {
+                await Task.Delay(500);
+                origImage.Draw(rectangle, new Bgr(System.Drawing.Color.Red));
+
+                //textBlock.Text = Result.Text;
+            }
+            //image.Source = ImageSourceFromBitmap(grayFrame.ToBitmap<Gray, Byte>());
+            image.Source = ImageSourceFromBitmap(origImage.ToBitmap<Bgr, Byte>());
         }
     }
 }
