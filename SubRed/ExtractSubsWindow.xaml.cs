@@ -26,6 +26,8 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Configuration;
 using System.Web;
 using Tesseract;
+using System.Xml.Linq;
+using System.IO;
 
 namespace SubRed
 {
@@ -34,13 +36,15 @@ namespace SubRed
     /// </summary>
     public partial class ExtractSubsWindow : Window
     {
+        List<Subtitle> listOfSubs = new List<Subtitle>();
         public string filePath { get; set; }
+        bool isVideoOpened = false;
         public ExtractSubsWindow()
         {
             InitializeComponent();
         }
 
-        private void OpenFile_Click(object sender, RoutedEventArgs e)
+        private void OpenImage_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog op = new OpenFileDialog();
             op.Title = "Select a picture";
@@ -51,56 +55,24 @@ namespace SubRed
             {
                 image.Source = new BitmapImage(new Uri(op.FileName));
                 filePath = op.FileName;
+                isVideoOpened = false;
             }
-            /*
-             OpenFileDialog openFileDialog1 = new OpenFileDialog();
-           
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                try
-                { 
-                    _capture = null;
-                    _capture = new Capture(openFileDialog1.FileName);
-
-                    FrameRate = _capture.GetCaptureProperty(Emgu.CV.CvEnum.CAP_PROP.CV_CAP_PROP_FPS);
-                    TotalFrames = _capture.GetCaptureProperty(Emgu.CV.CvEnum.CAP_PROP.CV_CAP_PROP_FRAME_COUNT);
-                    Application.Idle += ProcessFrame ;
-                    IsPlaying = true;
-                }
-                catch (NullReferenceException excpt)
-                {
-                    MessageBox.Show(excpt.Message);
-                }
-            }
-             
-             */
         }
-
-        /*private List<Image<Bgr, Byte>> GetVideoFrames(int Time_millisecounds)
+        private void OpenVideo_Click(object sender, RoutedEventArgs e)
         {
-            List<Image<Bgr, Byte>> image_array = new List<Image<Bgr, Byte>>();
-            System.Diagnostics.Stopwatch SW = new System.Diagnostics.Stopwatch();
-
-            bool Reading = true;
-            VideoCapture _capture = new VideoCapture(fileName);
-            SW.Start();
-
-            while (Reading)
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "All Media Files|*.wav;*.aac;*.wma;*.wmv;*.avi;*.mpg;*.mpeg;*.m1v;*.mp2;*.mp3;*.mpa;*.mpe;*.m3u;*.mp4;*.mov;*.3g2;*.3gp2;*.3gp;*.3gpp;*.m4a;*.cda;*.aif;*.aifc;*.aiff;*.mid;*.midi;*.rmi;*.mkv;*.WAV;*.AAC;*.WMA;*.WMV;*.AVI;*.MPG;*.MPEG;*.M1V;*.MP2;*.MP3;*.MPA;*.MPE;*.M3U;*.MP4;*.MOV;*.3G2;*.3GP2;*.3GP;*.3GPP;*.M4A;*.CDA;*.AIF;*.AIFC;*.AIFF;*.MID;*.MIDI;*.RMI;*.MKV";
+            if (openFileDialog.ShowDialog() == true)
             {
-                Image<Bgr, Byte> frame = _capture.QueryFrame();
-                if (frame != null)
-                {
-                    image_array.Add(frame.Copy());
-                    if (SW.ElapsedMilliseconds >= Time_millisecounds) Reading = false;
-                }
-                else
-                {
-                    Reading = false;
-                }
-            }
+                FileInfo fileInfo = new FileInfo(openFileDialog.FileName);
 
-            return image_array;
-        }*/
+                //MediaElement1.Source = new Uri(fileInfo.FullName);
+                filePath = fileInfo.FullName;
+                isVideoOpened = true;
+
+                return;
+            }
+        }
 
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -122,11 +94,122 @@ namespace SubRed
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
-            Mat img = CvInvoke.Imread(filePath);
-            FindTextInFrame(img);
+            listOfSubs.Clear();
+            if (isVideoOpened)
+            {
+                var video = new Emgu.CV.VideoCapture(filePath);
+                double totalFrames = video.Get(CapProp.FrameCount);
+                double fps = video.Get(CapProp.Fps);
+
+                var frame_number = 150;
+                var prevFrame = 0;
+                var currentFrame = frame_number;
+                var minFrameForSub = fps * 1;
+
+                video.Set(CapProp.PosFrames, frame_number - 1);
+                while(video.IsOpened && currentFrame < frame_number + 3)
+                {
+                    Mat img = video.QueryFrame();
+                    var listOfRegions = FindRegions(img);
+
+                    if(listOfSubs.Count == 0)
+                    {
+                        foreach (var region in listOfRegions)
+                        {
+                            var tempimg = img.ToImage<Gray, Byte>();
+                            tempimg.ROI = region;
+                            listOfSubs.Add(new Subtitle() {
+                                text = GetRegionsText(tempimg),
+                                frameBeginNum = currentFrame,
+                                frameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                frameRegion = region
+                            });
+                        }
+                    }
+                    foreach (var region in listOfRegions)
+                    {
+                        bool IsFoundSub = false;
+                        foreach(var sub in listOfSubs)
+                        {
+                            System.Drawing.Rectangle rectIntersect = sub.frameRegion;
+                            rectIntersect.Intersect(region);
+                            if (rectIntersect.Height * rectIntersect.Width > sub.frameRegion.Height * sub.frameRegion.Width * 0.2) //пересечение более 20%
+                            {
+                                //проверяем изменился ли текст
+                                var tempimg = img.ToImage<Gray, Byte>();
+                                tempimg.ROI = region;
+                                var subTempimg = sub.frameImage.ToImage<Gray, Byte>().SmoothMedian(3).ThresholdBinary(new Gray(20), new Gray(255));
+                                CvInvoke.AbsDiff(tempimg.SmoothMedian(3).ThresholdBinary(new Gray(20), new Gray(255)), subTempimg, tempimg);
+                                
+                                Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+                                Mat hier = new Mat();
+                                CvInvoke.FindContours(tempimg, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+                                for(int i = 0; i < contours.Length; i++)
+                                    if (CvInvoke.ContourArea(contours[i]) > 250) //Если субтитр поменялся
+                                    {
+                                        var sumFrameNum = currentFrame - sub.frameBeginNum;
+                                        if (fps < sumFrameNum && fps*60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
+                                        {
+                                            //Запись в глобальную переменную субтитр
+                                        }
+
+                                        //Добавляем новый субтитр
+                                        var newTempimg = img.ToImage<Gray, Byte>();
+                                        newTempimg.ROI = region;
+                                        listOfSubs.Add(new Subtitle()
+                                        {
+                                            text = GetRegionsText(newTempimg),
+                                            frameBeginNum = currentFrame,
+                                            frameImage = newTempimg.ToBitmap<Gray, Byte>(),
+                                            frameRegion = region
+                                        });
+
+                                        IsFoundSub = true; // нашли субтитр
+                                        break;
+                                    }
+                            }
+                        }
+                        if (!IsFoundSub) // если не нашли пересечение, то потенциально новый текст
+                        {
+                            var tempimg = img.ToImage<Gray, Byte>();
+                            tempimg.ROI = region;
+                            listOfSubs.Add(new Subtitle() { 
+                                text = GetRegionsText(tempimg),
+                                frameBeginNum = currentFrame,
+                                frameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                frameRegion = region
+                            });
+                        }
+                    }
+
+                    currentFrame++;
+                }
+                if (listOfSubs.Count > 0)
+                {
+                    foreach (var sub in listOfSubs)
+                    {
+                        var sumFrameNum = currentFrame - sub.frameBeginNum;
+                        if (fps < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
+                        {
+                            //Запись в глобальную переменную субтитр
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Mat img = CvInvoke.Imread(filePath);
+                var listOfRegions = FindRegions(img);
+                foreach(var region in listOfRegions )
+                {
+                    var tempimg = img.ToImage<Gray, Byte>();
+                    tempimg.ROI = region;
+                    listOfSubs.Add(new Subtitle() { text = GetRegionsText(tempimg)});
+                }
+            }
         }
 
-        private async void FindTextInFrame(Mat img)
+        private List<System.Drawing.Rectangle> FindRegions(Mat img)
         {
             Image<Bgr, Byte> origImage = img.ToImage<Bgr, Byte>();
             Image<Gray, Byte> grayFrame = img.ToImage<Gray, Byte>();
@@ -184,7 +267,6 @@ namespace SubRed
                         }
                     }
 
-
                     if (!(rect.Height < minHeight ||
                         rect.Width < minWidth ||
                         rect.Width / rect.Height < 1.3 ||
@@ -204,39 +286,45 @@ namespace SubRed
                     }
                 }
             }
+            image.Source = ImageSourceFromBitmap(origImage.ToBitmap<Bgr, Byte>());
+            return rois;
+        }
+        public string GetRegionsText(Image<Gray, Byte> frameRegion)
+        {
+            Image<Gray, Byte> tempPartImage = frameRegion.Clone();
+            tempPartImage = tempPartImage.SmoothMedian(3);
+            tempPartImage = tempPartImage.SmoothGaussian(3);
 
-            Image<Gray, Byte> tempPartImage = img.ToImage<Gray, Byte>();
+            var laplacian = tempPartImage.Laplace(3);
             CvInvoke.ConvertScaleAbs(laplacian, tempPartImage, 1, 0);
-            var imageParts = new List<Image<Gray, byte>>(); // List of extracted image parts
+            CvInvoke.Threshold(tempPartImage, tempPartImage, 170, 255, ThresholdType.Binary);
+            int k1 = 1;
+            int k2 = 1;
+            Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
+            CvInvoke.Dilate(tempPartImage, tempPartImage, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+
+            var ocrengine = new TesseractEngine(@".\tessdata", "eng", EngineMode.TesseractAndLstm);
+            var imgPix = Pix.LoadFromMemory(ImageToByte(tempPartImage.ToBitmap<Gray, Byte>()));
+            var res = ocrengine.Process(imgPix);
+            textBlock.Text = res.GetText();
+
+            return res.GetText();
+            /*
+             var imageParts = new List<Image<Gray, byte>>(); // List of extracted image parts
             foreach (var roi in rois)
             {
                 tempPartImage.ROI = roi;
                 imageParts.Add(tempPartImage.Copy());
             }
-            
-            foreach(var imagePart in imageParts)
-            {
-                CvInvoke.Threshold(imagePart, tempPartImage, 170, 255, ThresholdType.Binary);
-                k1 = 1;
-                k2 = 1;
-                element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
-                CvInvoke.Dilate(tempPartImage, tempPartImage, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
-
-                var ocrengine = new TesseractEngine(@".\tessdata", "eng", EngineMode.TesseractAndLstm);
-                var imgPix = Pix.LoadFromMemory(ImageToByte(origImage.ToBitmap<Bgr, Byte>()));
-                var res = ocrengine.Process(imgPix);
-                textBlock.Text = res.GetText();
-
-            }
-            foreach (var rectangle in rois)
+             */
+            /*foreach (var rectangle in rois)
             {
                 await Task.Delay(500);
                 origImage.Draw(rectangle, new Bgr(System.Drawing.Color.Red));
 
                 //textBlock.Text = Result.Text;
-            }
+            }*/
             //image.Source = ImageSourceFromBitmap(grayFrame.ToBitmap<Gray, Byte>());
-            image.Source = ImageSourceFromBitmap(origImage.ToBitmap<Bgr, Byte>());
         }
     }
 }

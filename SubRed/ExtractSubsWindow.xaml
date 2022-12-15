@@ -18,7 +18,8 @@
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="2">
             <Menu x:Name="menu">
-                <MenuItem Header="Открыть изображение" Click="OpenFile_Click"></MenuItem>
+                <MenuItem Header="Открыть изображение" Click="OpenImage_Click"></MenuItem>
+                <MenuItem Header="Открыть изображение" Click="OpenVideo_Click"></MenuItem>
             </Menu>
         </Grid>
         <Grid Grid.Column="0" Grid.Row="1">
