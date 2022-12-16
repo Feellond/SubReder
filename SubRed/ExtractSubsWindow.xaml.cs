@@ -97,6 +97,7 @@ namespace SubRed
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
             listOfSubs.Clear();
+            var ocrengine = new TesseractEngine(@".\tessdata", "eng", EngineMode.Default);
             if (isVideoOpened)
             {
                 var video = new Emgu.CV.VideoCapture(filePath);
@@ -121,7 +122,7 @@ namespace SubRed
                             var tempimg = img.ToImage<Gray, Byte>();
                             tempimg.ROI = region;
                             listOfSubs.Add(new Subtitle() {
-                                text = GetRegionsText(tempimg),
+                                text = GetRegionsText(tempimg, ocrengine),
                                 frameBeginNum = currentFrame,
                                 frameImage = tempimg.ToBitmap<Gray, Byte>(),
                                 frameRegion = region
@@ -170,7 +171,7 @@ namespace SubRed
                                         newTempimg.ROI = region;
                                         listOfSubs.Add(new Subtitle()
                                         {
-                                            text = GetRegionsText(newTempimg),
+                                            text = GetRegionsText(newTempimg, ocrengine),
                                             frameBeginNum = currentFrame,
                                             frameImage = newTempimg.ToBitmap<Gray, Byte>(),
                                             frameRegion = region
@@ -186,7 +187,7 @@ namespace SubRed
                             var tempimg = img.ToImage<Gray, Byte>();
                             tempimg.ROI = region;
                             listOfSubs.Add(new Subtitle() { 
-                                text = GetRegionsText(tempimg),
+                                text = GetRegionsText(tempimg, ocrengine),
                                 frameBeginNum = currentFrame,
                                 frameImage = tempimg.ToBitmap<Gray, Byte>(),
                                 frameRegion = region
@@ -228,7 +229,7 @@ namespace SubRed
                 {
                     var tempimg = img.ToImage<Gray, Byte>();
                     tempimg.ROI = region;
-                    listOfSubs.Add(new Subtitle() { text = GetRegionsText(tempimg)});
+                    listOfSubs.Add(new Subtitle() { text = GetRegionsText(tempimg, ocrengine)});
                 }
             }
         }
@@ -313,7 +314,7 @@ namespace SubRed
             image.Source = ImageSourceFromBitmap(origImage.ToBitmap<Bgr, Byte>());
             return rois;
         }
-        public string GetRegionsText(Image<Gray, Byte> frameRegion)
+        public string GetRegionsText(Image<Gray, Byte> frameRegion, TesseractEngine ocrengine)
         {
             Image<Gray, Byte> tempPartImage = frameRegion.Clone();
             tempPartImage = tempPartImage.SmoothMedian(3);
@@ -327,7 +328,6 @@ namespace SubRed
             Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
             CvInvoke.Dilate(tempPartImage, tempPartImage, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
-            var ocrengine = new TesseractEngine(@".\tessdata", "eng", EngineMode.TesseractAndLstm);
             var imgPix = Pix.LoadFromMemory(ImageToByte(tempPartImage.ToBitmap<Gray, Byte>()));
             var res = ocrengine.Process(imgPix);
             textBlock.Text = res.GetText();
