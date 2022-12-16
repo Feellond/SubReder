@@ -36,12 +36,14 @@ namespace SubRed
     /// </summary>
     public partial class ExtractSubsWindow : Window
     {
-        List<Subtitle> listOfSubs = new List<Subtitle>();
+        public List<Subtitle> globalListOfSubs;
+        public List<Subtitle> listOfSubs = new List<Subtitle>();
         public string filePath { get; set; }
-        bool isVideoOpened = false;
-        public ExtractSubsWindow()
+        public bool isVideoOpened = false;
+        public ExtractSubsWindow(List<Subtitle> globalListOfSubs)
         {
             InitializeComponent();
+            this.globalListOfSubs = globalListOfSubs;
         }
 
         private void OpenImage_Click(object sender, RoutedEventArgs e)
@@ -151,6 +153,16 @@ namespace SubRed
                                         if (fps < sumFrameNum && fps*60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                                         {
                                             //Запись в глобальную переменную субтитр
+                                            globalListOfSubs.Add(new Subtitle()
+                                            {
+                                                text = sub.text,
+                                                frameBeginNum = sub.frameBeginNum,
+                                                frameEndNum = currentFrame,
+                                                frameImage = sub.frameImage,
+                                                frameRegion = sub.frameRegion
+                                            });
+
+                                            listOfSubs.Remove(sub);
                                         }
 
                                         //Добавляем новый субтитр
@@ -192,15 +204,27 @@ namespace SubRed
                         if (fps < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                         {
                             //Запись в глобальную переменную субтитр
+                            //Запись в глобальную переменную субтитр
+                            globalListOfSubs.Add(new Subtitle()
+                            {
+                                text = sub.text,
+                                frameBeginNum = sub.frameBeginNum,
+                                frameEndNum = currentFrame,
+                                frameImage = sub.frameImage,
+                                frameRegion = sub.frameRegion
+                            });
+
+                            listOfSubs.Remove(sub);
                         }
                     }
+                    listOfSubs.Clear();
                 }
             }
             else
             {
                 Mat img = CvInvoke.Imread(filePath);
                 var listOfRegions = FindRegions(img);
-                foreach(var region in listOfRegions )
+                foreach(var region in listOfRegions)
                 {
                     var tempimg = img.ToImage<Gray, Byte>();
                     tempimg.ROI = region;

@@ -26,6 +26,8 @@ namespace SubRed
     /// </summary>
     public partial class MainWindow : Window
     {
+        public List<Subtitle> globalListOfSubs;
+
         public readonly Dispatcher UIdispatcher;
         private void ActionDispatcher(Action action)
             => UIdispatcher.BeginInvoke(action, null);
@@ -35,6 +37,7 @@ namespace SubRed
         public MainWindow()
         {
             InitializeComponent();
+            globalListOfSubs = new List<Subtitle>();
 
             UIdispatcher = this.Dispatcher;
 
@@ -72,7 +75,7 @@ namespace SubRed
 
         private void ExtractSubsFromFile_Click(object sender, RoutedEventArgs e)
         {
-            ExtractSubsWindow ESWindow = new ExtractSubsWindow();
+            ExtractSubsWindow ESWindow = new ExtractSubsWindow(globalListOfSubs);
             ESWindow.Show();
         }
 
