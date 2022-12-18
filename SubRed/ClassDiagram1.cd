@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SubRed.Sub_formats.AssSubtitle">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAEAAQAAAAAAAAAAABAAA=</HashCode>
+      <FileName>SubFormats\AssSubtitle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SubRed.Sub_formats.SmiSubtitle">
+    <Position X="0.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAEAAQAAAAAAAAAAABAAA=</HashCode>
+      <FileName>SubFormats\SmiSubtitle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SubRed.Sub_formats.SrtSubtitle">
+    <Position X="2.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAEAAQAAAAAAAAAAABAAA=</HashCode>
+      <FileName>SubFormats\SrtSubtitle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SubRed.Sub_formats.SsaSubtitle">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAEAAQAAAAAAAAAAABAAA=</HashCode>
+      <FileName>SubFormats\SsaSubtitle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SubRed.Sub_formats.SubFormats">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAgBAAAAAAQAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SubFormats\SubFormats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SubRed.ExtractSubsWindow">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAUgAACgAAQEAAABAoAAgAwUJAAAFAAAFABDAAAIEA=</HashCode>
+      <FileName>ExtractSubsWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SubRed.MainWindow">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAhAAKAAgABkQAAABAAAAAAAIAAIAAAEAAEAAIABA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SubRed.App">
+    <Position X="7.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SubRed.Subtitle">
+    <Position X="4" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIAAAAAKAAAAAAAgAAAAAAAAAAAAAAAIAAAAAAAAAhA=</HashCode>
+      <FileName>Subtitle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

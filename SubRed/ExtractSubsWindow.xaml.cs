@@ -28,6 +28,8 @@ using System.Web;
 using Tesseract;
 using System.Xml.Linq;
 using System.IO;
+using System.Security.Policy;
+using System.Diagnostics;
 
 namespace SubRed
 {
@@ -40,6 +42,18 @@ namespace SubRed
         public List<Subtitle> listOfSubs = new List<Subtitle>();
         public string filePath { get; set; }
         public bool isVideoOpened = false;
+        public VideoCapture video;
+        public string ocrLanguage = "eng";
+
+        double totalFrames;
+        double fps;
+
+        int frame_number;
+        int prevFrame;
+        int currentFrame;
+        int minFrameForSub;
+
+
         public ExtractSubsWindow(List<Subtitle> globalListOfSubs)
         {
             InitializeComponent();
@@ -71,6 +85,17 @@ namespace SubRed
                 //MediaElement1.Source = new Uri(fileInfo.FullName);
                 filePath = fileInfo.FullName;
                 isVideoOpened = true;
+                video = new Emgu.CV.VideoCapture(filePath);
+                Mat img = video.QueryFrame();
+                image.Source = ImageSourceFromBitmap(img.ToImage<Bgr, Byte>().ToBitmap<Bgr, Byte>());
+
+                totalFrames = video.Get(CapProp.FrameCount);
+                fps = video.Get(CapProp.Fps);
+
+                frame_number = 150;
+                prevFrame = 0;
+                currentFrame = frame_number;
+                minFrameForSub = (int)(fps * 1);
 
                 return;
             }
@@ -94,104 +119,121 @@ namespace SubRed
             return (byte[])converter.ConvertTo(img, typeof(byte[]));
         }
 
-        private void RunButton_Click(object sender, RoutedEventArgs e)
+        public void SubRegionChanged(Mat img)
+        {
+            for (int index = 0; index < listOfSubs.Count; index++)
+            {
+                var sub = listOfSubs[index];
+                //проверяем изменился ли текст
+                var tempimg = img.ToImage<Gray, Byte>();
+                tempimg.ROI = sub.frameRegion;
+
+                var subTempimg = sub.frameImage.ToImage<Gray, Byte>();
+                /*subTempimg = subTempimg.SmoothMedian(3).Laplace(3);
+                CvInvoke.ConvertScaleAbs(subTempimg, subTempimg, 1, 0);
+                subTempimg = subTempimg.ThresholdBinary(new Gray(20), new Gray(255));
+                CvInvoke.AbsDiff(tempimg.SmoothMedian(3).ThresholdBinary(new Gray(20), new Gray(255)), subTempimg, tempimg);*/
+
+                //currentframe = cv2.absdiff(currentframe, previousframe)
+                CvInvoke.DestroyAllWindows();
+                CvInvoke.Imshow("output" + currentFrame.ToString(), subTempimg);
+
+                CvInvoke.AbsDiff(subTempimg, tempimg, subTempimg);
+                Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+                Mat hier = new Mat();
+                CvInvoke.FindContours(subTempimg, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+                for (int i = 0; i < contours.Length; i++)
+                    try
+                    {
+                        using (VectorOfPoint contour = contours[i])
+                            if (CvInvoke.ContourArea(contour) > 250) //Если субтитр поменялся
+                            {
+                                var sumFrameNum = currentFrame - sub.frameBeginNum;
+                                if (fps < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
+                                {
+                                    //Запись в глобальную переменную субтитр
+                                    globalListOfSubs.Add(new Subtitle()
+                                    {
+                                        text = sub.text,
+                                        frameBeginNum = sub.frameBeginNum,
+                                        frameEndNum = currentFrame,
+                                        //frameImage = sub.frameImage,
+                                        frameRegion = sub.frameRegion
+                                    });
+
+                                    listOfSubs.Remove(sub);
+                                    index--;
+                                }
+
+                                break;
+                            }
+                    }
+                    catch(Exception ex) { Debug.WriteLine(ex.Message); }
+
+            }
+        }
+
+        private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
             listOfSubs.Clear();
-            var ocrengine = new TesseractEngine(@".\tessdata", "eng", EngineMode.Default);
             if (isVideoOpened)
             {
-                var video = new Emgu.CV.VideoCapture(filePath);
-                double totalFrames = video.Get(CapProp.FrameCount);
-                double fps = video.Get(CapProp.Fps);
-
-                var frame_number = 150;
-                var prevFrame = 0;
-                var currentFrame = frame_number;
-                var minFrameForSub = fps * 1;
-
                 video.Set(CapProp.PosFrames, frame_number - 1);
-                while(video.IsOpened && currentFrame < frame_number + 3)
+                while(video.IsOpened && currentFrame < frame_number + 100)
                 {
                     Mat img = video.QueryFrame();
-                    var listOfRegions = FindRegions(img);
+                    List <System.Drawing.Rectangle> listOfRegions = new List<System.Drawing.Rectangle>();
+                    await Task.Run(() =>
+                    {
+                        SubRegionChanged(img);
+                        listOfRegions = FindRegions(img);
+                    });
 
-                    if(listOfSubs.Count == 0)
+                    if (listOfSubs.Count == 0)
                     {
                         foreach (var region in listOfRegions)
                         {
                             var tempimg = img.ToImage<Gray, Byte>();
                             tempimg.ROI = region;
-                            listOfSubs.Add(new Subtitle() {
-                                text = GetRegionsText(tempimg, ocrengine),
-                                frameBeginNum = currentFrame,
-                                frameImage = tempimg.ToBitmap<Gray, Byte>(),
-                                frameRegion = region
-                            });
+                            var text = GetRegionsText(tempimg);
+                            if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                                listOfSubs.Add(new Subtitle() {
+                                    text = text,
+                                    frameBeginNum = currentFrame,
+                                    frameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                    frameRegion = region
+                                });
                         }
                     }
-                    foreach (var region in listOfRegions)
+                    else if (listOfRegions.Count > 0)
                     {
-                        bool IsFoundSub = false;
-                        foreach(var sub in listOfSubs)
+                        foreach (var region in listOfRegions)
                         {
-                            System.Drawing.Rectangle rectIntersect = sub.frameRegion;
-                            rectIntersect.Intersect(region);
-                            if (rectIntersect.Height * rectIntersect.Width > sub.frameRegion.Height * sub.frameRegion.Width * 0.2) //пересечение более 20%
+                            bool IsFoundSub = false;
+                            foreach (var sub in listOfSubs)
                             {
-                                //проверяем изменился ли текст
+                                System.Drawing.Rectangle rectIntersect = sub.frameRegion;
+                                rectIntersect.Intersect(region);
+                                if (rectIntersect.Height * rectIntersect.Width > sub.frameRegion.Height * sub.frameRegion.Width * 0.2) //Если пересекается более чем на 20%
+                                {
+                                    IsFoundSub = true; // нашли субтитр
+                                    break;
+                                }
+                            }
+                            if (!IsFoundSub) // если не нашли пересечение, то потенциально новый текст
+                            {
                                 var tempimg = img.ToImage<Gray, Byte>();
                                 tempimg.ROI = region;
-                                var subTempimg = sub.frameImage.ToImage<Gray, Byte>().SmoothMedian(3).ThresholdBinary(new Gray(20), new Gray(255));
-                                CvInvoke.AbsDiff(tempimg.SmoothMedian(3).ThresholdBinary(new Gray(20), new Gray(255)), subTempimg, tempimg);
-                                
-                                Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
-                                Mat hier = new Mat();
-                                CvInvoke.FindContours(tempimg, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
-                                for(int i = 0; i < contours.Length; i++)
-                                    if (CvInvoke.ContourArea(contours[i]) > 250) //Если субтитр поменялся
+                                var text = GetRegionsText(tempimg);
+                                if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                                    listOfSubs.Add(new Subtitle()
                                     {
-                                        var sumFrameNum = currentFrame - sub.frameBeginNum;
-                                        if (fps < sumFrameNum && fps*60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
-                                        {
-                                            //Запись в глобальную переменную субтитр
-                                            globalListOfSubs.Add(new Subtitle()
-                                            {
-                                                text = sub.text,
-                                                frameBeginNum = sub.frameBeginNum,
-                                                frameEndNum = currentFrame,
-                                                frameImage = sub.frameImage,
-                                                frameRegion = sub.frameRegion
-                                            });
-
-                                            listOfSubs.Remove(sub);
-                                        }
-
-                                        //Добавляем новый субтитр
-                                        var newTempimg = img.ToImage<Gray, Byte>();
-                                        newTempimg.ROI = region;
-                                        listOfSubs.Add(new Subtitle()
-                                        {
-                                            text = GetRegionsText(newTempimg, ocrengine),
-                                            frameBeginNum = currentFrame,
-                                            frameImage = newTempimg.ToBitmap<Gray, Byte>(),
-                                            frameRegion = region
-                                        });
-
-                                        IsFoundSub = true; // нашли субтитр
-                                        break;
-                                    }
+                                        text = GetRegionsText(tempimg),
+                                        frameBeginNum = currentFrame,
+                                        frameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                        frameRegion = region
+                                    });
                             }
-                        }
-                        if (!IsFoundSub) // если не нашли пересечение, то потенциально новый текст
-                        {
-                            var tempimg = img.ToImage<Gray, Byte>();
-                            tempimg.ROI = region;
-                            listOfSubs.Add(new Subtitle() { 
-                                text = GetRegionsText(tempimg, ocrengine),
-                                frameBeginNum = currentFrame,
-                                frameImage = tempimg.ToBitmap<Gray, Byte>(),
-                                frameRegion = region
-                            });
                         }
                     }
 
@@ -199,23 +241,24 @@ namespace SubRed
                 }
                 if (listOfSubs.Count > 0)
                 {
-                    foreach (var sub in listOfSubs)
+                    for (int index = 0; index < listOfSubs.Count; index++)
                     {
+                        var sub = listOfSubs[index];
                         var sumFrameNum = currentFrame - sub.frameBeginNum;
                         if (fps < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                         {
-                            //Запись в глобальную переменную субтитр
                             //Запись в глобальную переменную субтитр
                             globalListOfSubs.Add(new Subtitle()
                             {
                                 text = sub.text,
                                 frameBeginNum = sub.frameBeginNum,
                                 frameEndNum = currentFrame,
-                                frameImage = sub.frameImage,
+                                //frameImage = sub.frameImage,
                                 frameRegion = sub.frameRegion
                             });
 
                             listOfSubs.Remove(sub);
+                            index--;
                         }
                     }
                     listOfSubs.Clear();
@@ -229,21 +272,28 @@ namespace SubRed
                 {
                     var tempimg = img.ToImage<Gray, Byte>();
                     tempimg.ROI = region;
-                    listOfSubs.Add(new Subtitle() { text = GetRegionsText(tempimg, ocrengine)});
+                    listOfSubs.Add(new Subtitle() { text = GetRegionsText(tempimg)});
                 }
             }
         }
+
+        int imH;
+        int imW;
+        double minHeight;
+        double minWidth;
+        int k1;
+        int k2;
 
         private List<System.Drawing.Rectangle> FindRegions(Mat img)
         {
             Image<Bgr, Byte> origImage = img.ToImage<Bgr, Byte>();
             Image<Gray, Byte> grayFrame = img.ToImage<Gray, Byte>();
 
-            var imH = grayFrame.Height;
-            var imW = grayFrame.Width;
-            var minHeight = 0.01 * imH;
-            var minWidth = 0.01 * imW;
-            var maxHeight = 100;
+            imH = grayFrame.Height;
+            imW = grayFrame.Width;
+            minHeight = 0.01 * imH;
+            minWidth = 0.01 * imW;
+            //var maxHeight = 100;
 
             grayFrame = grayFrame.SmoothMedian(3);
             grayFrame = grayFrame.SmoothGaussian(3);
@@ -256,8 +306,8 @@ namespace SubRed
             Mat kernel1 = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(5, 5), new System.Drawing.Point(1, 1));
             grayFrame = grayFrame.MorphologyEx(MorphOp.Gradient, kernel1, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
-            int k1 = imH / 30;
-            int k2 = imW / 70;
+            k1 = imH / 30;
+            k2 = imW / 70;
             Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
             CvInvoke.Dilate(grayFrame, grayFrame, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
@@ -309,16 +359,32 @@ namespace SubRed
                         }
                         rois.Add(rect);
                     }
+
+                    tempImg.Dispose();
                 }
             }
-            image.Source = ImageSourceFromBitmap(origImage.ToBitmap<Bgr, Byte>());
+            //image.Source = ImageSourceFromBitmap(origImage.ToBitmap<Bgr, Byte>());
+            origImage.Dispose();
+            grayFrame.Dispose();
+            laplacian.Dispose();
+            kernel1.Dispose();
+            element.Dispose();
+            hier.Dispose();
+            contours.Dispose();
+            //Force garbage collection.
+            GC.Collect();
+
+            // Wait for all finalizers to complete before continuing.
+            GC.WaitForPendingFinalizers();
+
+
             return rois;
         }
-        public string GetRegionsText(Image<Gray, Byte> frameRegion, TesseractEngine ocrengine)
+        public string GetRegionsText(Image<Gray, Byte> frameRegion)
         {
             Image<Gray, Byte> tempPartImage = frameRegion.Clone();
             tempPartImage = tempPartImage.SmoothMedian(3);
-            tempPartImage = tempPartImage.SmoothGaussian(3);
+            //tempPartImage = tempPartImage.SmoothGaussian(3);
 
             var laplacian = tempPartImage.Laplace(3);
             CvInvoke.ConvertScaleAbs(laplacian, tempPartImage, 1, 0);
@@ -328,27 +394,20 @@ namespace SubRed
             Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
             CvInvoke.Dilate(tempPartImage, tempPartImage, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
+            //image.Source = ImageSourceFromBitmap(tempPartImage.ToBitmap<Gray, Byte>());
+            var ocrengine = new TesseractEngine(@".\tessdata", ocrLanguage, EngineMode.Default);
             var imgPix = Pix.LoadFromMemory(ImageToByte(tempPartImage.ToBitmap<Gray, Byte>()));
             var res = ocrengine.Process(imgPix);
-            textBlock.Text = res.GetText();
+            var returnText = res.GetText();
+            textBlock.Text = returnText;
 
-            return res.GetText();
-            /*
-             var imageParts = new List<Image<Gray, byte>>(); // List of extracted image parts
-            foreach (var roi in rois)
-            {
-                tempPartImage.ROI = roi;
-                imageParts.Add(tempPartImage.Copy());
-            }
-             */
-            /*foreach (var rectangle in rois)
-            {
-                await Task.Delay(500);
-                origImage.Draw(rectangle, new Bgr(System.Drawing.Color.Red));
+            tempPartImage.Dispose();
+            laplacian.Dispose();
+            element.Dispose();
+            ocrengine.Dispose();
+            imgPix.Dispose();
 
-                //textBlock.Text = Result.Text;
-            }*/
-            //image.Source = ImageSourceFromBitmap(grayFrame.ToBitmap<Gray, Byte>());
+            return returnText;
         }
     }
 }
