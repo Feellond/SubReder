@@ -53,11 +53,17 @@ namespace SubRed
         int currentFrame;
         int minFrameForSub;
 
+        public void ViewGrid()
+        {
+            //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
+            this.SubtitleGrid.ItemsSource = globalListOfSubs;
+        }
 
         public ExtractSubsWindow(List<Subtitle> globalListOfSubs)
         {
             InitializeComponent();
             this.globalListOfSubs = globalListOfSubs;
+            ViewGrid();
         }
 
         private void OpenImage_Click(object sender, RoutedEventArgs e)
@@ -175,6 +181,7 @@ namespace SubRed
 
         private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
+            globalListOfSubs.Clear();
             listOfSubs.Clear();
             if (isVideoOpened)
             {
@@ -275,6 +282,8 @@ namespace SubRed
                     listOfSubs.Add(new Subtitle() { text = GetRegionsText(tempimg)});
                 }
             }
+
+            ViewGrid();
         }
 
         int imH;

@@ -37,8 +37,15 @@
             <Button x:Name="runButton" Content="Run" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunButton_Click"/>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="1">
-            <DataGrid x:Name="SubtitleTable">
-
+            <DataGrid x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Item Category" Binding="{Binding begin}" Width="80"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Product" Binding="{Binding end}" Width="80"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="UnitPrice" Binding="{Binding frameBeginNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="UnitPrice" Binding="{Binding frameEndNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="UnitPrice" Binding="{Binding text}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
+                </DataGrid.Columns>
             </DataGrid>
         </Grid>
     </Grid>

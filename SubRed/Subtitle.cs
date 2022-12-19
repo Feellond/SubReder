@@ -11,18 +11,17 @@ namespace SubRed
     {
         public TimeSpan start { get; set; }
         public TimeSpan end { get; set; }
-        public TimeSpan timeStamp { get; set; }
-        public string text { get; set; }
+        public TimeSpan duration { get; set; }
         public int frameBeginNum { get; set; }
         public int frameEndNum { get; set; }
         public System.Drawing.Rectangle frameRegion { get; set; }
         public Bitmap frameImage { get; set; }
-
+        public string text { get; set; }
         public Subtitle()
         {
             start = TimeSpan.Zero;
             end = TimeSpan.Zero;
-            timeStamp = TimeSpan.Zero;
+            duration = TimeSpan.Zero;
             text = string.Empty;
         }
     }
