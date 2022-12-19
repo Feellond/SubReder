@@ -30,6 +30,7 @@ using System.Xml.Linq;
 using System.IO;
 using System.Security.Policy;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace SubRed
 {
@@ -56,13 +57,16 @@ namespace SubRed
         public void ViewGrid()
         {
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
+            this.SubtitleGrid.ItemsSource = null;
             this.SubtitleGrid.ItemsSource = globalListOfSubs;
+            
         }
 
         public ExtractSubsWindow(List<Subtitle> globalListOfSubs)
         {
             InitializeComponent();
             this.globalListOfSubs = globalListOfSubs;
+
             ViewGrid();
         }
 
@@ -408,7 +412,6 @@ namespace SubRed
             var imgPix = Pix.LoadFromMemory(ImageToByte(tempPartImage.ToBitmap<Gray, Byte>()));
             var res = ocrengine.Process(imgPix);
             var returnText = res.GetText();
-            textBlock.Text = returnText;
 
             tempPartImage.Dispose();
             laplacian.Dispose();

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="ExtractSubsWindow" Height="521" Width="800">
+        Title="ExtractSubsWindow" Height="552" Width="960">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,28 +23,30 @@
             </Menu>
         </Grid>
         <Grid Grid.Column="0" Grid.Row="1">
-            <DockPanel Width="100"/>
+            <DockPanel Width="250"/>
         </Grid>
         <Grid Grid.Column="1" Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition MinHeight="420" Height="*"/>
                 <RowDefinition Height="31"/>
             </Grid.RowDefinitions>
-            <Image Grid.Row="0" x:Name="image" Margin="0,0,0,33"/>
-            <TextBlock Grid.Row="1" x:Name="textBlock" TextWrapping="Wrap" Text="TextBlock" HorizontalAlignment="Center" Width="Auto" Height="31" VerticalAlignment="Top"/>
+            <Image Grid.Row="0" x:Name="image"/>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="0">
-            <Button x:Name="runButton" Content="Run" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunButton_Click"/>
+            <Button x:Name="runButton" Content="Run" HorizontalAlignment="Center" Height="30" VerticalAlignment="Center" Click="RunButton_Click" Width="52"/>
         </Grid>
-        <Grid Grid.Row="2" Grid.Column="1">
-            <DataGrid x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False">
+        <Grid Grid.Row="2" Grid.Column="1" Panel.ZIndex="1" MinHeight="100" MaxHeight="100">
+            <DataGrid x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
+                        ScrollViewer.CanContentScroll="True" 
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Item Category" Binding="{Binding begin}" Width="80"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Product" Binding="{Binding end}" Width="80"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="UnitPrice" Binding="{Binding frameBeginNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="UnitPrice" Binding="{Binding frameEndNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="UnitPrice" Binding="{Binding text}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Begin" Binding="{Binding begin}" Width="80"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="End" Binding="{Binding end}" Width="80"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

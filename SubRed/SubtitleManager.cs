@@ -45,11 +45,11 @@ namespace SubRed
             _currentTimeStamp = timestamp;
 
             // First entry not hit yet
-            if (_currentIndex < 0 && timestamp < _entries[0].timeStamp)
+            if (_currentIndex < 0 && timestamp < _entries[0].duration)
                 return;
 
             // Try to find a later entry than the current to be displayed
-            while (_currentIndex + 1 < _entries.Count && _entries[_currentIndex + 1].timeStamp < timestamp)
+            while (_currentIndex + 1 < _entries.Count && _entries[_currentIndex + 1].duration < timestamp)
             {
                 _currentIndex++;
             }
@@ -64,7 +64,7 @@ namespace SubRed
             // Look for the last entry that is "earlier" than the specified timestamp
             for (int i = _entries.Count - 1; i >= 0; i--)
             {
-                if (_entries[i].timeStamp < timestamp)
+                if (_entries[i].duration < timestamp)
                     return i;
             }
 
