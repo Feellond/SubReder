@@ -44,7 +44,7 @@ namespace SubRed
         public string filePath { get; set; }
         public bool isVideoOpened = false;
         public VideoCapture video;
-        public string ocrLanguage = "eng";
+        public string ocrLanguage = "rus";
 
         double totalFrames;
         double fps;
@@ -139,12 +139,7 @@ namespace SubRed
                 tempimg.ROI = sub.frameRegion;
 
                 var subTempimg = sub.frameImage.ToImage<Gray, Byte>();
-                /*subTempimg = subTempimg.SmoothMedian(3).Laplace(3);
-                CvInvoke.ConvertScaleAbs(subTempimg, subTempimg, 1, 0);
-                subTempimg = subTempimg.ThresholdBinary(new Gray(20), new Gray(255));
-                CvInvoke.AbsDiff(tempimg.SmoothMedian(3).ThresholdBinary(new Gray(20), new Gray(255)), subTempimg, tempimg);*/
 
-                //currentframe = cv2.absdiff(currentframe, previousframe)
                 CvInvoke.DestroyAllWindows();
                 CvInvoke.Imshow("output" + currentFrame.ToString(), subTempimg);
 
@@ -159,7 +154,7 @@ namespace SubRed
                             if (CvInvoke.ContourArea(contour) > 250) //Если субтитр поменялся
                             {
                                 var sumFrameNum = currentFrame - sub.frameBeginNum;
-                                if (fps < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
+                                if (fps / 2 < sumFrameNum && fps * 240 > sumFrameNum) // Если субтитр дольше секунды и меньше 3 минут
                                 {
                                     //Запись в глобальную переменную субтитр
                                     globalListOfSubs.Add(new Subtitle()
@@ -283,7 +278,12 @@ namespace SubRed
                 {
                     var tempimg = img.ToImage<Gray, Byte>();
                     tempimg.ROI = region;
-                    listOfSubs.Add(new Subtitle() { text = GetRegionsText(tempimg)});
+                    var text = GetRegionsText(tempimg);
+                    if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                        globalListOfSubs.Add(new Subtitle()
+                        {
+                            text = text
+                        });
                 }
             }
 
@@ -299,7 +299,6 @@ namespace SubRed
 
         private List<System.Drawing.Rectangle> FindRegions(Mat img)
         {
-            Image<Bgr, Byte> origImage = img.ToImage<Bgr, Byte>();
             Image<Gray, Byte> grayFrame = img.ToImage<Gray, Byte>();
 
             imH = grayFrame.Height;
@@ -308,8 +307,8 @@ namespace SubRed
             minWidth = 0.01 * imW;
             //var maxHeight = 100;
 
-            grayFrame = grayFrame.SmoothMedian(3);
             grayFrame = grayFrame.SmoothGaussian(3);
+            grayFrame = grayFrame.SmoothMedian(3);
 
             var laplacian = grayFrame.Laplace(3);
             CvInvoke.ConvertScaleAbs(laplacian, grayFrame, 1, 0);
@@ -321,14 +320,14 @@ namespace SubRed
 
             k1 = imH / 30;
             k2 = imW / 70;
-            Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
-            CvInvoke.Dilate(grayFrame, grayFrame, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+            kernel1 = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
+            CvInvoke.Dilate(grayFrame, grayFrame, kernel1, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
 
             k1 = imH / 20;
             k2 = imW / 65;
-            element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
-            CvInvoke.Erode(grayFrame, grayFrame, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+            kernel1 = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
+            CvInvoke.Erode(grayFrame, grayFrame, kernel1, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
 
             Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
@@ -345,15 +344,8 @@ namespace SubRed
                     Image<Gray, Byte> tempImg = img.ToImage<Gray, Byte>();
                     grayFrame.CopyTo(tempImg);
 
-                    int countWhitePixels = 0;
-                    for (int i1 = 0; i1 < tempImg.Rows; i1++)
-                    {
-                        for (int j1 = 0; j1 < tempImg.Cols; j1++)
-                        {
-                            if (tempImg.Data[i1, j1, 0] == 255)
-                                countWhitePixels++;
-                        }
-                    }
+                    int countWhitePixels = CvInvoke.CountNonZero(tempImg);
+                    
 
                     if (!(rect.Height < minHeight ||
                         rect.Width < minWidth ||
@@ -377,11 +369,9 @@ namespace SubRed
                 }
             }
             //image.Source = ImageSourceFromBitmap(origImage.ToBitmap<Bgr, Byte>());
-            origImage.Dispose();
             grayFrame.Dispose();
             laplacian.Dispose();
             kernel1.Dispose();
-            element.Dispose();
             hier.Dispose();
             contours.Dispose();
             //Force garbage collection.
@@ -396,16 +386,55 @@ namespace SubRed
         public string GetRegionsText(Image<Gray, Byte> frameRegion)
         {
             Image<Gray, Byte> tempPartImage = frameRegion.Clone();
+            Image<Gray, Byte> tempLaplace = frameRegion.Clone();
             tempPartImage = tempPartImage.SmoothMedian(3);
             //tempPartImage = tempPartImage.SmoothGaussian(3);
 
-            var laplacian = tempPartImage.Laplace(3);
-            CvInvoke.ConvertScaleAbs(laplacian, tempPartImage, 1, 0);
-            CvInvoke.Threshold(tempPartImage, tempPartImage, 170, 255, ThresholdType.Binary);
-            int k1 = 1;
+            float[,] matrix = new float[3, 3] {
+                { 0, -1, 0},
+                { -1, 4, -1},
+                { 0, -1, 0}
+            };
+            ConvolutionKernelF matrixKernel = new ConvolutionKernelF(matrix);
+
+            //Mat kernel = new Mat(*size, DepthType.Default, *data);
+            //CvInvoke.Laplacian(tempPartImage, tempPartImage, DepthType.Default, 3);
+            CvInvoke.DestroyAllWindows();
+            CvInvoke.Imshow("outputGray", tempPartImage);
+            //var laplace = tempPartImage.Laplace(3);
+            //CvInvoke.ConvertScaleAbs(laplace, tempLaplace, 1, 0);
+
+            CvInvoke.Filter2D(tempPartImage, tempLaplace, matrixKernel, new System.Drawing.Point(-1, -1));
+
+            CvInvoke.Imshow("outputLaplace", tempLaplace);
+
+            //CvInvoke.Threshold(tempPartImage, tempPartImage, 255, 255, ThresholdType.Binary);
+            CvInvoke.AdaptiveThreshold(tempLaplace, tempPartImage, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 7, 20);
+            CvInvoke.Imshow("outputThresh", tempPartImage);
+
+            //Mat white = Mat.Ones(tempLaplace.Rows, tempLaplace.Cols, DepthType.Default, 1);
+            //Mat dst = new Mat();
+            //CvInvoke.AbsDiff(white, tempLaplace.Mat, dst);
+
+            tempPartImage = tempPartImage.Not();
+            CvInvoke.Imshow("outputNOT", tempPartImage);
+            //CvInvoke.AbsDiff(tempPartImage, tempLaplace, tempPartImage);
+            //CvInvoke.Imshow("outputABSDiff", tempPartImage);
+
+            /*int k1 = 1;
             int k2 = 1;
-            Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
-            CvInvoke.Dilate(tempPartImage, tempPartImage, element, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+            Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
+            CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+            CvInvoke.Imshow("outputDilate", tempPartImage);*/
+
+            /*tempPartImage = tempPartImage.SmoothGaussian(3);
+            CvInvoke.Threshold(tempPartImage, tempPartImage, 10, 1, ThresholdType.Binary);
+            //CvInvoke.Imshow("output??", tempPartImage);
+            CvInvoke.Multiply(tempPartImage, tempLaplace, tempPartImage, 100);
+            CvInvoke.Imshow("output??Mul", tempPartImage);*/
+
+            //CvInvoke.Threshold(tempPartImage, tempPartImage, 0, 255, ThresholdType.Binary);
+            //CvInvoke.Imshow("output??THRESH", tempPartImage);
 
             //image.Source = ImageSourceFromBitmap(tempPartImage.ToBitmap<Gray, Byte>());
             var ocrengine = new TesseractEngine(@".\tessdata", ocrLanguage, EngineMode.Default);
@@ -414,8 +443,6 @@ namespace SubRed
             var returnText = res.GetText();
 
             tempPartImage.Dispose();
-            laplacian.Dispose();
-            element.Dispose();
             ocrengine.Dispose();
             imgPix.Dispose();
 

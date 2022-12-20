@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="ExtractSubsWindow" Height="552" Width="960">
+        Title="ExtractSubsWindow" Height="552" Width="1440">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -46,7 +46,7 @@
                     <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="85"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="500"  FontFamily="Tahoma"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
