@@ -15,6 +15,8 @@ namespace SubRed
         public int frameBeginNum { get; set; }
         public int frameEndNum { get; set; }
         public System.Drawing.Rectangle frameRegion { get; set; }
+        public int xCoord { get; set; }
+        public int yCoord { get; set; }
         public Bitmap frameImage { get; set; }
         public string text { get; set; }
         public Subtitle()
