@@ -18,7 +18,7 @@ namespace SubRed
 {
     static class SubtitleOCR
     {
-        public static string ocrLanguage = "rus";
+        public static string ocrLanguage = "eng";
 
         public static int imH;
         public static int imW;
@@ -55,6 +55,40 @@ namespace SubRed
             ImageConverter converter = new ImageConverter();
             return (byte[])converter.ConvertTo(img, typeof(byte[]));
         }
+
+        public static void OCRLanguageChange(string language)
+        {
+            switch (language)
+            {
+                case "Английский":
+                case "English":
+                    ocrLanguage = "eng";
+                    break;
+                case "Русский":
+                case "Russian":
+                    ocrLanguage = "rus";
+                    break;
+                default:
+                    ocrLanguage = "eng";
+                    break;
+            }
+        }
+
+        public static void ReturnDefaultValues()
+        {
+            ocrLanguage = "eng";
+
+            gausSeed = 3;
+            meanSeed = 3;
+            laplaceSeed = 3;
+            thresholdLaplace = 170;
+            morphSize = 5;
+
+            dilateHeight = 30;
+            dilateWidth = 70;
+            erodeHeight = 20;
+            erodeWidth = 65;
+    }
 
         public static List<System.Drawing.Rectangle> FindRegions(Mat img)
         {

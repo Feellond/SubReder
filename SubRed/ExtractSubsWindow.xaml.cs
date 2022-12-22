@@ -40,6 +40,7 @@ namespace SubRed
     public partial class ExtractSubsWindow : Window
     {
         public List<Subtitle> globalListOfSubs;
+        public List<Subtitle> tempGlobalListOfSubs;
         public List<Subtitle> listOfSubs = new List<Subtitle>();
         public string filePath { get; set; }
         public bool isVideoOpened = false;
@@ -57,7 +58,7 @@ namespace SubRed
         {
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
             this.SubtitleGrid.ItemsSource = null;
-            this.SubtitleGrid.ItemsSource = globalListOfSubs;
+            this.SubtitleGrid.ItemsSource = tempGlobalListOfSubs;
             
         }
 
@@ -133,7 +134,7 @@ namespace SubRed
                     }
                 }
             }
-            catch (Exception ex) { MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning); }
+            catch (Exception ex) { MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception", MessageBoxButton.OK, MessageBoxImage.Warning); }
 
         }
 
@@ -165,7 +166,7 @@ namespace SubRed
                             if (fps / 2 < sumFrameNum && fps * 240 > sumFrameNum) // Если субтитр дольше секунды и меньше 3 минут
                             {
                                 //Запись в глобальную переменную субтитр
-                                globalListOfSubs.Add(new Subtitle()
+                                tempGlobalListOfSubs.Add(new Subtitle()
                                 {
                                     text = sub.text,
                                     frameBeginNum = sub.frameBeginNum,
@@ -188,7 +189,16 @@ namespace SubRed
 
         private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
-            globalListOfSubs.Clear();
+            try
+            {
+                SetOCRValues();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            tempGlobalListOfSubs.Clear();
             listOfSubs.Clear();
             Mat previousFrame = new Mat();
             if (filePath != null)
@@ -266,7 +276,7 @@ namespace SubRed
                             if (fps / 2 < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                             {
                                 //Запись в глобальную переменную субтитр
-                                globalListOfSubs.Add(new Subtitle()
+                                tempGlobalListOfSubs.Add(new Subtitle()
                                 {
                                     text = sub.text,
                                     frameBeginNum = sub.frameBeginNum,
@@ -292,7 +302,7 @@ namespace SubRed
                         tempimg.ROI = region;
                         var text = SubtitleOCR.GetRegionsTextTesseract(tempimg);
                         if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
-                            globalListOfSubs.Add(new Subtitle()
+                            tempGlobalListOfSubs.Add(new Subtitle()
                             {
                                 text = text,
                                 xCoord = region.X,
@@ -303,6 +313,101 @@ namespace SubRed
 
                 ViewGrid();
             }
+        }
+
+        private static readonly Regex _regex = new Regex("[^0-9.-]+"); //regex that matches disallowed text
+        private void PreviewTextInputNumbers(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+        public static bool IsValid(string name, string str)
+        {
+            int i;
+            switch (name)
+            {
+                case "textBoxGausSeed":
+                case "textBoxMeanSeed":
+                case "textBoxLaplaceSeed":
+                case "textBoxMorphSize":
+                case "textBoxDilateHeight":
+                case "textBoxDilateWidth":
+                case "textBoxErodeHeight":
+                case "textBoxErodeWidth":
+                    return int.TryParse(str, out i) && i >= 1 && i <= 9999 && i % 2 == 1;
+                case "textBoxThresholdLaplace":
+                    return int.TryParse(str, out i) && i >= 0 && i <= 255;
+                default:
+                    return false;
+            }
+            
+        }
+
+        private void SetOCRValues()
+        {
+            SubtitleOCR.gausSeed = int.Parse(textBoxGausSeed.Text);
+            SubtitleOCR.meanSeed = int.Parse(textBoxMeanSeed.Text);
+            SubtitleOCR.laplaceSeed = int.Parse(textBoxLaplaceSeed.Text);
+            SubtitleOCR.morphSize = int.Parse(textBoxMorphSize.Text);
+            SubtitleOCR.thresholdLaplace = int.Parse(textBoxThresholdLaplace.Text);
+            SubtitleOCR.dilateHeight = int.Parse(textBoxDilateHeight.Text);
+            SubtitleOCR.dilateWidth = int.Parse(textBoxDilateWidth.Text);
+            SubtitleOCR.erodeHeight = int.Parse(textBoxErodeHeight.Text);
+            SubtitleOCR.erodeWidth = int.Parse(textBoxErodeWidth.Text);
+
+            ComboBoxItem ComboItem = (ComboBoxItem)comboBoxLanguage.SelectedItem;
+            SubtitleOCR.OCRLanguageChange(ComboItem.Name);
+        }
+
+        private void defaultButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleOCR.ReturnDefaultValues();
+            textBoxGausSeed.Text = SubtitleOCR.gausSeed.ToString();
+            textBoxMeanSeed.Text = SubtitleOCR.meanSeed.ToString();
+            textBoxLaplaceSeed.Text = SubtitleOCR.laplaceSeed.ToString();
+            textBoxMorphSize.Text = SubtitleOCR.morphSize.ToString();
+            textBoxThresholdLaplace.Text = SubtitleOCR.thresholdLaplace.ToString();
+            textBoxDilateHeight.Text = SubtitleOCR.dilateHeight.ToString();
+            textBoxDilateWidth.Text = SubtitleOCR.dilateWidth.ToString();
+            textBoxErodeHeight.Text = SubtitleOCR.erodeHeight.ToString();
+            textBoxErodeWidth.Text = SubtitleOCR.erodeWidth.ToString();
+
+            var lang = SubtitleOCR.ocrLanguage;
+            switch (lang)
+            {
+                case "eng":
+                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Английский")];
+                    break;
+                case "rus":
+                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Русский")];
+                    break;
+                default:
+                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[0];
+                    break;
+            }
+        }
+
+        private void okButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (tempGlobalListOfSubs.Count > 0)
+            {
+                globalListOfSubs.Clear();
+                globalListOfSubs.AddRange(tempGlobalListOfSubs);
+                CloseWindow();
+            }
+        }
+
+        private void CloseWindow()
+        {
+            GC.Collect(); // find finalizable objects
+            GC.WaitForPendingFinalizers(); // wait until finalizers executed
+            GC.Collect(); // collect finalized objects
+            this.Close();
+        }
+
+        private void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            CloseWindow();
         }
     }
 }
