@@ -20,6 +20,7 @@
             <Menu x:Name="menu">
                 <MenuItem Header="Открыть изображение" Click="OpenImage_Click"></MenuItem>
                 <MenuItem Header="Открыть видео" Click="OpenVideo_Click"></MenuItem>
+                <MenuItem Header="Сохранить Json" Click="SaveJson_Click"></MenuItem>
             </Menu>
         </Grid>
         <Grid Grid.Column="0" Grid.Row="1">
@@ -154,8 +155,8 @@
                 </Grid>
                 <Grid Grid.Row="1">
                     <ComboBox Name="comboBoxLanguage">
-                        <ComboBoxItem IsSelected="True">Английский</ComboBoxItem>
-                        <ComboBoxItem>Русский</ComboBoxItem>
+                        <ComboBoxItem Name="English" IsSelected="True">Английский</ComboBoxItem>
+                        <ComboBoxItem Name="Russian">Русский</ComboBoxItem>
                     </ComboBox>
                 </Grid>
             </Grid>
@@ -165,6 +166,7 @@
         </Grid>
         <Grid Grid.Column="1" Grid.Row="1" MinWidth="800" MinHeight="400">
             <Image Grid.Row="0" x:Name="image"/>
+            <ProgressBar x:Name="imageProgressBar" HorizontalAlignment="Center" Height="13" VerticalAlignment="Top" MinWidth="800" Visibility="Hidden" Minimum="0"/>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="0">
             <Button x:Name="runButton" Content="Запуск" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunButton_Click" Width="52" Margin="67,10,8,0"/>

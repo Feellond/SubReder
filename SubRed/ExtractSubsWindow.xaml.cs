@@ -31,6 +31,7 @@ using System.IO;
 using System.Security.Policy;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
 namespace SubRed
 {
@@ -39,8 +40,8 @@ namespace SubRed
     /// </summary>
     public partial class ExtractSubsWindow : Window
     {
-        public List<Subtitle> globalListOfSubs;
-        public List<Subtitle> tempGlobalListOfSubs;
+        public List<Subtitle> globalListOfSubs = new List<Subtitle>();
+        public List<Subtitle> tempGlobalListOfSubs = new List<Subtitle>();
         public List<Subtitle> listOfSubs = new List<Subtitle>();
         public string filePath { get; set; }
         public bool isVideoOpened = false;
@@ -52,22 +53,43 @@ namespace SubRed
         int frame_number;
         int prevFrame;
         int currentFrame;
-        int minFrameForSub;
 
         public void ViewGrid()
         {
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
             this.SubtitleGrid.ItemsSource = null;
             this.SubtitleGrid.ItemsSource = tempGlobalListOfSubs;
-            
+
+            imageProgressBar.Visibility = Visibility.Hidden;
         }
 
         public ExtractSubsWindow(List<Subtitle> globalListOfSubs)
         {
             InitializeComponent();
-            this.globalListOfSubs = globalListOfSubs;
+            globalListOfSubs = new List<Subtitle>();
+            tempGlobalListOfSubs = new List<Subtitle>();
+            this.globalListOfSubs.AddRange(globalListOfSubs);
+            this.tempGlobalListOfSubs.AddRange(globalListOfSubs);
+
 
             ViewGrid();
+        }
+
+        private void SaveJson_Click(object sender, RoutedEventArgs e)
+        {
+            string json = JsonConvert.SerializeObject(tempGlobalListOfSubs);
+            try
+            {
+                System.IO.File.WriteAllText(@"subtitleJson.txt", json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+            }
+            finally
+            {
+                Console.WriteLine("Executing finally block.");
+            }
         }
 
         private void OpenImage_Click(object sender, RoutedEventArgs e)
@@ -102,10 +124,9 @@ namespace SubRed
                 totalFrames = video.Get(CapProp.FrameCount);
                 fps = video.Get(CapProp.Fps);
 
-                frame_number = 150;
+                frame_number = 0;
                 prevFrame = 0;
                 currentFrame = frame_number;
-                minFrameForSub = (int)(fps * 1);
 
                 return;
             }
@@ -113,28 +134,26 @@ namespace SubRed
 
         public void FrameChanged(Mat newFrame, Mat previousFrame)
         {
-            try
+            if (!previousFrame.IsEmpty)
             {
-                if (!previousFrame.IsEmpty)
+                var tempNewFrame = newFrame.ToImage<Gray, Byte>();
+                var tempPrevFrame = previousFrame.ToImage<Gray, Byte>();
+                CvInvoke.AbsDiff(tempPrevFrame, tempNewFrame, tempPrevFrame);
+                CvInvoke.Threshold(tempPrevFrame, tempPrevFrame, 20, 255, ThresholdType.Binary);
+                Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
+                Mat hier = new Mat();
+                CvInvoke.FindContours(tempPrevFrame, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+                var subChangedControlValue = tempPrevFrame.Height * tempPrevFrame.Width * 0.5;
+                for (int i = 0; i < contours.Size; i++)
                 {
-                    var tempimg = newFrame.ToImage<Gray, Byte>();
-                    CvInvoke.AbsDiff(previousFrame, newFrame, tempimg);
-                    Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
-                    Mat hier = new Mat();
-                    CvInvoke.FindContours(tempimg, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
-                    for (int i = 0; i < contours.Length; i++)
+                    VectorOfPoint contour = contours[i];
+                    if (CvInvoke.ContourArea(contour) > subChangedControlValue) //Если кадр поменялся
                     {
-                        var subChangedControlValue = tempimg.Height * tempimg.Width * 0.5;
-                        using (VectorOfPoint contour = contours[i])
-                            if (CvInvoke.ContourArea(contour) > subChangedControlValue) //Если кадр поменялся
-                            {
-                                SubRegionChanged(newFrame);
-                                break;
-                            }
+                        SubRegionChanged(newFrame);
+                        break;
                     }
                 }
             }
-            catch (Exception ex) { MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception", MessageBoxButton.OK, MessageBoxImage.Warning); }
 
         }
 
@@ -150,20 +169,22 @@ namespace SubRed
                 var subTempimg = sub.frameImage.ToImage<Gray, Byte>();
 
                 CvInvoke.DestroyAllWindows();
-                CvInvoke.Imshow("output" + currentFrame.ToString(), subTempimg);
 
                 CvInvoke.AbsDiff(subTempimg, tempimg, subTempimg);
+                CvInvoke.Threshold(subTempimg, subTempimg, 20, 255, ThresholdType.Binary);
                 var contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
                 var hier = new Mat();
                 CvInvoke.FindContours(subTempimg, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
-                for (int j = 0; j < contours.Length; j++)
+
+                bool isChanged = false;
+                var subChangedControlValue = sub.frameRegion.Height * sub.frameRegion.Width * 0.3;
+                for (int j = 0; j < contours.Size; j++)
                 {
-                    var subChangedControlValue = sub.frameRegion.Height * sub.frameRegion.Width * 0.3;
                     using (VectorOfPoint contour = contours[j])
                         if (CvInvoke.ContourArea(contour) > subChangedControlValue) //Если субтитр поменялся
                         {
                             var sumFrameNum = currentFrame - sub.frameBeginNum;
-                            if (fps / 2 < sumFrameNum && fps * 240 > sumFrameNum) // Если субтитр дольше секунды и меньше 3 минут
+                            if (fps / 2 < sumFrameNum && fps * 120 > sumFrameNum) // Если субтитр дольше секунды и меньше 2 минут
                             {
                                 //Запись в глобальную переменную субтитр
                                 tempGlobalListOfSubs.Add(new Subtitle()
@@ -179,16 +200,23 @@ namespace SubRed
 
                                 listOfSubs.Remove(sub);
                                 index--;
+                                isChanged = true;
                             }
 
                             break;
                         }
+                }
+
+                if (!isChanged)
+                {
+                    listOfSubs[index].frameImage = tempimg.ToBitmap<Gray, byte>();
                 }
             }
         }
 
         private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
+            CvInvoke.DestroyAllWindows();
             try
             {
                 SetOCRValues();
@@ -201,18 +229,27 @@ namespace SubRed
             tempGlobalListOfSubs.Clear();
             listOfSubs.Clear();
             Mat previousFrame = new Mat();
+            frame_number = 0;
+            currentFrame = frame_number;
             if (filePath != null)
             {
                 if (isVideoOpened)
                 {
+                    imageProgressBar.Value = 0;
+                    imageProgressBar.Visibility = Visibility.Visible;
+                    imageProgressBar.Maximum = totalFrames;
+
                     video.Set(CapProp.PosFrames, frame_number - 1);
-                    while (video.IsOpened && currentFrame < frame_number + 100)
+                    while (video.IsOpened)
                     {
                         Mat newFrame = video.QueryFrame();
+                        if (newFrame == null) 
+                            break;
                         List<System.Drawing.Rectangle> listOfRegions = new List<System.Drawing.Rectangle>();
                         await Task.Run(() =>
                         {
-                            FrameChanged(newFrame, previousFrame);
+                        //FrameChanged(newFrame, previousFrame);
+                        SubRegionChanged(newFrame);
                             listOfRegions = SubtitleOCR.FindRegions(newFrame);
                         });
 
@@ -265,7 +302,9 @@ namespace SubRed
                             }
                         }
 
+                        previousFrame = newFrame.Clone();
                         currentFrame++;
+                        imageProgressBar.Value = currentFrame;
                     }
                     if (listOfSubs.Count > 0)
                     {
@@ -282,7 +321,9 @@ namespace SubRed
                                     frameBeginNum = sub.frameBeginNum,
                                     frameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,
-                                    frameRegion = sub.frameRegion
+                                    frameRegion = sub.frameRegion,
+                                    xCoord = sub.frameRegion.X,
+                                    yCoord = sub.frameRegion.Y
                                 });
 
                                 listOfSubs.Remove(sub);
@@ -296,11 +337,13 @@ namespace SubRed
                 {
                     Mat img = CvInvoke.Imread(filePath);
                     var listOfRegions = SubtitleOCR.FindRegions(img);
+                    var index = 0;
                     foreach (var region in listOfRegions)
                     {
+                        index++;
                         var tempimg = img.ToImage<Gray, Byte>();
                         tempimg.ROI = region;
-                        var text = SubtitleOCR.GetRegionsTextTesseract(tempimg);
+                        var text = SubtitleOCR.GetRegionsTextTesseract(tempimg, index.ToString());
                         if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
                             tempGlobalListOfSubs.Add(new Subtitle()
                             {
@@ -308,6 +351,7 @@ namespace SubRed
                                 xCoord = region.X,
                                 yCoord = region.Y
                             });
+                        break;
                     }
                 }
 

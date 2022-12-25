@@ -176,12 +176,15 @@ namespace SubRed
 
             return rois;
         }
-        public static string GetRegionsTextTesseract(Image<Gray, Byte> frameRegion)
+        public static string GetRegionsTextTesseract(Image<Gray, Byte> frameRegion, string n = "")
         {
             Image<Gray, Byte> tempPartImage = frameRegion.Clone();
-            Image<Gray, Byte> tempLaplace = frameRegion.Clone();
             tempPartImage = tempPartImage.SmoothMedian(meanSeed);
-            //tempPartImage = tempPartImage.SmoothGaussian(gausSeed);
+            tempPartImage = tempPartImage.SmoothGaussian(gausSeed);
+
+            int k1 = 2;
+            int k2 = 2;
+            Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
 
             float[,] matrix = new float[3, 3] {
                 { 0, -1, 0},
@@ -190,35 +193,39 @@ namespace SubRed
             };
             ConvolutionKernelF matrixKernel = new ConvolutionKernelF(matrix);
 
+            //CvInvoke.DestroyAllWindows();
+
             //Mat kernel = new Mat(*size, DepthType.Default, *data);
             //CvInvoke.Laplacian(tempPartImage, tempPartImage, DepthType.Default, 3);
-            CvInvoke.DestroyAllWindows();
-            CvInvoke.Imshow("outputGray", tempPartImage);
+
+            //CvInvoke.Imshow("outputGray", tempPartImage);
             //var laplace = tempPartImage.Laplace(3);
             //CvInvoke.ConvertScaleAbs(laplace, tempLaplace, 1, 0);
 
-            CvInvoke.Filter2D(tempPartImage, tempLaplace, matrixKernel, new System.Drawing.Point(-1, -1));
-
-            CvInvoke.Imshow("outputLaplace", tempLaplace);
-
-            //CvInvoke.Threshold(tempLaplace, tempPartImage, 190, 255, ThresholdType.Binary);
-            CvInvoke.AdaptiveThreshold(tempLaplace, tempPartImage, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 7, 20);
-            CvInvoke.Imshow("outputThresh", tempPartImage);
+            CvInvoke.Filter2D(tempPartImage, tempPartImage, matrixKernel, new System.Drawing.Point(-1, -1));
+            //CvInvoke.Imshow("filter2d" + n, tempPartImage);
+            CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+            //CvInvoke.Imshow("dilate" + n, tempPartImage);
+            CvInvoke.Threshold(tempPartImage, tempPartImage, 20, 255, ThresholdType.Binary);
+            //CvInvoke.AdaptiveThreshold(tempPartImage, tempPartImage, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 7, 10);
+            //CvInvoke.Imshow("thresh" + n, tempPartImage);
+            //CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+            tempPartImage = tempPartImage.Not();
+            //CvInvoke.Imshow("not" + n, tempPartImage);
+            //CvInvoke.AdaptiveThreshold(tempLaplace, tempPartImage, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 7, 20);
+            //
 
             //Mat white = Mat.Ones(tempLaplace.Rows, tempLaplace.Cols, DepthType.Default, 1);
             //Mat dst = new Mat();
             //CvInvoke.AbsDiff(white, tempLaplace.Mat, dst);
 
-            tempPartImage = tempPartImage.Not();
-            CvInvoke.Imshow("outputNOT", tempPartImage);
+            //tempPartImage = tempPartImage.Not();
+            //CvInvoke.Imshow("outputNOT", tempPartImage);
             //CvInvoke.AbsDiff(tempPartImage, tempLaplace, tempPartImage);
             //CvInvoke.Imshow("outputABSDiff", tempPartImage);
 
-            /*int k1 = 1;
-            int k2 = 1;
-            Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
-            CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
-            CvInvoke.Imshow("outputDilate", tempPartImage);*/
+            //CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
+            //CvInvoke.Imshow("outputDilate", tempPartImage);
 
             /*tempPartImage = tempPartImage.SmoothGaussian(3);
             CvInvoke.Threshold(tempPartImage, tempPartImage, 10, 1, ThresholdType.Binary);
@@ -230,7 +237,15 @@ namespace SubRed
             //CvInvoke.Imshow("output??THRESH", tempPartImage);
 
             //image.Source = ImageSourceFromBitmap(tempPartImage.ToBitmap<Gray, Byte>());
-            var ocrengine = new TesseractEngine(@".\tessdata", ocrLanguage, EngineMode.TesseractAndLstm);
+            //CvInvoke.Imshow("outputThresh", tempPartImage);
+
+            /*string path = @".\tessdata\" + ocrLanguage;
+            var _ocr = new Emgu.CV.OCR.Tesseract(path, ocrLanguage, OcrEngineMode.Default);
+            _ocr.SetImage(tempPartImage);
+            _ocr.Recognize();
+            var returnText = _ocr.GetUTF8Text();*/
+
+            var ocrengine = new TesseractEngine(@".\tessdata\" + ocrLanguage, ocrLanguage, EngineMode.TesseractAndLstm);
             var imgPix = Pix.LoadFromMemory(ImageToByte(tempPartImage.ToBitmap<Gray, Byte>()));
             var res = ocrengine.Process(imgPix);
             var returnText = res.GetText();
@@ -238,19 +253,6 @@ namespace SubRed
             tempPartImage.Dispose();
             ocrengine.Dispose();
             imgPix.Dispose();
-
-            return returnText;
-        }
-
-        public static string GetRegionsTextTessnet(Image<Gray, Byte> frameRegion)
-        {
-            //https://www.youtube.com/watch?v=ccoh6zmNN3Y&ab_channel=Azomol
-
-            var ocr = new Tesseract();
-            ocr.init(@".\tessdata", ocrLanguage, false);
-            List<tessnet2.Word> result = ocr.DoOCR(frameRegion.ToBitmap<Gray, Byte>(), System.Drawing.Rectangle.Empty);
-            foreach (tessnet2.Word word in result)
-                Console.WriteLine("{0} : {1}", word.Confidence, word.Text);
 
             return returnText;
         }
