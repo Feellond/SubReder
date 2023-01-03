@@ -4,56 +4,43 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace SubRed.Sub_formats
 {
-    class SrtSubtitle
+    static class SrtSubtitle
     {
-        private string[] separator = { "&&" };
-        private string[] separatorForText = { "\\N", "\\n", "\n" };
-        private string[] textFormatSplit = { "Start", "End", "Text" };
+        private static string[] separator = { "&&" };
+        private static string[] separatorForText = { "\\N", "\\n", "\n" };
+        private static string[] textFormatSplit = { "Start", "End", "Text" };
 
-        public void Save(string filename, string sub)
+        public static void Save(string filename, List<Subtitle> subList)
         {
             try
             {
                 using (StreamWriter sw = new StreamWriter(filename, false, System.Text.Encoding.Default))
                 {
                     int num = 0;
-                   
-                    string[] subSplit = sub.Split(separator, StringSplitOptions.None);
-                    for (int i = 0; i < subSplit.Length; i++)
+                    foreach (Subtitle sub in subList)
                     {
-                        if (subSplit[i].Contains("TextFormat:"))    // TextFormat: Start, End, Text, ...
-                        {
-                            textFormatSplit = subSplit[i].Replace("TextFormat:", "").Trim().Split(',');    // Start, End, Text, ...
-                        }
-                        else if (subSplit[i].Contains("Dialogue:"))
-                        {
-                            num++;
-                            string[] dialogueSplit = subSplit[i].Replace("Dialogue:", "").Trim().Split(',');
-                            sw.WriteLine(num);
+                        num++;
+                        sw.WriteLine(num);
 
-                            sw.Write(dialogueSplit[Array.IndexOf(textFormatSplit, "Start")]);
-                            sw.Write(" --> ");
-                            sw.WriteLine(dialogueSplit[Array.IndexOf(textFormatSplit, "End")]);
+                        sw.Write(sub.start.ToString());
+                        sw.Write(" --> ");
+                        sw.WriteLine(sub.end.ToString());
 
-                            string[] textSplit = dialogueSplit[Array.IndexOf(textFormatSplit, "Text")].Split(separatorForText, StringSplitOptions.None);
-                            foreach (string str in textSplit)
-                                sw.WriteLine(str);
-                        }
+                        sw.WriteLine(sub.text);
                     }
-
-                    
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message + "\n\n Error in SrtSubtitle Save method", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        public string Load(string filename)
+        public static string Load(string filename)
         {
             string sub = "";
             try

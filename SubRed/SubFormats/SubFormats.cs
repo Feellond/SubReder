@@ -6,49 +6,37 @@ using System.Threading.Tasks;
 
 namespace SubRed.Sub_formats
 {
-    public class SubFormats
+    public static class SubFormats
     {
-        AssSubtitle assSubtitle = new AssSubtitle();
-        SsaSubtitle ssaSubtitle = new SsaSubtitle();
-        SrtSubtitle srtSubtitle = new SrtSubtitle();
-        SmiSubtitle smiSubtitle = new SmiSubtitle();
 
-        public SubFormats()
-        {
-            assSubtitle = new AssSubtitle();
-            ssaSubtitle = new SsaSubtitle();
-            srtSubtitle = new SrtSubtitle();
-            smiSubtitle = new SmiSubtitle();
-        }
-
-        public string SelectFormat(string filename, string sub, bool isLoadFunction)
+        public static string SelectFormat(string filename, List<Subtitle> subList, bool isLoadFunction)
         {
             string[] format = filename.Split('.');
             switch (format[format.Length - 1])
             {
                 case "ass":
                     if (isLoadFunction)
-                        return assSubtitle.Load(filename);
+                        return AssSubtitle.Load(filename);
                     else
-                        assSubtitle.Save(filename, sub);
+                        //AssSubtitle.Save(filename, sub);
                     break;
                 case "ssa":
                     if (isLoadFunction)
-                        return ssaSubtitle.Load(filename);
+                        return SsaSubtitle.Load(filename);
                     else
-                        ssaSubtitle.Save(filename, sub);
+                        //SsaSubtitle.Save(filename, sub);
                     break;
                 case "srt":
                     if (isLoadFunction)
-                        return srtSubtitle.Load(filename);
+                        return SrtSubtitle.Load(filename);
                     else
-                        srtSubtitle.Save(filename, sub);
+                        SrtSubtitle.Save(filename, subList);
                     break;
                 case "smi":
                     if (isLoadFunction)
-                        return smiSubtitle.Load(filename);
+                        return SmiSubtitle.Load(filename);
                     else
-                        smiSubtitle.Save(filename, sub);
+                        //SmiSubtitle.Save(filename, sub);
                     break;
                 default:
                     return "";

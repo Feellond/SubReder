@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace SubRed.Sub_formats
 {
-    class SmiSubtitle
+    static class SmiSubtitle
     {
-        private string[] separator = { "&&" };
-        private string[] separatorForText = { "\\N", "\\n", "\n" };
-        private string[] textFormatSplit = { "Start", "Text" };
+        private static string[] separator = { "&&" };
+        private static string[] separatorForText = { "\\N", "\\n", "\n" };
+        private static string[] textFormatSplit = { "Start", "Text" };
 
-        public void Save(string filename, string sub)
+        public static void Save(string filename, string sub)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace SubRed.Sub_formats
             catch { }
         }
 
-        public string Load(string filename)
+        public static string Load(string filename)
         {
             string sub = "";
             string line = "";

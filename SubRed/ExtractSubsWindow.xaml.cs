@@ -63,14 +63,13 @@ namespace SubRed
             imageProgressBar.Visibility = Visibility.Hidden;
         }
 
-        public ExtractSubsWindow(List<Subtitle> globalListOfSubs)
+        public ExtractSubsWindow(ref List<Subtitle> globalListOfSubs)
         {
             InitializeComponent();
-            globalListOfSubs = new List<Subtitle>();
+            if (globalListOfSubs == null) globalListOfSubs = new List<Subtitle>();
             tempGlobalListOfSubs = new List<Subtitle>();
             this.globalListOfSubs.AddRange(globalListOfSubs);
             this.tempGlobalListOfSubs.AddRange(globalListOfSubs);
-
 
             ViewGrid();
         }
@@ -245,6 +244,9 @@ namespace SubRed
                         Mat newFrame = video.QueryFrame();
                         if (newFrame == null) 
                             break;
+
+                        image.Source = SubtitleOCR.ImageSourceFromBitmap(newFrame.ToBitmap());
+
                         List<System.Drawing.Rectangle> listOfRegions = new List<System.Drawing.Rectangle>();
                         await Task.Run(() =>
                         {
@@ -437,6 +439,7 @@ namespace SubRed
             {
                 globalListOfSubs.Clear();
                 globalListOfSubs.AddRange(tempGlobalListOfSubs);
+                this.DialogResult = true;
                 CloseWindow();
             }
         }
@@ -451,6 +454,7 @@ namespace SubRed
 
         private void cancelButton_Click(object sender, RoutedEventArgs e)
         {
+            this.DialogResult = false;
             CloseWindow();
         }
     }

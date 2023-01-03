@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace SubRed.Sub_formats
 {
-    class AssSubtitle
+    static class AssSubtitle
     {
-        private string[] separator = { "&&" };
-        private string[] separatorForText = { "\\N", "\\n", "\n" };
-        private string[] textFormatSplit = { "Name", "Fontname", "Fontsize", "PrimaryColour", "SecondaryColour", "OutlineColour", "BackColour", "" };
+        private static string[] separator = { "&&" };
+        private static string[] separatorForText = { "\\N", "\\n", "\n" };
+        private static string[] textFormatSplit = { "Name", "Fontname", "Fontsize", "PrimaryColour", "SecondaryColour", "OutlineColour", "BackColour", "" };
 
-        public void Save(string filename, string sub)
+        public static void Save(string filename, string sub)
         {
             sub = sub.Replace("OriginalScript:", "Original Script:");
             sub = sub.Replace("OriginalTranslation:", "Original Translation:");
@@ -92,7 +92,7 @@ namespace SubRed.Sub_formats
             }
         }
 
-        public string Load(string filename)
+        public static string Load(string filename)
         {
             string sub = "";
             try

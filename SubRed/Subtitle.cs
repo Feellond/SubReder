@@ -10,6 +10,7 @@ namespace SubRed
 {
     public class Subtitle
     {
+        public int id { get; set; }
         public TimeSpan start { get; set; }
         public TimeSpan end { get; set; }
         public TimeSpan duration { get; set; }

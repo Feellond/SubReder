@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using SubRed.Sub_formats;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -73,10 +74,24 @@ namespace SubRed
             });
         }
 
+        public void ViewGrid()
+        {
+            //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
+            this.SubtitleGrid.ItemsSource = null;
+            this.SubtitleGrid.ItemsSource = globalListOfSubs;
+
+            //imageProgressBar.Visibility = Visibility.Hidden;
+        }
+
         private void ExtractSubsFromFile_Click(object sender, RoutedEventArgs e)
         {
-            ExtractSubsWindow ESWindow = new ExtractSubsWindow(globalListOfSubs);
-            ESWindow.Show();
+            ExtractSubsWindow ESWindow = new ExtractSubsWindow(ref globalListOfSubs);
+            if (ESWindow.ShowDialog() == true)
+            {
+                globalListOfSubs = new List<Subtitle>();
+                globalListOfSubs.AddRange(ESWindow.globalListOfSubs);
+                ViewGrid();
+            }
         }
 
         private void MediaPlayer_TimeChanged(object sender, Vlc.DotNet.Core.VlcMediaPlayerTimeChangedEventArgs e)
@@ -164,6 +179,23 @@ namespace SubRed
         {
             long time = (long)slider.Value;
             ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Time = time);
+        }
+
+        private void SrtSave_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFile();
+        }
+        private void SaveFile()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "All Files|*.*"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                SubFormats.SelectFormat(saveFileDialog.FileName, globalListOfSubs, false);
+            }
         }
     }
 }

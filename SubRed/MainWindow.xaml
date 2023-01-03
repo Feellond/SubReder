@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="523" Width="800"
         xmlns:vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf">
     <Grid>
         <Grid.RowDefinitions>
@@ -13,14 +13,17 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Menu Height="25" VerticalAlignment="Top">
+            <Menu Height="30" VerticalAlignment="Top">
                 <MenuItem Header="Файл">
                     <MenuItem Header="Новый проект" ></MenuItem>
-                    <MenuItem Header="Открыть проект" >
-                        <MenuItem Header="WinForms"></MenuItem>
-                        <MenuItem Header="WPF" ></MenuItem>
+                    <MenuItem Header="Открыть проект"></MenuItem>
+                    <Separator />
+                    <MenuItem Header="Загрузить субтитр"></MenuItem>
+                    <MenuItem Header="Сохранить субтитр...">
+                        <MenuItem Header="В формате SRT" Click="SrtSave_Click"></MenuItem>
                     </MenuItem>
                     <Separator />
                     <MenuItem Header="Выход" ></MenuItem>
@@ -60,6 +63,28 @@
             <Button x:Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="1" Click="StartPausePlay_Click"/>
             <Button Content="Стоп" Grid.Column="2" Click="Stop_Click"/>
         </Grid>
-
+        <Grid Grid.Row="4" MinHeight="100" MaxHeight="100">
+            <DataGrid x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
+                        ScrollViewer.CanContentScroll="True" 
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Begin" Binding="{Binding begin}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="xCoord" Binding="{Binding xCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="yCoord" Binding="{Binding yCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap"></Setter>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </Window>
