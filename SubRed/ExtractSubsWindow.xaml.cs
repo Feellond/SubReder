@@ -50,12 +50,18 @@ namespace SubRed
         double totalFrames;
         double fps;
 
-        int frame_number;
+        int minFrameNumber;
+        int maxFrameNumber;
         int prevFrame;
         int currentFrame;
 
+        bool isPausedOCR = false;
+
         public void ViewGrid()
         {
+            for (int i = 0; i < tempGlobalListOfSubs.Count; i++)
+                tempGlobalListOfSubs[i].id = i + 1;
+
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
             this.SubtitleGrid.ItemsSource = null;
             this.SubtitleGrid.ItemsSource = tempGlobalListOfSubs;
@@ -123,9 +129,13 @@ namespace SubRed
                 totalFrames = video.Get(CapProp.FrameCount);
                 fps = video.Get(CapProp.Fps);
 
-                frame_number = 0;
+                minFrameNumber = 0;
                 prevFrame = 0;
-                currentFrame = frame_number;
+                currentFrame = minFrameNumber;
+                maxFrameNumber = (int)(RangeSlider.UpperValue * fps);
+
+                RangeSlider.Minimum = 0;
+                RangeSlider.Maximum = totalFrames / fps;
 
                 return;
             }
@@ -189,6 +199,8 @@ namespace SubRed
                                 tempGlobalListOfSubs.Add(new Subtitle()
                                 {
                                     text = sub.text,
+                                    start = new TimeSpan(0, 0, 0, (int)(fps * sub.frameBeginNum * 1000)),
+                                    end = new TimeSpan(0, 0, 0, (int)(fps * sub.frameEndNum * 1000)),
                                     frameBeginNum = sub.frameBeginNum,
                                     frameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,
@@ -212,8 +224,42 @@ namespace SubRed
                 }
             }
         }
+        private void RangeSliderUpdate(ref int minFrameNumber, ref int maxFrameNumber)
+        {
+            minFrameNumber = (int)(RangeSlider.LowerValue * fps);
+            maxFrameNumber = (int)(RangeSlider.UpperValue * fps);
+        }
 
-        private async void RunButton_Click(object sender, RoutedEventArgs e)
+        private void RunPauseButtonChange(object sender, RoutedEventArgs e)
+        {
+            if (pauseResumeButton.Content.ToString() == "Пауза")
+            {
+                pauseResumeButton.Content = "Продолжить";
+                isPausedOCR = true;
+            }
+            else if (pauseResumeButton.Content.ToString() == "Продолжить")
+            {
+                pauseResumeButton.Content = "Пауза";
+                isPausedOCR = false;
+                doOCR();
+            }
+        }
+
+        private void RunButton_Click(object sender, RoutedEventArgs e)
+        {
+            tempGlobalListOfSubs.Clear();
+            listOfSubs.Clear();
+
+            runButton.Visibility = Visibility.Hidden;
+            pauseResumeButton.Visibility = Visibility.Visible;
+
+            RangeSliderUpdate(ref minFrameNumber, ref maxFrameNumber);
+            currentFrame = minFrameNumber;
+
+            doOCR();
+        }
+
+        private async void doOCR()
         {
             CvInvoke.DestroyAllWindows();
             try
@@ -225,11 +271,7 @@ namespace SubRed
                 MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            tempGlobalListOfSubs.Clear();
-            listOfSubs.Clear();
             Mat previousFrame = new Mat();
-            frame_number = 0;
-            currentFrame = frame_number;
             if (filePath != null)
             {
                 if (isVideoOpened)
@@ -238,11 +280,11 @@ namespace SubRed
                     imageProgressBar.Visibility = Visibility.Visible;
                     imageProgressBar.Maximum = totalFrames;
 
-                    video.Set(CapProp.PosFrames, frame_number - 1);
-                    while (video.IsOpened)
+                    video.Set(CapProp.PosFrames, minFrameNumber - 1);
+                    while (video.IsOpened && currentFrame <= maxFrameNumber && !isPausedOCR)
                     {
                         Mat newFrame = video.QueryFrame();
-                        if (newFrame == null) 
+                        if (newFrame == null)
                             break;
 
                         image.Source = SubtitleOCR.ImageSourceFromBitmap(newFrame.ToBitmap());
@@ -250,8 +292,8 @@ namespace SubRed
                         List<System.Drawing.Rectangle> listOfRegions = new List<System.Drawing.Rectangle>();
                         await Task.Run(() =>
                         {
-                        //FrameChanged(newFrame, previousFrame);
-                        SubRegionChanged(newFrame);
+                            //FrameChanged(newFrame, previousFrame);
+                            SubRegionChanged(newFrame);
                             listOfRegions = SubtitleOCR.FindRegions(newFrame);
                         });
 
@@ -320,6 +362,8 @@ namespace SubRed
                                 tempGlobalListOfSubs.Add(new Subtitle()
                                 {
                                     text = sub.text,
+                                    start = new TimeSpan(0, 0, 0, (int)(fps * sub.frameBeginNum * 1000)),
+                                    end = new TimeSpan(0, 0, 0, (int)(fps * sub.frameEndNum * 1000)),
                                     frameBeginNum = sub.frameBeginNum,
                                     frameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,
@@ -355,6 +399,12 @@ namespace SubRed
                             });
                         break;
                     }
+                }
+
+                if (!isPausedOCR)
+                {
+                    runButton.Visibility = Visibility.Visible;
+                    pauseResumeButton.Visibility = Visibility.Hidden;
                 }
 
                 ViewGrid();

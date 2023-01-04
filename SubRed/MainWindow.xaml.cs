@@ -2,6 +2,7 @@
 using SubRed.Sub_formats;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -195,6 +196,19 @@ namespace SubRed
             if (saveFileDialog.ShowDialog() == true)
             {
                 SubFormats.SelectFormat(saveFileDialog.FileName, globalListOfSubs, false);
+            }
+        }
+
+        private void Row_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (player.SourceProvider.MediaPlayer != null)
+            {
+                if (!string.IsNullOrWhiteSpace(LastFilePlay) && File.Exists(LastFilePlay))
+                {
+                    DataRowView dataRowView = (DataRowView)SubtitleGrid.SelectedItem;
+                    int ID = Convert.ToInt32(dataRowView.Row[0]);
+                    player.SourceProvider.MediaPlayer.Time = (long)(globalListOfSubs[ID - 1].frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond * 1000);
+                }
             }
         }
     }

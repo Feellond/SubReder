@@ -166,7 +166,7 @@
                              mah:SliderHelper.ChangeValueBy="LargeChange"
                              mah:SliderHelper.EnableMouseWheel="MouseHover"
                              AutoToolTipPlacement="TopLeft"
-                             LargeChange="10"
+                             LargeChange="1"
                              LowerValue="40"
                              Maximum="100"
                              Minimum="0"
@@ -175,10 +175,11 @@
                              x:Name="RangeSlider"/>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="0">
-            <Button x:Name="runButton" Content="Запуск" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunButton_Click" Width="60" Margin="110,10,0,0"/>
-            <Button x:Name="defaultButton" Content="Default" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="60" Margin="8,10,0,0" Click="defaultButton_Click"/>
-            <Button x:Name="cancelButton" Content="Отмена" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="60" Margin="8,60,0,0" Click="cancelButton_Click"/>
-            <Button x:Name="okButton" Content="OK" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="60" Margin="110,60,0,0" Click="okButton_Click"/>
+            <Button x:Name="runButton" Content="Запуск" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunButton_Click" Width="80" Margin="110,10,0,0"/>
+            <Button x:Name="defaultButton" Content="Default" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="80" Margin="8,10,0,0" Click="defaultButton_Click"/>
+            <Button x:Name="cancelButton" Content="Отмена" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="80" Margin="8,60,0,0" Click="cancelButton_Click"/>
+            <Button x:Name="okButton" Content="OK" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="80" Margin="110,60,0,0" Click="okButton_Click"/>
+            <Button x:Name="pauseResumeButton" Content="Пауза" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunPauseButtonChange" Width="80" Margin="110,10,0,0" Visibility="Hidden"/>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="1" MinHeight="100" MaxHeight="200" MinWidth="400">
             <DataGrid x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
@@ -186,6 +187,7 @@
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"/>
                     <DataGridTextColumn Header="Begin" Binding="{Binding begin}" Width="60"  FontFamily="Tahoma"/>
                     <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"/>
                     <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"/>

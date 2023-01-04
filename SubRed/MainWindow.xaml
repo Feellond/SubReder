@@ -68,7 +68,13 @@
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <DataGrid.ItemContainerStyle>
+                    <Style TargetType="DataGridRow">
+                        <EventSetter Event="MouseDown" Handler="Row_Click"/>
+                    </Style>
+                </DataGrid.ItemContainerStyle>
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="Begin" Binding="{Binding begin}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
