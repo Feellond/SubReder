@@ -137,6 +137,11 @@ namespace SubRed
                 RangeSlider.Minimum = 0;
                 RangeSlider.Maximum = totalFrames / fps;
 
+                RangeSlider.LowerValue = 0;
+                RangeSlider.UpperValue = totalFrames / fps;
+
+                imageProgressBar.Maximum = maxFrameNumber;
+
                 return;
             }
         }
@@ -199,8 +204,8 @@ namespace SubRed
                                 tempGlobalListOfSubs.Add(new Subtitle()
                                 {
                                     text = sub.text,
-                                    start = new TimeSpan(0, 0, 0, (int)(fps * sub.frameBeginNum * 1000)),
-                                    end = new TimeSpan(0, 0, 0, (int)(fps * sub.frameEndNum * 1000)),
+                                    start = new TimeSpan(0, 0, 0, 0, (int)(sub.frameBeginNum / fps * 1000)),
+                                    end = new TimeSpan(0, 0, 0, 0, (int)(currentFrame / fps * 1000)),
                                     frameBeginNum = sub.frameBeginNum,
                                     frameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,
@@ -247,16 +252,22 @@ namespace SubRed
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
-            tempGlobalListOfSubs.Clear();
-            listOfSubs.Clear();
+            if (filePath != null)
+            {
+                if (filePath != "")
+                {
+                    tempGlobalListOfSubs.Clear();
+                    listOfSubs.Clear();
 
-            runButton.Visibility = Visibility.Hidden;
-            pauseResumeButton.Visibility = Visibility.Visible;
+                    runButton.Visibility = Visibility.Hidden;
+                    pauseResumeButton.Visibility = Visibility.Visible;
 
-            RangeSliderUpdate(ref minFrameNumber, ref maxFrameNumber);
-            currentFrame = minFrameNumber;
+                    RangeSliderUpdate(ref minFrameNumber, ref maxFrameNumber);
+                    currentFrame = minFrameNumber;
 
-            doOCR();
+                    doOCR();
+                }
+            }
         }
 
         private async void doOCR()
@@ -276,11 +287,10 @@ namespace SubRed
             {
                 if (isVideoOpened)
                 {
-                    imageProgressBar.Value = 0;
+                    imageProgressBar.Value = currentFrame;
                     imageProgressBar.Visibility = Visibility.Visible;
-                    imageProgressBar.Maximum = totalFrames;
 
-                    video.Set(CapProp.PosFrames, minFrameNumber - 1);
+                    video.Set(CapProp.PosFrames, currentFrame);
                     while (video.IsOpened && currentFrame <= maxFrameNumber && !isPausedOCR)
                     {
                         Mat newFrame = video.QueryFrame();
@@ -362,8 +372,8 @@ namespace SubRed
                                 tempGlobalListOfSubs.Add(new Subtitle()
                                 {
                                     text = sub.text,
-                                    start = new TimeSpan(0, 0, 0, (int)(fps * sub.frameBeginNum * 1000)),
-                                    end = new TimeSpan(0, 0, 0, (int)(fps * sub.frameEndNum * 1000)),
+                                    start = new TimeSpan(0, 0, 0, 0, (int)(sub.frameBeginNum / fps * 1000)),
+                                    end = new TimeSpan(0, 0, 0, 0, (int)(sub.frameEndNum / fps * 1000)),
                                     frameBeginNum = sub.frameBeginNum,
                                     frameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,

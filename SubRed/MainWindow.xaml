@@ -63,19 +63,19 @@
             <Button x:Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="1" Click="StartPausePlay_Click"/>
             <Button Content="Стоп" Grid.Column="2" Click="Stop_Click"/>
         </Grid>
-        <Grid Grid.Row="4" MinHeight="100" MaxHeight="100">
-            <DataGrid x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
+        <Grid Grid.Row="4" MinHeight="100" MaxHeight="200">
+            <DataGrid Style="{x:Null}" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                <DataGrid.ItemContainerStyle>
+                <DataGrid.Resources>
                     <Style TargetType="DataGridRow">
                         <EventSetter Event="MouseDown" Handler="Row_Click"/>
                     </Style>
-                </DataGrid.ItemContainerStyle>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Begin" Binding="{Binding begin}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Begin" Binding="{Binding start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>

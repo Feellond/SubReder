@@ -201,15 +201,15 @@ namespace SubRed
 
         private void Row_Click(object sender, MouseButtonEventArgs e)
         {
-            if (player.SourceProvider.MediaPlayer != null)
-            {
-                if (!string.IsNullOrWhiteSpace(LastFilePlay) && File.Exists(LastFilePlay))
-                {
-                    DataRowView dataRowView = (DataRowView)SubtitleGrid.SelectedItem;
-                    int ID = Convert.ToInt32(dataRowView.Row[0]);
-                    player.SourceProvider.MediaPlayer.Time = (long)(globalListOfSubs[ID - 1].frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond * 1000);
-                }
-            }
+            if (SubtitleGrid.SelectedItem != null)
+                if (player.SourceProvider.MediaPlayer != null)
+                    if (!string.IsNullOrWhiteSpace(LastFilePlay) && File.Exists(LastFilePlay))
+                        if (globalListOfSubs.Count > 0)
+                        {
+                            DataRowView dataRowView = (DataRowView)SubtitleGrid.SelectedItem;
+                            int ID = Convert.ToInt32(dataRowView.Row[0]);
+                            player.SourceProvider.MediaPlayer.Time = (long)(globalListOfSubs[ID - 1].frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond * 1000);
+                        }
         }
     }
 }
