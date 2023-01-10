@@ -70,7 +70,7 @@
                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Resources>
                     <Style TargetType="DataGridRow">
-                        <EventSetter Event="MouseDown" Handler="Row_Click"/>
+                        <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>

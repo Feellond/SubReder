@@ -3,6 +3,7 @@ using SubRed.Sub_formats;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -204,15 +206,45 @@ namespace SubRed
 
         private void Row_Click(object sender, MouseButtonEventArgs e)
         {
-            if (SubtitleGrid.SelectedItem != null)
-                if (player.SourceProvider.MediaPlayer != null)
-                    if (!string.IsNullOrWhiteSpace(LastFilePlay) && File.Exists(LastFilePlay))
-                        if (globalListOfSubs.Count > 0)
-                        {
-                            DataRowView dataRowView = (DataRowView)SubtitleGrid.SelectedItem;
-                            int ID = Convert.ToInt32(dataRowView.Row[0]);
-                            player.SourceProvider.MediaPlayer.Time = (long)(globalListOfSubs[ID - 1].frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond * 1000);
-                        }
+            try
+            {
+                if (player.SourceProvider.MediaPlayer.State == MediaStates.Playing)
+                    ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Pause());
+
+                Subtitle dataRow = (Subtitle)SubtitleGrid.SelectedItem;
+                int index = 4;
+                int frameNum = (int)(dataRow.frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond);
+                slider.Value = frameNum;
+
+                player.SourceProvider.MediaPlayer.Time = (long)(frameNum);
+                /*
+                if (SubtitleGrid.SelectedItem != null)
+                    if (player.SourceProvider.MediaPlayer != null)
+                        if (!string.IsNullOrWhiteSpace(LastFilePlay) && File.Exists(LastFilePlay))
+                            if (globalListOfSubs.Count > 0)
+                            {
+                                DataGridRow row = sender as DataGridRow;
+                                DataGridCellsPresenter presenter = GetVisualChild<DataGridCellsPresenter>(rowContainer);
+
+                                // try to get the cell but it may possibly be virtualized
+                                DataGridCell cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
+                                if (cell == null)
+                                {
+                                    // now try to bring into view and retreive the cell
+                                    dataGrid.ScrollIntoView(rowContainer, dataGrid.Columns[column]);
+
+                                    cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
+                                }
+
+
+                                int ID = Convert.ToInt32(row);
+                                player.SourceProvider.MediaPlayer.Time = (long)(globalListOfSubs[ID - 1].frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond * 1000);
+                            }*/
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
