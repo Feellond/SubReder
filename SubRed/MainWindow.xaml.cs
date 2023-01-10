@@ -186,7 +186,7 @@ namespace SubRed
         {
             SaveFile();
         }
-        private void SaveFile()
+        private void SaveFile(string format = "")
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -195,7 +195,10 @@ namespace SubRed
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                SubFormats.SelectFormat(saveFileDialog.FileName, globalListOfSubs, false);
+                if (format == "")
+                    SubFormats.SelectFormat(saveFileDialog.FileName, globalListOfSubs, false);
+                else
+                    SubFormats.SelectFormat(saveFileDialog.FileName, globalListOfSubs, false, format);
             }
         }
 

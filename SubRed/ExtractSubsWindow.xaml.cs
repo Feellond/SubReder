@@ -32,6 +32,7 @@ using System.Security.Policy;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
+using SubRed.Sub_formats;
 
 namespace SubRed
 {
@@ -516,6 +517,27 @@ namespace SubRed
         {
             this.DialogResult = false;
             CloseWindow();
+        }
+
+        private void SrtSave_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFile("srt");
+        }
+
+        private void SaveFile(string format = "")
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "All Files|*.*"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                if (format == "")
+                    SubFormats.SelectFormat(saveFileDialog.FileName, tempGlobalListOfSubs, false);
+                else
+                    SubFormats.SelectFormat(saveFileDialog.FileName, tempGlobalListOfSubs, false, format);
+            }
         }
     }
 }
