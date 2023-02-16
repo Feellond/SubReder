@@ -14,19 +14,22 @@ using ControlzEx.Standard;
 
 namespace SubRed
 {
-    static class EastDetector
+    class EastDetector
     {
-        public static void EastDetect(Mat inputFrame)
+        public Net net;
+
+        public EastDetector()
+        {
+            string model = "frozen_east_text_detection.pb";
+            net = DnnInvoke.ReadNet(model);
+        }
+        public void EastDetect(Mat inputFrame)
         {
             double confThreshold = 0.5;
             double nmsThreshold = 0.4;
             int inpWidth = 320;
             int inpHeight = 320;
-            string model = "frozen_east_text_detector.pb";
-
-            Net net = DnnInvoke.ReadNet(model);
-            CvInvoke.NamedWindow("EAST");
-
+            
             VectorOfMat outs = new VectorOfMat();
             string[] outNames = new string[2];
             outNames[0] = "feature_fusion/Conv_7/Sigmoid";
@@ -35,7 +38,7 @@ namespace SubRed
             Mat frame, blob;
             frame = inputFrame;
 
-            blob = DnnInvoke.BlobFromImage(frame, 1, new System.Drawing.Size(inpWidth, inpHeight), new MCvScalar(123.68, 116.78, 103.94));
+            blob = DnnInvoke.BlobFromImage(frame, 1, new System.Drawing.Size(inpWidth, inpHeight), new MCvScalar(123.68, 116.78, 103.94), true, false);
             net.SetInput(blob);
             net.Forward(outs, outNames);
             Mat scores = outs[0];
@@ -66,11 +69,11 @@ namespace SubRed
                 CvInvoke.Rectangle(frame, box_in, new MCvScalar(255, 255, 0), 4);
             }
 
+            CvInvoke.Resize(frame, frame, new Size(1024, 720));
             CvInvoke.Imshow("result", frame);
-            CvInvoke.WaitKey();
         }
 
-        public static void DecodeBox(Mat scores, Mat geometry, double scoreThresh, VectorOfRect detections, VectorOfFloat confidences)
+        public void DecodeBox(Mat scores, Mat geometry, double scoreThresh, VectorOfRect detections, VectorOfFloat confidences)
         {
             if (detections.Size > 0)
                 detections.Clear();

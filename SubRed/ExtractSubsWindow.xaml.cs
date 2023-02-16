@@ -393,6 +393,10 @@ namespace SubRed
                 else
                 {
                     Mat img = CvInvoke.Imread(filePath);
+
+                    EastDetector eastDetector = new EastDetector();
+                    eastDetector.EastDetect(img);
+
                     var listOfRegions = SubtitleOCR.FindRegions(img);
                     var index = 0;
                     foreach (var region in listOfRegions)
@@ -408,7 +412,6 @@ namespace SubRed
                                 xCoord = region.X,
                                 yCoord = region.Y
                             });
-                        break;
                     }
                 }
 
@@ -538,6 +541,11 @@ namespace SubRed
                 else
                     SubFormats.SelectFormat(saveFileDialog.FileName, tempGlobalListOfSubs, false, format);
             }
+        }
+
+        private void MoreSettings_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -22,6 +22,7 @@
             <Menu x:Name="menu">
                 <MenuItem Header="Открыть изображение" Click="OpenImage_Click"/>
                 <MenuItem Header="Открыть видео" Click="OpenVideo_Click"/>
+                <MenuItem Header="Расширенные настройки" Click="MoreSettings_Click"/>
                 <MenuItem Header="Сохранить...">
                     <MenuItem Header="Сохранить в формате json" Click="SaveJson_Click"></MenuItem>
                     <MenuItem Header="Сохранить в формате srt" Click="SrtSave_Click"></MenuItem>
