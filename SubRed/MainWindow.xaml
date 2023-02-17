@@ -21,18 +21,47 @@
                     <MenuItem Header="Новый проект" ></MenuItem>
                     <MenuItem Header="Открыть проект"></MenuItem>
                     <Separator />
-                    <MenuItem Header="Загрузить субтитр"></MenuItem>
-                    <MenuItem Header="Сохранить субтитр...">
+                    <MenuItem Header="Загрузить субтитры"></MenuItem>
+                    <MenuItem Header="Сохранить субтитры"/>
+                    <MenuItem Header="Сохранить субтитры как...">
                         <MenuItem Header="В формате SRT" Click="SrtSave_Click"></MenuItem>
                     </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="Открыть видео"/>
+                    <MenuItem Header="Свойства проекта"/>
                     <Separator />
                     <MenuItem Header="Выход" ></MenuItem>
                 </MenuItem>
-                <MenuItem Header="Изменить" >
-                    <MenuItem Header="Субтитры" ></MenuItem>
+                <MenuItem Header="Редактирование">
+                    <MenuItem Header="Отменить" ></MenuItem>
+                    <MenuItem Header="Вернуть"></MenuItem>
+                    <Separator />
+                    <MenuItem Header="Вырезать"></MenuItem>
+                    <MenuItem Header="Копировать"></MenuItem>
+                    <MenuItem Header="Вставить"></MenuItem>
+                    <MenuItem Header="Удалить"></MenuItem>
+                    <Separator />
+                    <MenuItem Header="Найти и заменить"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="Обработка" >
+                <MenuItem Header="Субтитры" >
+                    <MenuItem Header="Стили" ></MenuItem>
+                    <MenuItem Header="Эффекты" ></MenuItem>
+                    <MenuItem Header="Сместить время на" ></MenuItem>
+                    <MenuItem Header="Передать текст в MS Word" ></MenuItem>
+                    <MenuItem Header="Перенумеровать" ></MenuItem>
+                    <MenuItem Header="Отсортировать время и перенумеровать" ></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Автоматизация" >
                     <MenuItem Header="Извлечь встроенные субтитры" Click="ExtractSubsFromFile_Click"></MenuItem>
+                    <MenuItem Header="Очистить теги"></MenuItem>
+                    <MenuItem Header="Удаление тегов"></MenuItem>
+                    <MenuItem Header="Выделить пересечения"></MenuItem>
+                    <MenuItem Header="Проверить и исправить"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Вид" >
+                    <MenuItem Header="Только субтитры"></MenuItem>
+                    <MenuItem Header="Видео+субтитры"></MenuItem>
+                    <MenuItem Header="Аудиодорожка"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Помощь" >
                     <MenuItem Header="О программе" ></MenuItem>

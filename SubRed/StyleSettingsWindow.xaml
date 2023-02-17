@@ -1,0 +1,18 @@
+﻿<Window x:Class="SubRed.StyleSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SubRed"
+        mc:Ignorable="d"
+        Title="StyleSettingsWindow" Height="450" Width="800">
+    <Grid>
+        <GroupBox x:Name="groupBox" Header="GroupBox" Margin="10,10,473,366"/>
+        <GroupBox x:Name="groupBox_Copy" Header="GroupBox" Margin="10,150,473,226"/>
+        <GroupBox x:Name="groupBox_Copy1" Header="GroupBox" Margin="10,213,473,163"/>
+        <GroupBox x:Name="groupBox_Copy2" Header="GroupBox" Margin="10,276,473,100"/>
+        <GroupBox x:Name="groupBox_Copy3" Header="GroupBox" Margin="473,10,10,366"/>
+        <GroupBox x:Name="groupBox_Copy4" Header="GroupBox" Margin="473,150,10,226"/>
+        <GroupBox x:Name="groupBox_Copy5" Header="GroupBox" Margin="473,213,10,163"/>
+    </Grid>
+</Window>
