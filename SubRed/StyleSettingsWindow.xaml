@@ -21,7 +21,7 @@
         <GroupBox x:Name="groupBox1" Header="Имя стиля" Grid.Column="0" Grid.Row="0">
             <TextBox Width="300"></TextBox>
         </GroupBox>
-        <GroupBox x:Name="groupBox2" Header="GroupBox" Grid.Column="0" Grid.Row="1">
+        <GroupBox x:Name="groupBox2" Header="Шрифт" Grid.Column="0" Grid.Row="1">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -36,24 +36,89 @@
                     <mah:NumericUpDown Grid.Column="1"></mah:NumericUpDown>
                 </Grid>
                 <Grid Grid.Row="1">
-                    <CheckBox></CheckBox>
-                    <Label></Label>
-                    <CheckBox></CheckBox>
-                    <Label></Label>
-                    <CheckBox></CheckBox>
-                    <Label></Label>
-                    <CheckBox></CheckBox>
-                    <Label></Label>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="0"></CheckBox>
+                    <Label Content="Жирный" Grid.Column="1"></Label>
+                    <CheckBox Grid.Column="2"></CheckBox>
+                    <Label Content="Курсив" Grid.Column="3"></Label>
+                    <CheckBox Grid.Column="4"></CheckBox>
+                    <Label Content="Подчеркивание" Grid.Column="5"></Label>
+                    <CheckBox Grid.Column="6"></CheckBox>
+                    <Label Content="Зачеркнутый" Grid.Column="7"></Label>
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="groupBox3" Header="GroupBox" Grid.Column="0" Grid.Row="2">
-            
+        <GroupBox x:Name="groupBox3" Header="Цвет" Grid.Column="0" Grid.Row="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="https://www.c-sharpcorner.com/blogs/wpf-color-picker-c-sharp" Grid.Row="0" Grid.Column="0"/>
+                <Label Content="Вторичный" Grid.Row="0" Grid.Column="1"/>
+                <Label Content="Контур" Grid.Row="0" Grid.Column="2"/>
+                <Label Content="Тень" Grid.Row="0" Grid.Column="3"/>
+            </Grid>
         </GroupBox>
-        <GroupBox x:Name="groupBox4" Header="GroupBox" Grid.Column="0" Grid.Row="3">
-            
+        <GroupBox x:Name="groupBox4" Header="Отступы и выравнивание" Grid.Column="0" Grid.Row="3">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Слева" Grid.Row="0" Grid.Column="0"/>
+                <mah:NumericUpDown Grid.Row="1" Grid.Column="0"></mah:NumericUpDown>
+                <Label Content="Справа" Grid.Row="0" Grid.Column="1"/>
+                <mah:NumericUpDown Grid.Row="1" Grid.Column="1"></mah:NumericUpDown>
+                <Label Content="Вертикаль" Grid.Row="0" Grid.Column="2"/>
+                <mah:NumericUpDown Grid.Row="1" Grid.Column="2"></mah:NumericUpDown>
+                <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Grid.Row="0" Grid.Column="0"/>
+                    <RadioButton Grid.Row="0" Grid.Column="1"/>
+                    <RadioButton Grid.Row="0" Grid.Column="2"/>
+
+                    <RadioButton Grid.Row="1" Grid.Column="0"/>
+                    <RadioButton Grid.Row="1" Grid.Column="1"/>
+                    <RadioButton Grid.Row="1" Grid.Column="2"/>
+
+                    <RadioButton Grid.Row="2" Grid.Column="0"/>
+                    <RadioButton Grid.Row="2" Grid.Column="1"/>
+                    <RadioButton Grid.Row="2" Grid.Column="2"/>
+                </Grid>
+            </Grid>
         </GroupBox>
-        <GroupBox x:Name="groupBox5" Header="GroupBox" Grid.Column="1" Grid.Row="0">
+        <GroupBox x:Name="groupBox5" Header="Контур" Grid.Column="1" Grid.Row="0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -67,7 +132,7 @@
                 <mah:NumericUpDown Grid.Column="3"></mah:NumericUpDown>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="groupBox6" Header="GroupBox" Grid.Column="1" Grid.Row="1">
+        <GroupBox x:Name="groupBox6" Header="Разное" Grid.Column="1" Grid.Row="1">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -90,11 +155,27 @@
                 <mah:NumericUpDown Grid.Row="1" Grid.Column="3"></mah:NumericUpDown>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="groupBox7" Header="GroupBox" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2">
-            
+        <GroupBox x:Name="groupBox7" Header="Предпросмотр" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Width="300" Height="100"></Image>
+                <TextBox Text="Sample Text\nExample" Grid.Column="0" Grid.Row="1"/>
+            </Grid>
         </GroupBox>
-        <Grid Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">
-
+        <Grid Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="ОК" Width="100" Grid.Column="0" Margin="3"></Button>
+            <Button Content="Отмена" Width="100" Grid.Column="1" Margin="3"></Button>
         </Grid>
     </Grid>
 </Window>

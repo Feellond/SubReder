@@ -20,8 +20,8 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="label1" Content="Сместить на" Width="Auto" Grid.Column="0"/>
-            <ComboBox x:Name="" Grid.Column="1" MinWidth="100">
+            <Label Content="Сместить на" Width="Auto" Grid.Column="0"/>
+            <ComboBox x:Name="changeComboBox" Grid.Column="1" MinWidth="100">
                 <ComboBoxItem Selector.IsSelected="True">
                     <StackPanel>
                         <TextBlock>Прибавить</TextBlock>
@@ -39,40 +39,40 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="label2" Content="Часы" Grid.Column="0"/>
-            <TextBox x:Name="textBox2" Text="" Width="120" Grid.Column="1"/>
+            <Label Content="Часы" Grid.Column="0"/>
+            <TextBox x:Name="hoursTextBox" Text="" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="2" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="label3" Content="Минуты" Grid.Column="0"/>
-            <TextBox x:Name="textBox3" Text="" Width="120" Grid.Column="1"/>
+            <Label Content="Минуты" Grid.Column="0"/>
+            <TextBox x:Name="minutesTextBox" Text="" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="3" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="label4" Content="Секунды" Grid.Column="0"/>
-            <TextBox x:Name="textBox4" Text="" Width="120" Grid.Column="1"/>
+            <Label Content="Секунды" Grid.Column="0"/>
+            <TextBox x:Name="secondsTextBox" Text="" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="4" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="label5" Content="Миллисекунды" Grid.Column="0"/>
-            <TextBox x:Name="textBox5" Text="" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
+            <Label Content="Миллисекунды" Grid.Column="0"/>
+            <TextBox x:Name="milisecondsTextBox" Text="" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="5" Margin="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="button" Content="Выделенные" Grid.Column="0" Margin="0 0 5 0" Width="90"/>
-            <Button x:Name="button_Copy" Content="Все" Grid.Column="1" Margin="5 0 0 0" Width="90"/>
+            <Button x:Name="selectedButton" Content="Выделенные" Grid.Column="0" Margin="0 0 5 0" Width="90"/>
+            <Button x:Name="allButton" Content="Все" Grid.Column="1" Margin="5 0 0 0" Width="90"/>
         </Grid>
     </Grid>
 </Window>

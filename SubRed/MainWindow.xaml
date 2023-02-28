@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="MainWindow" Height="523" Width="800"
+        Title="MainWindow" Height="Auto" Width="Auto"
         xmlns:vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf">
     <Grid>
         <Grid.RowDefinitions>
@@ -19,7 +19,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
             <Menu Height="30" VerticalAlignment="Top">
                 <MenuItem Header="Файл">
                     <MenuItem Header="Новый проект" ></MenuItem>
@@ -72,10 +72,96 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Grid.Column="0">
             <vlc:VlcControl x:Name="player" />
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="1">
+            <TabControl>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock>Субтитры</TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Label Content="KEKW"></Label>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBox Grid.Row="0"/>
+                                    <TextBox Grid.Row="1"/>
+                                </Grid>
+                                <TextBlock Grid.Column="1"></TextBlock>
+                                <Grid Grid.Column="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+                                        <ComboBoxItem Selector.IsSelected="True">
+                                            <StackPanel>
+                                                <TextBlock>---</TextBlock>
+                                            </StackPanel>
+                                        </ComboBoxItem>
+                                    </ComboBox>
+                                    <Label Content="H" Grid.Row="1" Grid.Column="0"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="1">
+                                        <ComboBoxItem Selector.IsSelected="True">
+                                            <StackPanel>
+                                                <TextBlock>Центр</TextBlock>
+                                            </StackPanel>
+                                        </ComboBoxItem>
+                                    </ComboBox>
+                                    <Label Content="V" Grid.Row="1" Grid.Column="2"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="3">
+                                        <ComboBoxItem Selector.IsSelected="True">
+                                            <StackPanel>
+                                                <TextBlock>Низ</TextBlock>
+                                            </StackPanel>
+                                        </ComboBoxItem>
+                                    </ComboBox>
+                                    <Label Content="X" Grid.Row="2" Grid.Column="0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1"/>
+                                    <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
+                                    <TextBox Grid.Row="2" Grid.Column="3"/>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock>Перевод</TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <TextBox Height="100" Width="100" Text="KEKW"></TextBox>
+                    </TabItem.Content>
+                </TabItem>
+            </TabControl>
+        </Grid>
+        <Grid Grid.Row="2" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
@@ -86,7 +172,7 @@
                     Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"/>
             <TextBlock x:Name="textBlock" Grid.Column="2" Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
         </Grid>
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="3" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -96,34 +182,52 @@
             <Button x:Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="1" Click="StartPausePlay_Click"/>
             <Button Content="Стоп" Grid.Column="2" Click="Stop_Click"/>
         </Grid>
-        <Grid Grid.Row="4" MinHeight="100" MaxHeight="200">
-            <DataGrid Style="{x:Null}" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="100" MaxHeight="200">
+            <TabControl TabStripPlacement="Left">
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock>Данные</TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <DataGrid Style="{x:Null}" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                <DataGrid.Resources>
-                    <Style TargetType="DataGridRow">
-                        <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
-                    </Style>
-                </DataGrid.Resources>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Begin" Binding="{Binding start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="xCoord" Binding="{Binding xCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="yCoord" Binding="{Binding yCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="TextWrapping" Value="Wrap"></Setter>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridRow">
+                                    <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Begin" Binding="{Binding start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="xCoord" Binding="{Binding xCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="yCoord" Binding="{Binding yCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextWrapping" Value="Wrap"></Setter>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock>Аудиодорожка</TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 </Window>

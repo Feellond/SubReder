@@ -99,9 +99,9 @@
                     <TextBox x:Name="x_resolutionTextBox" Width="100" Grid.Row="0" Grid.Column="0" Margin="3"></TextBox>
                     <Label Grid.Row="0" Grid.Column="1">x</Label>
                     <TextBox x:Name="y_resolutionTextBox" Width="100" Grid.Row="0" Grid.Column="2" Margin="3"></TextBox>
-                    <Button Content="Из видео" Grid.Row="0" Grid.Column="3" Margin="3"></Button>
-                    <Button Content="Сменить" Grid.Row="1" Grid.Column="0" Margin="3"></Button>
-                    <Button Content="Файлы" Grid.Row="1" Grid.Column="2" Margin="3"></Button>
+                    <Button x:Name="fromVideoButton" Content="Из видео" Grid.Row="0" Grid.Column="3" Margin="3"></Button>
+                    <Button x:Name="changeButton" Content="Сменить" Grid.Row="1" Grid.Column="0" Margin="3"></Button>
+                    <Button x:Name="filesButton" Content="Файлы" Grid.Row="1" Grid.Column="2" Margin="3"></Button>
                     </Grid>
             </GroupBox>
         </Grid>
