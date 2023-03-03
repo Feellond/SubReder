@@ -32,15 +32,23 @@ namespace SubRed
     {
         public List<Subtitle> globalListOfSubs;
 
+        #region Работа с видеофайлом
         public readonly Dispatcher UIdispatcher;
         private void ActionDispatcher(Action action)
             => UIdispatcher.BeginInvoke(action, null);
         private string LastFilePlay;
         private long LastTime;
+        #endregion
+
+        #region
+
+        #endregion
 
         public MainWindow()
         {
             InitializeComponent();
+
+
             globalListOfSubs = new List<Subtitle>();
 
             UIdispatcher = this.Dispatcher;
@@ -52,6 +60,8 @@ namespace SubRed
             var options = new string[]
             {
                 // VLC options can be given here. Please refer to the VLC command line documentation.
+                "--no-sub-autodetect-file",
+                "--sub-autodetect-fuzzy=1"
             };
 
             LastFilePlay = Properties.Settings.Default.LastFilePlay;
@@ -77,6 +87,25 @@ namespace SubRed
             });
         }
 
+        /// <summary>
+        /// Создание нового проекта по загрузке
+        /// </summary>
+        private void NewLoad()
+        {
+
+        }
+
+        /// <summary>
+        /// Полное обновление всех данных в окне
+        /// </summary>
+        private void UpdateForm()
+        {
+
+        }
+
+        /// <summary>
+        /// Отображение субтитров в таблице
+        /// </summary>
         public void ViewGrid()
         {
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
@@ -86,6 +115,9 @@ namespace SubRed
             //imageProgressBar.Visibility = Visibility.Hidden;
         }
 
+        /// <summary>
+        /// Окно для выгрузки обнаруженных субтитров из файла
+        /// </summary>
         private void ExtractSubsFromFile_Click(object sender, RoutedEventArgs e)
         {
             ExtractSubsWindow ESWindow = new ExtractSubsWindow(ref globalListOfSubs);
@@ -213,7 +245,7 @@ namespace SubRed
 
                 Subtitle dataRow = (Subtitle)SubtitleGrid.SelectedItem;
                 int index = 4;
-                int frameNum = (int)(dataRow.frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond);
+                int frameNum = (int)(dataRow.FrameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond);
                 slider.Value = frameNum;
 
                 player.SourceProvider.MediaPlayer.Time = (long)(frameNum);

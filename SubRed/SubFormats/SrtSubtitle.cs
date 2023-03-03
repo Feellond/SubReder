@@ -26,11 +26,11 @@ namespace SubRed.Sub_formats
                         num++;
                         sw.WriteLine(num);
 
-                        sw.Write(sub.start.ToString());
+                        sw.Write(sub.Start.ToString());
                         sw.Write(" --> ");
-                        sw.WriteLine(sub.end.ToString());
+                        sw.WriteLine(sub.End.ToString());
 
-                        sw.WriteLine(sub.text);
+                        sw.WriteLine(sub.Text);
                     }
                 }
             }

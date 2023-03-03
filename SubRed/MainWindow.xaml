@@ -72,19 +72,79 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1" Grid.Column="0">
+        <Grid Grid.Row="1" Grid.Column="0" MinHeight="360" MinWidth="480">
             <vlc:VlcControl x:Name="player" />
         </Grid>
         <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="1">
-            <TabControl>
-                <TabItem>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"/>
+                    <Button Grid.Row="1"/>
+                    <Button Grid.Row="2"/>
+                    <Button Grid.Row="3"/>
+                    <Button Grid.Row="4"/>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"/>
+                    <Button Grid.Row="1"/>
+                    <Button Grid.Row="2"/>
+                    <Button Grid.Row="3"/>
+                    <Button Grid.Row="4"/>
+                    <Button Grid.Row="5"/>
+                    <Button Grid.Row="6"/>
+                    <Button Grid.Row="7"/>
+                    <Button Grid.Row="8"/>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"/>
+                    <Button Grid.Row="1"/>
+                </Grid>
+            </Grid>
+            <TabControl Grid.Column="1">
+                <TabItem IsEnabled="False">
+                    <TabItem.Template>
+                        <ControlTemplate>
+                            <Button/>
+                        </ControlTemplate>
+                    </TabItem.Template>
+                </TabItem>
+                <TabItem IsSelected="True">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>Субтитры</TextBlock>
                         </StackPanel>
                     </TabItem.Header>
                     <TabItem.Content>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Height="100" VerticalAlignment="Top">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -104,7 +164,9 @@
                                     <TextBox Grid.Row="0"/>
                                     <TextBox Grid.Row="1"/>
                                 </Grid>
-                                <TextBlock Grid.Column="1"></TextBlock>
+                                <Grid Grid.Column="2">
+                                    <TextBlock Width="200" Height="200" Text="KOKW"></TextBlock>
+                                </Grid>
                                 <Grid Grid.Column="3">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -183,51 +245,38 @@
             <Button Content="Стоп" Grid.Column="2" Click="Stop_Click"/>
         </Grid>
         <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="100" MaxHeight="200">
-            <TabControl TabStripPlacement="Left">
-                <TabItem>
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock>Данные</TextBlock>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <TabItem.Content>
-                        <DataGrid Style="{x:Null}" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DataGrid Style="{x:Null}" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                            <DataGrid.Resources>
-                                <Style TargetType="DataGridRow">
-                                    <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
-                                </Style>
-                            </DataGrid.Resources>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="Begin" Binding="{Binding start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="xCoord" Binding="{Binding xCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="yCoord" Binding="{Binding yCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                                <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="TextWrapping" Value="Wrap"></Setter>
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </TabItem.Content>
-                </TabItem>
-                <TabItem>
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock>Аудиодорожка</TextBlock>
-                        </StackPanel>
-                    </TabItem.Header>
-                </TabItem>
-            </TabControl>
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                        Grid.Row="0">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Begin" Binding="{Binding start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="xCoord" Binding="{Binding xCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="yCoord" Binding="{Binding yCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap"></Setter>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </Grid>
 </Window>

@@ -45,18 +45,18 @@ namespace SubRed
             _currentTimeStamp = timestamp;
 
             // First entry not hit yet
-            if (_currentIndex < 0 && timestamp < _entries[0].duration)
+            if (_currentIndex < 0 && timestamp < _entries[0].Duration)
                 return;
 
             // Try to find a later entry than the current to be displayed
-            while (_currentIndex + 1 < _entries.Count && _entries[_currentIndex + 1].duration < timestamp)
+            while (_currentIndex + 1 < _entries.Count && _entries[_currentIndex + 1].Duration < timestamp)
             {
                 _currentIndex++;
             }
 
             // Has the current entry changed? Notify!
             if (_currentIndex >= 0 && _currentIndex < _entries.Count && _currentIndex != previousIndex)
-                OnUpdateSubtitles(_entries[_currentIndex].text);
+                OnUpdateSubtitles(_entries[_currentIndex].Text);
         }
 
         private int FindPreviousEntry(TimeSpan timestamp)
@@ -64,7 +64,7 @@ namespace SubRed
             // Look for the last entry that is "earlier" than the specified timestamp
             for (int i = _entries.Count - 1; i >= 0; i--)
             {
-                if (_entries[i].duration < timestamp)
+                if (_entries[i].Duration < timestamp)
                     return i;
             }
 

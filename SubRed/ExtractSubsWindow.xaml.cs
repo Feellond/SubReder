@@ -61,7 +61,7 @@ namespace SubRed
         public void ViewGrid()
         {
             for (int i = 0; i < tempGlobalListOfSubs.Count; i++)
-                tempGlobalListOfSubs[i].id = i + 1;
+                tempGlobalListOfSubs[i].Id = i + 1;
 
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
             this.SubtitleGrid.ItemsSource = null;
@@ -179,9 +179,9 @@ namespace SubRed
                 var sub = listOfSubs[index];
                 //проверяем изменился ли текст
                 var tempimg = newFrame.ToImage<Gray, Byte>();
-                tempimg.ROI = sub.frameRegion;
+                tempimg.ROI = sub.FrameRegion;
 
-                var subTempimg = sub.frameImage.ToImage<Gray, Byte>();
+                var subTempimg = sub.FrameImage.ToImage<Gray, Byte>();
 
                 CvInvoke.DestroyAllWindows();
 
@@ -192,27 +192,27 @@ namespace SubRed
                 CvInvoke.FindContours(subTempimg, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
 
                 bool isChanged = false;
-                var subChangedControlValue = sub.frameRegion.Height * sub.frameRegion.Width * 0.3;
+                var subChangedControlValue = sub.FrameRegion.Height * sub.FrameRegion.Width * 0.3;
                 for (int j = 0; j < contours.Size; j++)
                 {
                     using (VectorOfPoint contour = contours[j])
                         if (CvInvoke.ContourArea(contour) > subChangedControlValue) //Если субтитр поменялся
                         {
-                            var sumFrameNum = currentFrame - sub.frameBeginNum;
+                            var sumFrameNum = currentFrame - sub.FrameBeginNum;
                             if (fps / 2 < sumFrameNum && fps * 120 > sumFrameNum) // Если субтитр дольше секунды и меньше 2 минут
                             {
                                 //Запись в глобальную переменную субтитр
                                 tempGlobalListOfSubs.Add(new Subtitle()
                                 {
-                                    text = sub.text,
-                                    start = new TimeSpan(0, 0, 0, 0, (int)(sub.frameBeginNum / fps * 1000)),
-                                    end = new TimeSpan(0, 0, 0, 0, (int)(currentFrame / fps * 1000)),
-                                    frameBeginNum = sub.frameBeginNum,
-                                    frameEndNum = currentFrame,
+                                    Text = sub.Text,
+                                    Start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000)),
+                                    End = new TimeSpan(0, 0, 0, 0, (int)(currentFrame / fps * 1000)),
+                                    FrameBeginNum = sub.FrameBeginNum,
+                                    FrameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,
-                                    frameRegion = sub.frameRegion,
-                                    xCoord = sub.frameRegion.X,
-                                    yCoord = sub.frameRegion.Y
+                                    FrameRegion = sub.FrameRegion,
+                                    XCoord = sub.FrameRegion.X,
+                                    YCoord = sub.FrameRegion.Y
                                 });
 
                                 listOfSubs.Remove(sub);
@@ -226,7 +226,7 @@ namespace SubRed
 
                 if (!isChanged)
                 {
-                    listOfSubs[index].frameImage = tempimg.ToBitmap<Gray, byte>();
+                    listOfSubs[index].FrameImage = tempimg.ToBitmap<Gray, byte>();
                 }
             }
         }
@@ -318,10 +318,10 @@ namespace SubRed
                                 if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
                                     listOfSubs.Add(new Subtitle()
                                     {
-                                        text = text,
-                                        frameBeginNum = currentFrame,
-                                        frameImage = tempimg.ToBitmap<Gray, Byte>(),
-                                        frameRegion = region
+                                        Text = text,
+                                        FrameBeginNum = currentFrame,
+                                        FrameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                        FrameRegion = region
                                     });
                             }
                         }
@@ -332,9 +332,9 @@ namespace SubRed
                                 bool IsFoundSub = false;
                                 foreach (var sub in listOfSubs)
                                 {
-                                    System.Drawing.Rectangle rectIntersect = sub.frameRegion;
+                                    System.Drawing.Rectangle rectIntersect = sub.FrameRegion;
                                     rectIntersect.Intersect(region);
-                                    if (rectIntersect.Height * rectIntersect.Width > sub.frameRegion.Height * sub.frameRegion.Width * 0.2) //Если пересекается более чем на 20%
+                                    if (rectIntersect.Height * rectIntersect.Width > sub.FrameRegion.Height * sub.FrameRegion.Width * 0.2) //Если пересекается более чем на 20%
                                     {
                                         IsFoundSub = true; // нашли субтитр
                                         break;
@@ -348,10 +348,10 @@ namespace SubRed
                                     if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
                                         listOfSubs.Add(new Subtitle()
                                         {
-                                            text = SubtitleOCR.GetRegionsTextTesseract(tempimg),
-                                            frameBeginNum = currentFrame,
-                                            frameImage = tempimg.ToBitmap<Gray, Byte>(),
-                                            frameRegion = region
+                                            Text = SubtitleOCR.GetRegionsTextTesseract(tempimg),
+                                            FrameBeginNum = currentFrame,
+                                            FrameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                            FrameRegion = region
                                         });
                                 }
                             }
@@ -366,21 +366,21 @@ namespace SubRed
                         for (int index = 0; index < listOfSubs.Count; index++)
                         {
                             var sub = listOfSubs[index];
-                            var sumFrameNum = currentFrame - sub.frameBeginNum;
+                            var sumFrameNum = currentFrame - sub.FrameBeginNum;
                             if (fps / 2 < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                             {
                                 //Запись в глобальную переменную субтитр
                                 tempGlobalListOfSubs.Add(new Subtitle()
                                 {
-                                    text = sub.text,
-                                    start = new TimeSpan(0, 0, 0, 0, (int)(sub.frameBeginNum / fps * 1000)),
-                                    end = new TimeSpan(0, 0, 0, 0, (int)(sub.frameEndNum / fps * 1000)),
-                                    frameBeginNum = sub.frameBeginNum,
-                                    frameEndNum = currentFrame,
+                                    Text = sub.Text,
+                                    Start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000)),
+                                    End = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameEndNum / fps * 1000)),
+                                    FrameBeginNum = sub.FrameBeginNum,
+                                    FrameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,
-                                    frameRegion = sub.frameRegion,
-                                    xCoord = sub.frameRegion.X,
-                                    yCoord = sub.frameRegion.Y
+                                    FrameRegion = sub.FrameRegion,
+                                    XCoord = sub.FrameRegion.X,
+                                    YCoord = sub.FrameRegion.Y
                                 });
 
                                 listOfSubs.Remove(sub);
@@ -408,9 +408,9 @@ namespace SubRed
                         if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
                             tempGlobalListOfSubs.Add(new Subtitle()
                             {
-                                text = text,
-                                xCoord = region.X,
-                                yCoord = region.Y
+                                Text = text,
+                                XCoord = region.X,
+                                YCoord = region.Y
                             });
                     }
                 }
