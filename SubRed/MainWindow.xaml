@@ -145,69 +145,71 @@
                     </TabItem.Header>
                     <TabItem.Content>
                         <StackPanel Orientation="Horizontal" Height="100" VerticalAlignment="Top">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid Grid.Column="0">
-                                    <Label Content="KEKW"></Label>
-                                </Grid>
-                                <Grid Grid.Column="1">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBox Grid.Row="0"/>
-                                    <TextBox Grid.Row="1"/>
-                                </Grid>
-                                <Grid Grid.Column="2">
-                                    <TextBlock Width="200" Height="200" Text="KOKW"></TextBlock>
-                                </Grid>
-                                <Grid Grid.Column="3">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
+                            <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,3,3">
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
-                                        <ComboBoxItem Selector.IsSelected="True">
-                                            <StackPanel>
-                                                <TextBlock>---</TextBlock>
-                                            </StackPanel>
-                                        </ComboBoxItem>
-                                    </ComboBox>
-                                    <Label Content="H" Grid.Row="1" Grid.Column="0"/>
-                                    <ComboBox Grid.Row="1" Grid.Column="1">
-                                        <ComboBoxItem Selector.IsSelected="True">
-                                            <StackPanel>
-                                                <TextBlock>Центр</TextBlock>
-                                            </StackPanel>
-                                        </ComboBoxItem>
-                                    </ComboBox>
-                                    <Label Content="V" Grid.Row="1" Grid.Column="2"/>
-                                    <ComboBox Grid.Row="1" Grid.Column="3">
-                                        <ComboBoxItem Selector.IsSelected="True">
-                                            <StackPanel>
-                                                <TextBlock>Низ</TextBlock>
-                                            </StackPanel>
-                                        </ComboBoxItem>
-                                    </ComboBox>
-                                    <Label Content="X" Grid.Row="2" Grid.Column="0"/>
-                                    <TextBox Grid.Row="2" Grid.Column="1"/>
-                                    <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
-                                    <TextBox Grid.Row="2" Grid.Column="3"/>
+                                    <Grid Grid.Column="0" Margin="3">
+                                        <Label Content="KEKW"></Label>
+                                    </Grid>
+                                    <Grid Grid.Column="1" Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBox Grid.Row="0"/>
+                                        <TextBox Grid.Row="1"/>
+                                    </Grid>
+                                    <Grid Grid.Column="2" Margin="3">
+                                        <TextBlock Width="200" Text="KOKW"></TextBlock>
+                                    </Grid>
+                                    <Grid Grid.Column="3" Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+                                            <ComboBoxItem Selector.IsSelected="True">
+                                                <StackPanel>
+                                                    <TextBlock>---</TextBlock>
+                                                </StackPanel>
+                                            </ComboBoxItem>
+                                        </ComboBox>
+                                        <Label Content="H" Grid.Row="1" Grid.Column="0"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="1">
+                                            <ComboBoxItem Selector.IsSelected="True">
+                                                <StackPanel>
+                                                    <TextBlock>Центр</TextBlock>
+                                                </StackPanel>
+                                            </ComboBoxItem>
+                                        </ComboBox>
+                                        <Label Content="V" Grid.Row="1" Grid.Column="2"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="3">
+                                            <ComboBoxItem Selector.IsSelected="True">
+                                                <StackPanel>
+                                                    <TextBlock>Низ</TextBlock>
+                                                </StackPanel>
+                                            </ComboBoxItem>
+                                        </ComboBox>
+                                        <Label Content="X" Grid.Row="2" Grid.Column="0"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1"/>
+                                        <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
+                                        <TextBox Grid.Row="2" Grid.Column="3"/>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            </Border>
                         </StackPanel>
                     </TabItem.Content>
                 </TabItem>
