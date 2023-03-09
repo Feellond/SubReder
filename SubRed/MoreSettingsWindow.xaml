@@ -10,149 +10,168 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <GroupBox x:Name="filterGroupBox" Header="Фильтры" Grid.Row="0"  Grid.RowSpan="3" BorderThickness="2,2,2,2" BorderBrush="#FF009FFF" Margin="1,1,5,1">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Label x:Name="labelGausSeed" Content="Ядро Гаусса" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.ColumnSpan="2"/>
+        <GroupBox Grid.Column="0" Grid.Row="0" Margin="3" Header="Обнаружение текста" BorderThickness="2,2,2,2">
+            <Grid Grid.Column="0" Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <GroupBox x:Name="filterGroupBox" Header="Фильтры" Grid.Row="0"  Grid.RowSpan="3" BorderThickness="2,2,2,2" Margin="1,1,5,1">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Label x:Name="labelGausSeed" Content="Ядро Гаусса" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.ColumnSpan="2"/>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <TextBox x:Name="textBoxGausSeed" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                                </Grid>
+                                <Grid Grid.Row="2">
+                                    <Label x:Name="labelMeanSeed" Content="Ядро Медианы" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                </Grid>
+                                <Grid Grid.Row="3">
+                                    <TextBox x:Name="textBoxMeanSeed" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                                </Grid>
                             </Grid>
-                            <Grid Grid.Row="1">
-                                <TextBox x:Name="textBoxGausSeed" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <GroupBox x:Name="laplaceGroupBox" Header="Метод Лапласа" Grid.Row="0"  Grid.RowSpan="3" BorderThickness="2,2,2,2" BorderBrush="#FF009FFF" Margin="1,1,5,1">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Label x:Name="labelLaplaceSeed" Content="Ядро Лапласа" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <TextBox x:Name="textBoxLaplaceSeed" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                                </Grid>
+                                <Grid Grid.Row="2">
+                                    <Label x:Name="labelThresholdLaplace" Content="Порог Лапласа" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                </Grid>
+                                <Grid Grid.Row="3">
+                                    <TextBox x:Name="textBoxThresholdLaplace" TextWrapping="Wrap" Text="170" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                                </Grid>
                             </Grid>
-                            <Grid Grid.Row="2">
-                                <Label x:Name="labelMeanSeed" Content="Ядро Медианы" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <GroupBox x:Name="morphGroupBox" Header="Морфологические методы" Grid.Row="0"  Grid.RowSpan="3" BorderThickness="2,2,2,2" BorderBrush="#FF009FFF" Margin="1,1,5,1">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Label x:Name="labelMorphSize" Content="Ядро морфологии" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <TextBox x:Name="textBoxMorphSize" TextWrapping="Wrap" Text="5" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                                </Grid>
                             </Grid>
-                            <Grid Grid.Row="3">
-                                <TextBox x:Name="textBoxMeanSeed" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
             </Grid>
-            <Grid Grid.Row="1">
-                <GroupBox x:Name="laplaceGroupBox" Header="Метод Лапласа" Grid.Row="0"  Grid.RowSpan="3" BorderThickness="2,2,2,2" BorderBrush="#FF009FFF" Margin="1,1,5,1">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Label x:Name="labelLaplaceSeed" Content="Ядро Лапласа" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <TextBox x:Name="textBoxLaplaceSeed" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                            <Grid Grid.Row="2">
-                                <Label x:Name="labelThresholdLaplace" Content="Порог Лапласа" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                            </Grid>
-                            <Grid Grid.Row="3">
-                                <TextBox x:Name="textBoxThresholdLaplace" TextWrapping="Wrap" Text="170" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-            </Grid>
-            <Grid Grid.Row="2">
-                <GroupBox x:Name="morphGroupBox" Header="Морфологические методы" Grid.Row="0"  Grid.RowSpan="3" BorderThickness="2,2,2,2" BorderBrush="#FF009FFF" Margin="1,1,5,1">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Label x:Name="labelMorphSize" Content="Ядро морфологии" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <TextBox x:Name="textBoxMorphSize" TextWrapping="Wrap" Text="5" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                            <Grid Grid.Row="2">
-                                <Label x:Name="labelDilateHeight" Content="Высота расширения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="26" VerticalAlignment="Top"/>
-                            </Grid>
-                            <Grid Grid.Row="3">
-                                <TextBox x:Name="textBoxDilateHeight" TextWrapping="Wrap" Text="30" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                            <Grid Grid.Row="4">
-                                <Label x:Name="labelDilateWidth" Content="Ширина расширения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                            </Grid>
-                            <Grid Grid.Row="5">
-                                <TextBox x:Name="textBoxDilateWidth" TextWrapping="Wrap" Text="70" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                            <Grid Grid.Row="6">
-                                <Label x:Name="labelErodeHeight" Content="Высота сужения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                            </Grid>
-                            <Grid Grid.Row="7">
-                                <TextBox x:Name="textBoxErodeHeight" TextWrapping="Wrap" Text="20" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                            <Grid Grid.Row="8">
-                                <Label x:Name="labelErodeWidth" Content="Ширина сужения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                            </Grid>
-                            <Grid Grid.Row="9">
-                                <TextBox x:Name="textBoxErodeWidth" TextWrapping="Wrap" Text="65" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
-                            </Grid>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-            </Grid>
-            <Grid Grid.Row="3">
+        </GroupBox>
+        <GroupBox Grid.Row="0" Grid.Column="1" Margin="10 3 3 3" Header="Распознавание текста" BorderThickness="2,2,2,2">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Label x:Name="labelLanguage" Content="Язык субтитров" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                </Grid>
-                <Grid Grid.Row="1">
-                    <ComboBox x:Name="comboBoxLanguage">
-                        <ComboBoxItem x:Name="English" IsSelected="True" Content="Английский"/>
-                        <ComboBoxItem x:Name="Russian" Content="Русский"/>
-                    </ComboBox>
-                </Grid>
-                <CheckBox x:Name="useEastCheckBox" Grid.Row="2" Content="Использовать EAST detector" Margin="5"/>
+                <GroupBox Grid.Row="0" Header="Фильтры" BorderThickness="2,2,2,2" Margin="1,1,5,1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Name="labelGausSeedRecognise" Content="Ядро Гаусса" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.ColumnSpan="2"/>
+                        <TextBox Grid.Row="1" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                        <Label Grid.Row="2" Name="labelMeanSeedRecognise" Content="Ядро Медианы" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <TextBox Grid.Row="3" TextWrapping="Wrap" Text="3" Width="50" Height="20" PreviewTextInput="PreviewTextInputNumbers"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Морфологические методы" BorderThickness="2,2,2,2" Margin="1,1,5,1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Content="Высота расширения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <TextBox Grid.Row="1" Name="textBoxMorphSizeRecognise" TextWrapping="Wrap" Text="30" Width="50" Height="20"
+                                 PreviewTextInput="PreviewTextInputNumbers"/>
+                        <Label Grid.Row="2" Content="Ширина расширения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <TextBox Grid.Row="3" Name="textBoxDilateWidthRecognise" TextWrapping="Wrap" Text="70" Width="50" Height="20" 
+                                 PreviewTextInput="PreviewTextInputNumbers"/>
+                        <Label Grid.Row="4" Content="Высота сужения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <TextBox Grid.Row="5" Name="textBoxErodeHeightRecognise" TextWrapping="Wrap" Text="20" Width="50" Height="20"
+                                 PreviewTextInput="PreviewTextInputNumbers"/>
+                        <Label Grid.Row="6" Content="Ширина сужения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <TextBox Grid.Row="7" Name="textBoxErodeWidthRecognise" TextWrapping="Wrap" Text="65" Width="50" Height="20"
+                                 PreviewTextInput="PreviewTextInputNumbers"/>
+                    </Grid>
+                </GroupBox>
             </Grid>
-        </Grid>
-        <Grid Grid.Row="0" Grid.Column="1" Margin="3">
+        </GroupBox>
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
+            <Grid Grid.Row="0">
+                <Label x:Name="labelLanguage" Content="Язык субтитров" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <ComboBox x:Name="comboBoxLanguage">
+                    <ComboBoxItem x:Name="English" IsSelected="True" Content="Английский"/>
+                    <ComboBoxItem x:Name="Russian" Content="Русский"/>
+                </ComboBox>
+            </Grid>
+            <CheckBox x:Name="useEastCheckBox" Grid.Row="2" Content="Использовать EAST detector" Margin="5"/>
         </Grid>
-        <Grid Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="3">
+        <Grid Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>

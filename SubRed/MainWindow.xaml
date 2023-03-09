@@ -72,7 +72,7 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1" Grid.Column="0" MinHeight="360" MinWidth="480">
+        <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" MinHeight="360" MinWidth="480">
             <vlc:VlcControl x:Name="player" />
         </Grid>
         <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="1">
@@ -86,7 +86,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
+                <Grid Grid.Row="0" Margin="3">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -133,7 +133,7 @@
                 <TabItem IsEnabled="False">
                     <TabItem.Template>
                         <ControlTemplate>
-                            <Button/>
+                            <Button Content="+"/>
                         </ControlTemplate>
                     </TabItem.Template>
                 </TabItem>
@@ -225,26 +225,43 @@
                 </TabItem>
             </TabControl>
         </Grid>
-        <Grid Grid.Row="2" Grid.Column="0">
+        <Grid Grid.Row="2" Grid.Column="0" Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Value, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0" Width="{Binding ActualWidth, ElementName=textBlock, Mode=OneWay}"/>
-            <Slider Grid.Column="1" x:Name="slider" Maximum="0.1"
+            <TextBlock Text="{Binding Value, ElementName=slider, StringFormat=\{0:F0\}}" 
+                       Margin="5,0" Width="{Binding ActualWidth, ElementName=textBlock, Mode=OneWay}" 
+                       Background="Transparent" Foreground="White"/>
+            <Slider Grid.Column="1" x:Name="slider" Maximum="0.1" Background="Transparent"
                     Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"/>
-            <TextBlock x:Name="textBlock" Grid.Column="2" Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
+            <TextBlock x:Name="textBlock" Grid.Column="2" Background="Transparent" Foreground="White"
+                       Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
         </Grid>
         <Grid Grid.Row="3" Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Content="Загрузить" Click="Load_Click"/>
-            <Button x:Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="1" Click="StartPausePlay_Click"/>
-            <Button Content="Стоп" Grid.Column="2" Click="Stop_Click"/>
+            <Button Name="LoadVideoButton" Content="Загрузить" Grid.Column="0" Click="Load_Click"/>
+            <Button Name="StopVideoButton" Content="Стоп" Grid.Column="1" Click="Stop_Click"/>
+            <Button Name="BackVideoButton" Content="Prev 10" Grid.Column="2"/>
+            <Button Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="3" Click="StartPausePlay_Click"/>
+            <Button Name="ForwardVideoButton" Content="Next 10" Grid.Column="4"/>
+            <Button Name="EndVideoButton" Content="ToEnd" Grid.Column="5"/>
+            <TextBox Name="CurrentTimeVideoTextBox" Text="00:00:00:00" Grid.Column="6"/>
+            <TextBox Name="IdSubtitleTextBox" Text="-1" Grid.Column="7"/>
+            <Button Name="PrevSubtitleButton" Content="Prev" Grid.Column="8"/>
+            <Button Name="NextSubtitleButton" Content="Next" Grid.Column="9"/>
         </Grid>
         <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="100" MaxHeight="200">
             <Grid.RowDefinitions>
