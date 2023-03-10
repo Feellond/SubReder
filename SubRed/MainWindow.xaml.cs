@@ -278,5 +278,13 @@ namespace SubRed
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (tabControl.SelectedIndex == 0)
+            {
+                tabControl.SelectedIndex = 1;
+            }
+        }
     }
 }
