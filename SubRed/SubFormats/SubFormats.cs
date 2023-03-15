@@ -9,69 +9,35 @@ namespace SubRed.Sub_formats
     public static class SubFormats
     {
 
-        public static string SelectFormat(string filename, List<Subtitle> subList, bool isLoadFunction)
+        public static string SelectFormat(string filename, SubProject project, bool isLoadFunction, string format = "")
         {
-            string[] format = filename.Split('.');
-            switch (format[format.Length - 1])
+            string[] formatSplit = filename.Split('.');
+            switch (formatSplit[formatSplit.Length - 1])
             {
                 case "ass":
                     if (isLoadFunction)
-                        return AssSubtitle.Load(filename);
+                        AssSubtitle.Load(filename, project);
                     else
-                        //AssSubtitle.Save(filename, sub);
+                        AssSubtitle.Save(filename, project);
                     break;
                 case "ssa":
                     if (isLoadFunction)
-                        return SsaSubtitle.Load(filename);
+                        SsaSubtitle.Load(filename, project);
                     else
-                        //SsaSubtitle.Save(filename, sub);
+                        SsaSubtitle.Save(filename, project);
                     break;
                 case "srt":
                     if (isLoadFunction)
-                        return SrtSubtitle.Load(filename);
+                        SrtSubtitle.Load(filename, project);
                     else
-                        SrtSubtitle.Save(filename, subList);
+                        SrtSubtitle.Save(filename, project);
                     break;
                 case "smi":
                     if (isLoadFunction)
-                        return SmiSubtitle.Load(filename);
+                        SmiSubtitle.Load(filename, project);
                     else
-                        //SmiSubtitle.Save(filename, sub);
+                        SmiSubtitle.Save(filename, project);
                     break;
-                default:
-                    return "";
-            }
-            return "";
-        }
-
-        public static string SelectFormat(string filename, List<Subtitle> subList, bool isLoadFunction, string format)
-        {
-            switch (format)
-            {
-                case "ass":
-                    if (isLoadFunction)
-                        return AssSubtitle.Load(filename);
-                    else
-                        //AssSubtitle.Save(filename, sub);
-                        break;
-                case "ssa":
-                    if (isLoadFunction)
-                        return SsaSubtitle.Load(filename);
-                    else
-                        //SsaSubtitle.Save(filename, sub);
-                        break;
-                case "srt":
-                    if (isLoadFunction)
-                        return SrtSubtitle.Load(filename);
-                    else
-                        SrtSubtitle.Save(filename, subList);
-                    break;
-                case "smi":
-                    if (isLoadFunction)
-                        return SmiSubtitle.Load(filename);
-                    else
-                        //SmiSubtitle.Save(filename, sub);
-                        break;
                 default:
                     return "";
             }

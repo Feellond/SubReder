@@ -1,9 +1,14 @@
-﻿using System;
+﻿using Emgu.CV.Stitching;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Automation.Text;
 
 namespace SubRed.Sub_formats
 {
@@ -13,88 +18,94 @@ namespace SubRed.Sub_formats
         private static string[] separatorForText = { "\\N", "\\n", "\n" };
         private static string[] textFormatSplit = { "Name", "Fontname", "Fontsize", "PrimaryColour", "SecondaryColour", "OutlineColour", "BackColour", "" };
 
-        public static void Save(string filename, string sub)
+        public static void Save(string filename, SubProject project)
         {
-            sub = sub.Replace("OriginalScript:", "Original Script:");
-            sub = sub.Replace("OriginalTranslation:", "Original Translation:");
             try
             {
-                using (StreamWriter sw = new StreamWriter(filename, false, System.Text.Encoding.Default))
+                using StreamWriter sw = new StreamWriter(filename, false, System.Text.Encoding.Default);
+                sw.WriteLine("[Script Info]");
+                sw.WriteLine("Title: " + project.Title);
+                sw.WriteLine("OriginalScript: " + project.OriginalScript);
+                sw.WriteLine("OriginalTranslation: " + project.OriginalTranslation);
+                sw.WriteLine("OriginalEditing: " + project.OriginalEditing);
+                sw.WriteLine("OriginalTiming: " + project.OriginalTiming);
+                sw.WriteLine("SyncPoint: " + project.SyncPoint);
+                sw.WriteLine("ScriptUpdatedBy: " + project.ScriptUpdatedBy);
+                sw.WriteLine("UpdateDetails: " + project.UpdateDetails);
+                sw.WriteLine("ScriptType: " + project.ScriptType);
+                sw.WriteLine("Collisions: " + project.Collisions);
+                sw.WriteLine("PlayResX: " + project.PlayResX);
+                sw.WriteLine("PlayResY: " + project.PlayResY);
+                sw.WriteLine("PlayDepth: " + project.PlayDepth);
+                sw.WriteLine("Timer: " + project.Timer);
+                sw.WriteLine("Wav: " + project.Wav);
+                sw.WriteLine("LastWav: " + project.LastWav);
+                sw.WriteLine("WrapStyle: " + project.WrapStyle);
+
+                sw.WriteLine("[V4+ Styles]");
+                sw.WriteLine("Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, " +
+                    "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, " +
+                    "Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
+                foreach (var style in project.SubtitleStyleList)
                 {
-                    //Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColor, 
-                    //BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
-                    //Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
-                    //BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+                    sw.Write("Style: ");
+                    sw.Write(style.Name + ",");
+                    sw.Write(style.Fontname + ",");
+                    sw.Write(style.Fontsize.ToString() + ",");
+                    sw.Write(style.PrimaryColor + ",");
+                    sw.Write(style.SecondaryColor + ",");
+                    sw.Write(style.OutlineColor + ",");
+                    sw.Write(style.BackColor + ",");
+                    sw.Write(style.Bold ? -1 : 0 + ",");
+                    sw.Write(style.Italic ? -1 : 0 + ",");
+                    sw.Write(style.Underline ? -1 : 0 + ",");
+                    sw.Write(style.StrikeOut ? -1 : 0 + ",");
+                    sw.Write(style.ScaleX.ToString() + ",");
+                    sw.Write(style.ScaleY.ToString() + ",");
+                    sw.Write(style.Spacing.ToString() + ",");
+                    sw.Write(style.Angle.ToString() + ",");
+                    sw.Write(style.BorderStyle.ToString() + ",");
+                    sw.Write(style.Outline.ToString() + ",");
+                    sw.Write(style.Shadow.ToString() + ",");
+                    sw.Write(style.Alignment.ToString() + ",");
+                    sw.Write(style.MarginL.ToString() + ",");
+                    sw.Write(style.MarginR.ToString() + ",");
+                    sw.Write(style.MarginV.ToString() + ",");
+                    sw.Write(style.AlphaLevel.ToString() + ",");
+                    sw.Write(style.Encoding.ToString() + ",");
+                    sw.WriteLine();
+                }
 
-                    string[] subSplit = sub.Split(separator, StringSplitOptions.None);
-
-                    for (int i = 0; i < subSplit.Length; i++)
-                    {
-                        subSplit[i] = subSplit[i].Trim();
-                        if (subSplit[i].Contains("StyleFormat:"))
-                        {
-                            textFormatSplit = subSplit[i].Replace("StyleFormat:", "").Trim().Split(',');
-                            subSplit[i] = subSplit[i].Replace("StyleFormat:", "Format:");
-
-                            try
-                            {
-                                string[] styleSplit = subSplit[i].Replace("Format:", "").Trim().Split(',');
-                                styleSplit[Array.IndexOf(textFormatSplit, "AlphaLevel")] = "";
-
-                                subSplit[i] = "Format: " + String.Join(",", styleSplit.Where(s => !string.IsNullOrEmpty(s)));
-                            }
-                            catch { }
-                        }
-                        else if (subSplit[i].Contains("TextFormat:"))
-                        {
-                            subSplit[i] = subSplit[i].Replace("TextFormat:", "Format:");
-                        }
-                        else if (subSplit[i].Contains("Style:") && !subSplit[i].Contains("WrapStyle:"))
-                        {
-                            try
-                            {
-                                string[] styleSplit = subSplit[i].Replace("Style:", "").Trim().Split(',');
-                                styleSplit[Array.IndexOf(textFormatSplit, "AlphaLevel")] = "";
-
-                                subSplit[i] = "Style: " + String.Join(",", styleSplit.Where(s => !string.IsNullOrEmpty(s)));
-                            }
-                            catch { }
-                        }
-                        else if (subSplit[i].Contains("Text:"))
-                        {
-                            subSplit[i] = subSplit[i].Replace("Text:", "Dialogue:");
-                        }
-                    }
-
-                    sw.WriteLine("[Script Info]");
-                    int n = 0;
-                    for (int i = 0; i < subSplit.Length; i++)
-                    {
-                        if (subSplit[i].Contains("Format:"))
-                        {
-                            sw.WriteLine();
-                            if (n == 0)
-                                sw.WriteLine("[V4+ Styles]");
-                            else
-                                sw.WriteLine("[Events]");
-
-                            sw.WriteLine(subSplit[i]);
-                            n++;
-                        }
-                        else
-                            sw.WriteLine(subSplit[i]);
-                    }
+                sw.WriteLine("[Events]");
+                sw.WriteLine("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text");
+                foreach (var dialogue in project.SubtitlesList)
+                {
+                    sw.Write("Dialogue: ");
+                    sw.Write(dialogue.Layer + ",");
+                    sw.Write(dialogue.Start.ToString("hh\\:mm\\:ss\\.FFFF") + ",");
+                    sw.Write(dialogue.End.ToString("hh\\:mm\\:ss\\.FFFF") + ",");
+                    sw.Write(dialogue.Style.Name + ",");
+                    sw.Write(dialogue.Name + ",");
+                    sw.Write(dialogue.Style.MarginL.ToString() + ",");
+                    sw.Write(dialogue.Style.MarginR.ToString() + ",");
+                    sw.Write(dialogue.Style.MarginV.ToString() + ",");
+                    sw.Write(dialogue.Effect.ToString() + ",");
+                    sw.Write(dialogue.Text + ",");
+                    sw.WriteLine();
                 }
             }
             catch
             {
-
+                MessageBox.Show("Ошибка сохранения .ass формата субтитров", "Ошибка сохранения .ass", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        public static string Load(string filename)
+        public static void Load(string filename, SubProject project)
         {
-            string sub = "";
+            project = new SubProject();
+            project.SubtitleStyleList = new List<SubtitleStyle>();
+            project.SubtitlesList = new List<Subtitle>();
+            int numSubs = 1;
             try
             {
                 string line = "";
@@ -108,25 +119,120 @@ namespace SubRed.Sub_formats
                                 string[] lineSplit = line.Split(new char[] { ':' }, 2);
                                 lineSplit[0] = lineSplit[0].Trim();
 
-                                sub = sub + lineSplit[0] + ":" + lineSplit[1];
-                                sub += "&&";
+                                switch (lineSplit[0])
+                                {
+                                    #region Данные проекта [Script info]
+                                    case "Title":
+                                        project.Title = lineSplit[1];
+                                        break;
+                                    case "OriginalScript":
+                                        project.OriginalScript = lineSplit[1];
+                                        break;
+                                    case "OriginalTranslation":
+                                        project.OriginalTranslation = lineSplit[1];
+                                        break;
+                                    case "OriginalEditing":
+                                        project.OriginalEditing = lineSplit[1];
+                                        break;
+                                    case "OriginalTiming":
+                                        project.OriginalTiming = lineSplit[1];
+                                        break;
+                                    case "SyncPoint":
+                                        project.SyncPoint = lineSplit[1];
+                                        break;
+                                    case "ScriptUpdatedBy":
+                                        project.ScriptUpdatedBy = lineSplit[1];
+                                        break;
+                                    case "UpdateDetails":
+                                        project.UpdateDetails = lineSplit[1];
+                                        break;
+                                    case "ScriptType":
+                                        project.ScriptType = lineSplit[1];
+                                        break;
+                                    case "Collisions":
+                                        project.Collisions = lineSplit[1];
+                                        break;
+                                    case "PlayResX":
+                                        project.PlayResX = lineSplit[1];
+                                        break;
+                                    case "PlayResY":
+                                        project.PlayResY = lineSplit[1];
+                                        break;
+                                    case "PlayDepth":
+                                        project.PlayDepth = lineSplit[1];
+                                        break;
+                                    case "Timer":
+                                        project.Timer = lineSplit[1];
+                                        break;
+                                    case "WrapStyle":
+                                        project.WrapStyle = lineSplit[1];
+                                        break;
+                                    case "Wav":
+                                        project.Wav = lineSplit[1];
+                                        break;
+                                    case "LastWav":
+                                        project.LastWav = lineSplit[1];
+                                        break;
+                                    #endregion
+                                    #region Стили [V4+ Styles]
+                                    case "Style":
+                                        var splitStyle = lineSplit[1].Split(',');
+                                        project.SubtitleStyleList.Add(new SubtitleStyle 
+                                        {
+                                            Name = splitStyle[0],
+                                            Fontname = splitStyle[1],
+                                            Fontsize = Convert.ToInt32(splitStyle[2]),
+                                            PrimaryColor = splitStyle[3],
+                                            SecondaryColor = splitStyle[4],
+                                            OutlineColor = splitStyle[5],
+                                            BackColor = splitStyle[6],
+                                            Bold = splitStyle[7] == "0" ? false : true,
+                                            Italic = splitStyle[8] == "0" ? false : true,
+                                            Underline = splitStyle[9] == "0" ? false : true,
+                                            StrikeOut = splitStyle[10] == "0" ? false : true,
+                                            ScaleX = Convert.ToInt32(splitStyle[11]),
+                                            ScaleY = Convert.ToInt32(splitStyle[12]),
+                                            Spacing = Convert.ToInt32(splitStyle[13]),
+                                            Angle = Convert.ToInt32(splitStyle[14]),
+                                            BorderStyle = Convert.ToInt32(splitStyle[15]),
+                                            Outline = Convert.ToInt32(splitStyle[16]),
+                                            Shadow = Convert.ToInt32(splitStyle[17]),
+                                            Alignment = Convert.ToInt32(splitStyle[18]),
+                                            MarginL = Convert.ToInt32(splitStyle[19]),
+                                            MarginR = Convert.ToInt32(splitStyle[20]),
+                                            MarginV = Convert.ToInt32(splitStyle[21]),
+                                            AlphaLevel = Convert.ToInt32(splitStyle[22]),
+                                            Encoding = splitStyle[23]
+                                        });
+                                        break;
+                                    #endregion
+                                    #region Субтитры [Events]
+                                    case "Dialogue":
+                                        var splitDialogue = lineSplit[1].Split(',');
+                                        Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+                                        project.SubtitlesList.Add(new Subtitle
+                                        {
+                                            Id = numSubs,
+                                            Marked = Convert.ToInt32(splitDialogue[0]),
+                                            Layer = Convert.ToInt32(splitDialogue[1]),
+                                            Start = TimeSpan.Parse(splitDialogue[2]),   //00:00:00.00
+                                            End = TimeSpan.Parse(splitDialogue[3]),
+                                            Style = project.SubtitleStyleList.Find(x => x.Name == splitDialogue[4]) ?? new SubtitleStyle(),
+                                            Name = splitDialogue[5],
+                                            Effect = splitDialogue[8],
+                                            Text = splitDialogue[9]
+                                        });
+                                        break;
+                                    #endregion
+                                }
                             }
                 }
-
-                string format = "Format";
-                int i = sub.IndexOf(format);
-                sub = sub.Remove(i, format.Length).Insert(i, "StyleFormat");
-                i = sub.IndexOf(format, i + "StyleFormat".Length);
-                sub = sub.Remove(i, format.Length).Insert(i, "TextFormat");
-
                 file.Close();
             }
             catch
             {
-
+                MessageBox.Show("Ошибка загрузки .ass формата субтитров", "Ошибка загрузки .ass", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            return sub;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace SubRed
     /// </summary>
     public partial class MainWindow : Window
     {
-        public List<Subtitle> globalListOfSubs;
+        public SubProject currentSubRedProject;
 
         #region Работа с видеофайлом
         public readonly Dispatcher UIdispatcher;
@@ -48,8 +48,7 @@ namespace SubRed
         {
             InitializeComponent();
 
-
-            globalListOfSubs = new List<Subtitle>();
+            currentSubRedProject = new SubProject();
 
             UIdispatcher = this.Dispatcher;
 
@@ -100,7 +99,141 @@ namespace SubRed
         /// </summary>
         private void UpdateForm()
         {
+            ViewGrid();
+            ViewSubtitleTab();
+        }
 
+        public void ViewSubtitleTab()
+        {
+            subListGrid.Children.Add();
+            for(int index = 0; index < currentSubRedProject.SubtitlesList.Count; index++)
+            {
+                StackPanel sp = new StackPanel { 
+                    Orientation = Orientation.Horizontal,
+                    Height = 100,
+                    VerticalAlignment= VerticalAlignment.Top,
+                    Margin = new Thickness(3)
+                };
+                sp.SetValue(Grid.RowProperty, index);
+
+                Border border = new Border {
+                    Background = new SolidColorBrush(Colors.GhostWhite),
+                    BorderBrush = new SolidColorBrush(Colors.Silver),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(8, 8, 8, 8)
+                };
+
+                Grid globalGrid = new Grid();
+                Grid innerGrid = new Grid { Margin = new Thickness(3) };
+                innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto});
+                innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+                innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+
+                Grid labelGrid = new Grid { Margin = new Thickness(3) };
+                labelGrid.SetValue(Grid.ColumnProperty, 0);
+                Label idLabel = new Label { Name = "idLabel" + index.ToString(), Content = index.ToString() };
+                labelGrid.Children.Add(idLabel);
+                innerGrid.Children.Add(labelGrid);
+                
+                Grid timeGrid = new Grid { Margin= new Thickness(3) };
+                timeGrid.SetValue(Grid.ColumnProperty, 1);
+                timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                TextBox beginTextBox = new TextBox { Name = "beginTextBox" + index.ToString(), Text = "00:00:00.0000" };
+                beginTextBox.SetValue(Grid.RowProperty, 0);
+                TextBox endTextBox = new TextBox { Name = "endTextBox" + index.ToString(), Text = "00:00:00.0000" };
+                endTextBox.SetValue(Grid.RowProperty, 1);
+                timeGrid.Children.Add(beginTextBox);
+                timeGrid.Children.Add(endTextBox);
+                innerGrid.Children.Add(timeGrid);
+
+                Grid textBlockGrid = new Grid { Margin = new Thickness(3) };
+                TextBlock subtitleTextBlock = new TextBlock { 
+                    Name = "subtitleTextBlock",
+                    Text = "Text", 
+                    Background = new SolidColorBrush(Colors.White)
+                };
+                textBlockGrid.Children.Add(subtitleTextBlock);
+                innerGrid.Children.Add(textBlockGrid);
+
+                #region Правая колонка
+                Grid selectionGrid = new Grid { Margin = new Thickness(3) };
+                selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+
+                ComboBox styleSelectComboBox = new ComboBox { Name = "StyleSelectComboBox" + index.ToString() };
+                styleSelectComboBox.SetValue(Grid.RowProperty, 0);
+                styleSelectComboBox.SetValue(Grid.ColumnProperty, 0);
+                styleSelectComboBox.SetValue(Grid.ColumnSpanProperty, 4);
+                ComboBoxItem itemSelected = new ComboBoxItem { Name = "item1", IsSelected = true};
+                StackPanel panelForItem = new StackPanel();
+                TextBlock blockForPanel = new TextBlock {Text = "---"};
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected.Content = panelForItem;
+                styleSelectComboBox.Items.Add(itemSelected);
+                selectionGrid.Children.Add(styleSelectComboBox);
+
+                Label hLabel = new Label {Content = "H"};
+                hLabel.SetValue(Grid.RowProperty, 1);
+                hLabel.SetValue(Grid.ColumnProperty, 0);
+                selectionGrid.Children.Add(hLabel);
+
+                ComboBox hSelectComboBox = new ComboBox();
+                hSelectComboBox.SetValue(Grid.RowProperty, 1);
+                hSelectComboBox.SetValue(Grid.ColumnProperty, 1);
+                itemSelected = new ComboBoxItem { Name = "hItem1", IsSelected = true};
+                panelForItem = new StackPanel();
+                blockForPanel = new TextBlock { Text = "Центр"};
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected.Content = panelForItem;
+                hSelectComboBox.Items.Add(itemSelected);
+                selectionGrid.Children.Add(hSelectComboBox);
+
+                Label vLabel = new Label { Content = "V" };
+                vLabel.SetValue(Grid.RowProperty, 1);
+                vLabel.SetValue(Grid.ColumnProperty, 2);
+                selectionGrid.Children.Add(vLabel);
+
+                ComboBox vSelectComboBox = new ComboBox();
+                vSelectComboBox.SetValue(Grid.RowProperty, 1);
+                vSelectComboBox.SetValue(Grid.ColumnProperty, 3);
+                itemSelected = new ComboBoxItem { Name = "vItem1", IsSelected = true };
+                panelForItem = new StackPanel();
+                blockForPanel = new TextBlock { Text = "Низ" };
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected.Content = panelForItem;
+                vSelectComboBox.Items.Add(itemSelected);
+                selectionGrid.Children.Add(vSelectComboBox);
+
+                Label xLabel = new Label { Content = "X" };
+                xLabel.SetValue(Grid.RowProperty, 2);
+                xLabel.SetValue(Grid.ColumnProperty, 0);
+                selectionGrid.Children.Add(xLabel);
+
+                TextBox xTextBox = new TextBox();
+                xTextBox.SetValue(Grid.RowProperty, 2);
+                xTextBox.SetValue(Grid.ColumnProperty, 1);
+                selectionGrid.Children.Add(xTextBox);
+
+                Label yLabel = new Label { Content = "Y" };
+                yLabel.SetValue(Grid.RowProperty, 2);
+                yLabel.SetValue(Grid.ColumnProperty, 2);
+                selectionGrid.Children.Add(yLabel);
+
+                TextBox yTextBox = new TextBox();
+                yTextBox.SetValue(Grid.RowProperty, 2);
+                yTextBox.SetValue(Grid.ColumnProperty, 3);
+                selectionGrid.Children.Add(yTextBox);
+                #endregion
+                innerGrid.Children.Add(selectionGrid);
+            }
         }
 
         /// <summary>
@@ -110,7 +243,7 @@ namespace SubRed
         {
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
             this.SubtitleGrid.ItemsSource = null;
-            this.SubtitleGrid.ItemsSource = globalListOfSubs;
+            this.SubtitleGrid.ItemsSource = currentSubRedProject.SubtitlesList;
 
             //imageProgressBar.Visibility = Visibility.Hidden;
         }
@@ -120,11 +253,11 @@ namespace SubRed
         /// </summary>
         private void ExtractSubsFromFile_Click(object sender, RoutedEventArgs e)
         {
-            ExtractSubsWindow ESWindow = new ExtractSubsWindow(ref globalListOfSubs);
+            ExtractSubsWindow ESWindow = new ExtractSubsWindow(currentSubRedProject.SubtitlesList);
             if (ESWindow.ShowDialog() == true)
             {
-                globalListOfSubs = new List<Subtitle>();
-                globalListOfSubs.AddRange(ESWindow.globalListOfSubs);
+                currentSubRedProject.SubtitlesList = new List<Subtitle>();
+                currentSubRedProject.SubtitlesList.AddRange(ESWindow.globalListOfSubs);
                 ViewGrid();
             }
         }
@@ -215,10 +348,22 @@ namespace SubRed
             long time = (long)slider.Value;
             ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Time = time);
         }
-
+        #region Методы загрузки и сохранения субтитров
         private void SrtSave_Click(object sender, RoutedEventArgs e)
         {
-            SaveFile();
+            SaveFile(".srt");
+        }
+        private void AssSave_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFile(".ass");
+        }
+        private void SrtLoad_Click(object sender, RoutedEventArgs e)
+        {
+            LoadFile(".srt");
+        }
+        private void AssLoad_Click(object sender, RoutedEventArgs e)
+        {
+            LoadFile(".ass");
         }
         private void SaveFile(string format = "")
         {
@@ -229,13 +374,23 @@ namespace SubRed
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                if (format == "")
-                    SubFormats.SelectFormat(saveFileDialog.FileName, globalListOfSubs, false);
-                else
-                    SubFormats.SelectFormat(saveFileDialog.FileName, globalListOfSubs, false, format);
+                SubFormats.SelectFormat(saveFileDialog.FileName, currentSubRedProject, false, format);
             }
         }
 
+        private void LoadFile(string format = "")
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "All Files|*.*"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                SubFormats.SelectFormat(openFileDialog.FileName, currentSubRedProject, true, format);
+            }
+        }
+        #endregion
         private void Row_Click(object sender, MouseButtonEventArgs e)
         {
             try

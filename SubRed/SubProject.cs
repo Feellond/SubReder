@@ -31,6 +31,7 @@ namespace SubRed
                                                        //2: нет переноса, теги \n и \N игнорируются
                                                        //3: аналогично 0, но нижняя строка всегда будет длиннее верхней.
         public List<Subtitle> SubtitlesList { get; set; }
+        public List<SubtitleStyle> SubtitleStyleList { get; set; }
 
         public SubProject() 
         {
@@ -52,9 +53,11 @@ namespace SubRed
             Wav = "";
             LastWav = "";
 
+            SubtitleStyleList = new List<SubtitleStyle> { new SubtitleStyle() };
+
             SubtitlesList = new List<Subtitle>
             {
-                new Subtitle()
+                new Subtitle() { Style = SubtitleStyleList[0]}
             };
         }
     }

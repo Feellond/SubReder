@@ -15,6 +15,7 @@ namespace SubRed
         public string PrimaryColor { get; set; }
         public string SecondaryColor { get; set;}
         public string OutlineColor { get; set; }
+        public string BackColor { get; set; }
         public bool Bold { get; set; }
         public bool Italic { get; set; }
         public bool Underline { get; set; }
@@ -41,6 +42,7 @@ namespace SubRed
             PrimaryColor = "FFFFFF";
             SecondaryColor = "";
             OutlineColor = "000000";
+            BackColor = "";
             Bold = false;
             Italic = false;
             Underline = false;

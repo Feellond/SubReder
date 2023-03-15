@@ -14,14 +14,14 @@ namespace SubRed.Sub_formats
         private static string[] separatorForText = { "\\N", "\\n", "\n" };
         private static string[] textFormatSplit = { "Start", "End", "Text" };
 
-        public static void Save(string filename, List<Subtitle> subList)
+        public static void Save(string filename, SubProject project)
         {
             try
             {
                 using (StreamWriter sw = new StreamWriter(filename, false, System.Text.Encoding.Default))
                 {
                     int num = 0;
-                    foreach (Subtitle sub in subList)
+                    foreach (Subtitle sub in project.SubtitlesList)
                     {
                         num++;
                         sw.WriteLine(num);
@@ -40,7 +40,7 @@ namespace SubRed.Sub_formats
             }
         }
 
-        public static string Load(string filename)
+        public static string Load(string filename, SubProject project)
         {
             string sub = "";
             try

@@ -70,7 +70,7 @@ namespace SubRed
             imageProgressBar.Visibility = Visibility.Hidden;
         }
 
-        public ExtractSubsWindow(ref List<Subtitle> globalListOfSubs)
+        public ExtractSubsWindow(List<Subtitle> globalListOfSubs)
         {
             InitializeComponent();
             if (globalListOfSubs == null) globalListOfSubs = new List<Subtitle>();

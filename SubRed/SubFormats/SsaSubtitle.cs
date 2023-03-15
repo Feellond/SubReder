@@ -13,7 +13,7 @@ namespace SubRed.Sub_formats
         private static string[] separatorForText = { "\\N", "\\n", "\n" };
         private static string[] textFormatSplit = { "Name", "Fontname", "Fontsize", "PrimaryColour", "SecondaryColour", "OutlineColour", "BackColour", "" };
 
-        public static void Save(string filename, string sub)
+        public static void Save(string filename, SubProject project)
         {
             sub = sub.Replace("OriginalScript:", "Original Script:");
             sub = sub.Replace("OriginalTranslation:", "Original Translation:");
@@ -100,7 +100,7 @@ namespace SubRed.Sub_formats
             }
         }
 
-        public static string Load(string filename)
+        public static string Load(string filename, SubProject project)
         {
             string sub = "";
             try
