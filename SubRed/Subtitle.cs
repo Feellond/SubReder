@@ -51,6 +51,44 @@ namespace SubRed
             Effect = string.Empty;
         }
 
+        /// <summary>
+        /// Применяет тег к тексту субтитра
+        /// </summary>
+        /// <param name="beginIndex">Позиция вставки начала</param>
+        /// <param name="endIndex">Позиция вставки окончания</param>
+        /// <param name="action">Применяемое действие: bold, cursive, underline, strikethrough</param>
+        public void ChangeInTextAction(int beginIndex, int endIndex, string action)
+        {
+            string beginTag = "";
+            string endTag = "";
+            switch (action)
+            {
+                case "bold":
+                    beginTag = "<b>";
+                    endTag = "</b>";
+                    break;
+                case "cursive":
+                    beginTag = "<i>";
+                    endTag = "</i>";
+                    break;
+                case "underline":
+                    beginTag = "<u>";
+                    endTag = "</u>";
+                    break;
+                case "strikethrough":
+                    beginTag = "<s>";
+                    endTag = "</s>";
+                    break;
+                case "break":
+                    beginTag = "</br>";
+                    break;
+            }
+
+            this.Text = this.Text.Insert(beginIndex, beginTag);
+            if (endIndex > 0 && endTag != "")
+                this.Text = this.Text.Insert(endIndex, endTag);
+        }
+
         /*
         * Field 1:      Marked.    Marked=1 означает, что в Sub Station Alpha строка будет показана как "отмеченная"
         *                          Marked=0 означает, что в Sub Station Alpha строка не будет показана как "отмеченная"

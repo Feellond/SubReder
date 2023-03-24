@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -40,8 +41,8 @@ namespace SubRed
         private long LastTime;
         #endregion
 
-        #region
-
+        #region Оконные переменные
+        int SelectedIndexOfSubtitle;
         #endregion
 
         public MainWindow()
@@ -52,6 +53,11 @@ namespace SubRed
 
             UIdispatcher = this.Dispatcher;
 
+            RestartVideoPlayer();
+        }
+
+        private void RestartVideoPlayer(string SubFileName = "")
+        {
             var currentAssembly = Assembly.GetEntryAssembly();
             var currentDirectory = new FileInfo(currentAssembly.Location).DirectoryName;
             // Default installation path of VideoLAN.LibVLC.Windows
@@ -60,7 +66,8 @@ namespace SubRed
             {
                 // VLC options can be given here. Please refer to the VLC command line documentation.
                 "--no-sub-autodetect-file",
-                "--sub-autodetect-fuzzy=1"
+                "--sub-autodetect-fuzzy=1",
+                "--sub-file=" + SubFileName
             };
 
             LastFilePlay = Properties.Settings.Default.LastFilePlay;
@@ -97,7 +104,7 @@ namespace SubRed
         /// <summary>
         /// Полное обновление всех данных в окне
         /// </summary>
-        private void UpdateForm()
+        private void UpdateWindow()
         {
             ViewGrid();
             ViewSubtitleTab();
@@ -105,14 +112,18 @@ namespace SubRed
 
         public void ViewSubtitleTab()
         {
-            subListGrid.Children.Add();
-            for(int index = 0; index < currentSubRedProject.SubtitlesList.Count; index++)
+            subListGrid.Children.Clear();
+            subListGrid.RowDefinitions.Clear();
+
+            for (int index = 0; index < currentSubRedProject.SubtitlesList.Count; index++)
             {
-                StackPanel sp = new StackPanel { 
+                subListGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                StackPanel sp = new StackPanel {
                     Orientation = Orientation.Horizontal,
-                    Height = 100,
-                    VerticalAlignment= VerticalAlignment.Top,
-                    Margin = new Thickness(3)
+                    Height = 120,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(3),
+                    Name = "SubtitleStackPanel_" + index.ToString()
                 };
                 sp.SetValue(Grid.RowProperty, index);
 
@@ -120,8 +131,10 @@ namespace SubRed
                     Background = new SolidColorBrush(Colors.GhostWhite),
                     BorderBrush = new SolidColorBrush(Colors.Silver),
                     BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(8, 8, 8, 8)
+                    CornerRadius = new CornerRadius(8, 8, 8, 8),
+                    Name = "SubtitleBorder_" + index.ToString(),
                 };
+                border.MouseLeftButtonUp += Border_MouseLeftButtonUp;
 
                 Grid globalGrid = new Grid();
                 Grid innerGrid = new Grid { Margin = new Thickness(3) };
@@ -130,32 +143,42 @@ namespace SubRed
                 innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
                 innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
-                Grid labelGrid = new Grid { Margin = new Thickness(3) };
+                Grid labelGrid = new Grid { Margin = new Thickness(3), VerticalAlignment = VerticalAlignment.Top };
                 labelGrid.SetValue(Grid.ColumnProperty, 0);
-                Label idLabel = new Label { Name = "idLabel" + index.ToString(), Content = index.ToString() };
+                Label idLabel = new Label { 
+                    Name = "idLabel_" + index.ToString(),
+                    Content = index.ToString(),
+                    MinWidth = 42
+                };
                 labelGrid.Children.Add(idLabel);
                 innerGrid.Children.Add(labelGrid);
                 
-                Grid timeGrid = new Grid { Margin= new Thickness(3) };
+                Grid timeGrid = new Grid { Margin = new Thickness(3), VerticalAlignment = VerticalAlignment.Top };
                 timeGrid.SetValue(Grid.ColumnProperty, 1);
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                TextBox beginTextBox = new TextBox { Name = "beginTextBox" + index.ToString(), Text = "00:00:00.0000" };
+                TextBox beginTextBox = new TextBox { Name = "beginTextBox_" + index.ToString(), MinWidth=87,
+                    Text = currentSubRedProject.SubtitlesList[index].Start.ToString("hh\\:mm\\:ss\\.FFFF") };
                 beginTextBox.SetValue(Grid.RowProperty, 0);
-                TextBox endTextBox = new TextBox { Name = "endTextBox" + index.ToString(), Text = "00:00:00.0000" };
+                TextBox endTextBox = new TextBox { Name = "endTextBox_" + index.ToString(), MinWidth=87,
+                    Text = currentSubRedProject.SubtitlesList[index].End.ToString("hh\\:mm\\:ss\\.FFFF")
+                };
                 endTextBox.SetValue(Grid.RowProperty, 1);
                 timeGrid.Children.Add(beginTextBox);
                 timeGrid.Children.Add(endTextBox);
                 innerGrid.Children.Add(timeGrid);
 
                 Grid textBlockGrid = new Grid { Margin = new Thickness(3) };
-                TextBlock subtitleTextBlock = new TextBlock { 
-                    Name = "subtitleTextBlock",
-                    Text = "Text", 
-                    Background = new SolidColorBrush(Colors.White)
+                ScrollViewer scrollViewer = new ScrollViewer
+                {
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                    HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
                 };
-                textBlockGrid.Children.Add(subtitleTextBlock);
+                RichTextBox richTextBox = new RichTextBox { Width = 250, Name = "subtitleRichTextBox_" + index.ToString()};
+                richTextBox.AppendText(currentSubRedProject.SubtitlesList[index].Text);
+                scrollViewer.Content = richTextBox;
+                textBlockGrid.Children.Add(scrollViewer);
                 innerGrid.Children.Add(textBlockGrid);
 
                 #region Правая колонка
@@ -168,7 +191,7 @@ namespace SubRed
                 selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
                 selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
-                ComboBox styleSelectComboBox = new ComboBox { Name = "StyleSelectComboBox" + index.ToString() };
+                ComboBox styleSelectComboBox = new ComboBox { Name = "StyleSelectComboBox_" + index.ToString() };
                 styleSelectComboBox.SetValue(Grid.RowProperty, 0);
                 styleSelectComboBox.SetValue(Grid.ColumnProperty, 0);
                 styleSelectComboBox.SetValue(Grid.ColumnSpanProperty, 4);
@@ -233,6 +256,10 @@ namespace SubRed
                 selectionGrid.Children.Add(yTextBox);
                 #endregion
                 innerGrid.Children.Add(selectionGrid);
+
+                globalGrid.Children.Add(innerGrid);
+                sp.Children.Add(globalGrid);
+                subListGrid.Children.Add(sp);
             }
         }
 
@@ -248,6 +275,11 @@ namespace SubRed
             //imageProgressBar.Visibility = Visibility.Hidden;
         }
 
+        public void ViewSubtitleOnVideo()
+        {
+
+        }
+
         /// <summary>
         /// Окно для выгрузки обнаруженных субтитров из файла
         /// </summary>
@@ -258,7 +290,7 @@ namespace SubRed
             {
                 currentSubRedProject.SubtitlesList = new List<Subtitle>();
                 currentSubRedProject.SubtitlesList.AddRange(ESWindow.globalListOfSubs);
-                ViewGrid();
+                UpdateWindow();
             }
         }
 
@@ -334,7 +366,6 @@ namespace SubRed
             });
         }
 
-
         private bool isSliderDragStarted = false;
 
         private void SliderDragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
@@ -351,21 +382,21 @@ namespace SubRed
         #region Методы загрузки и сохранения субтитров
         private void SrtSave_Click(object sender, RoutedEventArgs e)
         {
-            SaveFile(".srt");
+            SaveSubFile(".srt");
         }
         private void AssSave_Click(object sender, RoutedEventArgs e)
         {
-            SaveFile(".ass");
+            SaveSubFile(".ass");
         }
         private void SrtLoad_Click(object sender, RoutedEventArgs e)
         {
-            LoadFile(".srt");
+            LoadSubFile(".srt");
         }
         private void AssLoad_Click(object sender, RoutedEventArgs e)
         {
-            LoadFile(".ass");
+            LoadSubFile(".ass");
         }
-        private void SaveFile(string format = "")
+        private void SaveSubFile(string format = "")
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -378,7 +409,7 @@ namespace SubRed
             }
         }
 
-        private void LoadFile(string format = "")
+        private void LoadSubFile(string format = "")
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -389,8 +420,12 @@ namespace SubRed
             {
                 SubFormats.SelectFormat(openFileDialog.FileName, currentSubRedProject, true, format);
             }
+
+            if (player.SourceProvider.MediaPlayer.Video != null)
+                LoadSubFile(openFileDialog.FileName);
         }
         #endregion
+        #region Select subtitle in form methods
         private void Row_Click(object sender, MouseButtonEventArgs e)
         {
             try
@@ -399,47 +434,234 @@ namespace SubRed
                     ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Pause());
 
                 Subtitle dataRow = (Subtitle)SubtitleGrid.SelectedItem;
-                int index = 4;
                 int frameNum = (int)(dataRow.FrameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond);
                 slider.Value = frameNum;
-
                 player.SourceProvider.MediaPlayer.Time = (long)(frameNum);
-                /*
-                if (SubtitleGrid.SelectedItem != null)
-                    if (player.SourceProvider.MediaPlayer != null)
-                        if (!string.IsNullOrWhiteSpace(LastFilePlay) && File.Exists(LastFilePlay))
-                            if (globalListOfSubs.Count > 0)
-                            {
-                                DataGridRow row = sender as DataGridRow;
-                                DataGridCellsPresenter presenter = GetVisualChild<DataGridCellsPresenter>(rowContainer);
 
-                                // try to get the cell but it may possibly be virtualized
-                                DataGridCell cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
-                                if (cell == null)
-                                {
-                                    // now try to bring into view and retreive the cell
-                                    dataGrid.ScrollIntoView(rowContainer, dataGrid.Columns[column]);
+                SelectedIndexOfSubtitle = dataRow.Id;
+                //------------------------//
 
-                                    cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(column);
-                                }
-
-
-                                int ID = Convert.ToInt32(row);
-                                player.SourceProvider.MediaPlayer.Time = (long)(globalListOfSubs[ID - 1].frameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond * 1000);
-                            }*/
+                scrollViewerSubListGrid.ScrollToVerticalOffset(100 * SelectedIndexOfSubtitle);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error in Row_Click method", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        // TODO необходимо проверить, работает ли
+        private void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Border? prevBorder = subListGrid.FindName("SubtitleBorder" + SelectedIndexOfSubtitle.ToString()) as Border;
+            if (prevBorder != null) prevBorder.Background = new SolidColorBrush(Colors.GhostWhite);
+
+            Border border = e.Source as Border; 
+            border.Background = new SolidColorBrush(Colors.Lavender);
+            SelectedIndexOfSubtitle = Convert.ToInt32(border.Name.Split('_')[1]);   // SubtitleBorder_1 -> (string)1 -> (int)1
+
+            SubtitleGrid.SelectedIndex = SelectedIndexOfSubtitle;
+            SubtitleGrid.UpdateLayout();
+            SubtitleGrid.ScrollIntoView(SubtitleGrid.SelectedItem);
+            //------------------------//
+
+            if (player.SourceProvider.MediaPlayer.State == MediaStates.Playing)
+                ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Pause());
+
+            int frameNum = (int)(currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].FrameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond);
+            slider.Value = frameNum;
+            player.SourceProvider.MediaPlayer.Time = (long)(frameNum);
+        }
+        #endregion
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (tabControl.SelectedIndex == 0)
+            if (tabControl.SelectedIndex == 0) tabControl.SelectedIndex = 1;
+        }
+
+        #region Редактирование субтитров
+        private Grid FindClickedItem(object sender)
+        {
+            MenuItem mi = sender as MenuItem;
+            if (mi != null)
             {
-                tabControl.SelectedIndex = 1;
+                ContextMenu cm = mi.CommandParameter as ContextMenu;
+                if (cm != null)
+                {
+                    Grid g = cm.PlacementTarget as Grid;
+                    if (g != null)
+                    {
+                        return g;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private void Add_OnClick(object sender, RoutedEventArgs e)
+        {
+            var clickedItem = FindClickedItem(sender);
+            if (clickedItem != null)
+            {
+                if (SelectedIndexOfSubtitle >= 0)
+                {
+                    // Do this
+                }
+                else MessageBox.Show("Не выбран элемент, перед которым добавлять", "Ошибка добавления", MessageBoxButton.OK, MessageBoxImage.Question);
             }
         }
+
+        private void Delete_OnClick(object sender, RoutedEventArgs e)
+        {
+            var clickedItem = FindClickedItem(sender);
+            if (clickedItem != null)
+            {
+                if (SelectedIndexOfSubtitle >= 0)
+                {
+                    MessageBoxResult result = MessageBox.Show("Вы уверены, что хотите удалить элемент id = " + SelectedIndexOfSubtitle
+                        , "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        // Do this
+                    }
+                }
+                else MessageBox.Show("Не выбран элемент для удаления", "Ошибка удаления", MessageBoxButton.OK, MessageBoxImage.Question);
+            }
+        }
+        #region Кнопки форматирования субтитров
+        private void leftAlignButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleAlignmentChange(1);
+        }
+
+        private void centerAlignButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleAlignmentChange(2);
+        }
+
+        private void rightAlignButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleAlignmentChange(3);
+        }
+
+        public void SubtitleAlignmentChange(int alignment)
+        {
+            if (SelectedIndexOfSubtitle >= 0)
+            {
+                RichTextBox richTextBox = (RichTextBox)this.FindName("subtitleRichTextBox_" + SelectedIndexOfSubtitle.ToString());
+                richTextBox.HorizontalAlignment = HorizontalAlignment.Left;
+
+                currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.HorizontalAlignment = 3;
+            }
+        }
+
+        private void copyButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void cutButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void pasteButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void boldButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleInTextChange("bold");
+        }
+
+        private void italicButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleInTextChange("italic");
+        }
+
+        private void underlineButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleInTextChange("underline");
+        }
+
+        private void strikethroughButton_Click(object sender, RoutedEventArgs e)
+        {
+            SubtitleInTextChange("strikethrough");
+        }
+
+        public void SubtitleInTextChange(string inTextString)
+        {
+            if (SelectedIndexOfSubtitle >= 0)
+            {
+                RichTextBox richTextBox = (RichTextBox)this.FindName("subtitleRichTextBox_" + SelectedIndexOfSubtitle.ToString());
+                TextSelection text = richTextBox.Selection;
+
+                if (text != null)
+                {
+                    var docStart = richTextBox.Document.ContentStart;
+
+                    var selectionStart = richTextBox.Selection.Start;
+                    var selectionEnd = richTextBox.Selection.End;
+
+                    //these will give you the positions needed to apply highlighting
+                    var indexStart = docStart.GetOffsetToPosition(selectionStart);
+                    var indexEnd = docStart.GetOffsetToPosition(selectionEnd);
+
+                    //these values will give you the absolute character positions relative to the very beginning of the text.
+                    TextRange start = new TextRange(docStart, selectionStart);
+                    TextRange end = new TextRange(docStart, selectionEnd);
+
+
+                    System.Drawing.FontStyle fontStyle = System.Drawing.FontStyle.Regular;
+                    switch (inTextString)
+                    {
+                        case "bold":
+                            fontStyle = System.Drawing.FontStyle.Bold;
+                            break;
+                        case "italic":
+                            fontStyle = System.Drawing.FontStyle.Italic;
+                            break;
+                        case "underline":
+                            fontStyle = System.Drawing.FontStyle.Underline;
+                            break;
+                        case "strikethrough":
+                            fontStyle = System.Drawing.FontStyle.Strikeout;
+                            break;
+                    }
+
+                    Font font = new Font(currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Fontname,
+                        currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Fontsize, fontStyle);
+                    text.ApplyPropertyValue(RichTextBox.FontStyleProperty, font);
+                    currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].ChangeInTextAction(indexStart, indexEnd, inTextString);
+                }
+                else
+                {
+                    switch (inTextString)
+                    {
+                        case "bold":
+                            richTextBox.FontWeight = FontWeights.Bold;
+                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Bold = true;
+                            break;
+                        case "italic":
+                            richTextBox.FontStyle = FontStyles.Italic;
+                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Italic = true;
+                            break;
+                        case "underline":
+                            richTextBox.SelectAll();
+                            richTextBox.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, TextDecorations.Underline);
+                            richTextBox.Selection.Select(richTextBox.Document.ContentStart, richTextBox.Document.ContentStart);
+                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Underline = true;
+                            break;
+                        case "strikethrough":
+                            richTextBox.SelectAll();
+                            richTextBox.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, TextDecorations.Strikethrough);
+                            richTextBox.Selection.Select(richTextBox.Document.ContentStart, richTextBox.Document.ContentStart);
+                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.StrikeOut = true;
+                            break;
+                    }
+                }
+            }
+        }
+        #endregion]
+        #endregion
     }
 }

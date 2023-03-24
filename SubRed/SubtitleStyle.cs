@@ -27,7 +27,20 @@ namespace SubRed
         public int BorderStyle { get; set; }
         public int Outline { get; set; }
         public int Shadow { get; set; }
-        public int Alignment { get; set; }
+        /// <summary>
+        /// Горизонтальное: 1=по левому краю, 2=по центру, 3=по правому краю.
+        ///             Для вертикального выравнивания по верхнему краю, добавьте к значению горизонтального выравнивания 4. 
+        ///             Для вертикального выравнивания по центру кадра, добавьте к значению горизонтального выравнивания 8.
+        ///             Например. 5 = выравнивание по верхнему левому углу.
+        /// </summary>
+        public int HorizontalAlignment { get; set; }
+        /// <summary>
+        /// Горизонтальное: 1=вверху, 2=по центру, 3=снизу.
+        ///             Для вертикального выравнивания по верхнему краю, добавьте к значению горизонтального выравнивания 4. 
+        ///             Для вертикального выравнивания по центру кадра, добавьте к значению горизонтального выравнивания 8.
+        ///             Например. 5 = выравнивание по верхнему левому углу.
+        /// </summary>
+        public int VerticalAlignment { get; set; }
         public int MarginL { get; set; }
         public int MarginR { get; set;}
         public int MarginV { get; set; }
@@ -53,7 +66,8 @@ namespace SubRed
             BorderStyle = 1;
             Outline = 1;
             Shadow = 1;
-            Alignment = 2;
+            HorizontalAlignment = 2;
+            VerticalAlignment = 3;
             MarginL = 0;
             MarginR = 0;
             MarginV = 0;

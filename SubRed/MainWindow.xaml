@@ -97,22 +97,25 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0" Name="leftAlignButton" Click="leftAlignButton_Click">
                         <Image Source="icons/left-align.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="1" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="centerAlignButton" Click="centerAlignButton_Click">
                         <Image Source="icons/center-align.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0" Name="rightAlignButton" Click="rightAlignButton_Click">
                         <Image Source="icons/right-align.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="3" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="3" Background="Transparent" BorderThickness="0" Name="copyButton"
+                            Command="ApplicationCommands.Copy" FocusManager.IsFocusScope="True">
                         <Image Source="icons/copy.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="4" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="4" Background="Transparent" BorderThickness="0" Name="cutButton" 
+                            Command="ApplicationCommands.Cut" FocusManager.IsFocusScope="True">
                         <Image Source="icons/cut.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="5" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="5" Background="Transparent" BorderThickness="0" Name="pasteButton"
+                            Command="ApplicationCommands.Paste" FocusManager.IsFocusScope="True">
                         <Image Source="icons/paste.png" Width="16" Height="16"></Image>
                     </Button>
                 </Grid>
@@ -123,22 +126,22 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0" Name="boldButton" Click="boldButton_Click">
                         <Image Source="icons/bold.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="1" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="italicButton" Click="italicButton_Click">
                         <Image Source="icons/italic.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0" Name="underlineButton" Click="underlineButton_Click">
                         <Image Source="icons/underline.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="3" Background="Transparent" BorderThickness="0">
+                    <Button Grid.Row="3" Background="Transparent" BorderThickness="0" Name="strikethroughButton" Click="strikethroughButton_Click">
                         <Image Source="icons/strikethrough.png" Width="16" Height="16"></Image>
                     </Button>
                 </Grid>
             </Grid>
             <TabControl Name="tabControl" Grid.Column="1" Margin="3" SelectionChanged="TabControl_SelectionChanged" 
-                        MaxHeight="400">
+                        MinHeight="300" MaxHeight="400">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="Template">
@@ -180,8 +183,18 @@
                         </StackPanel>
                     </TabItem.Header>
                     <TabItem.Content>
-                        <ScrollViewer>
+                        <ScrollViewer Name="scrollViewerSubListGrid">
                             <Grid x:Name="subListGrid">
+                                <Grid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Add"
+                                              Click="Add_OnClick"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
+                                        <MenuItem Header="Delete"
+                                              Click="Delete_OnClick"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
+                                    </ContextMenu>
+                                </Grid.ContextMenu>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
@@ -189,8 +202,9 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" Height="100" VerticalAlignment="Top" Grid.Row="0" Margin="3">
-                                    <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8">
+                                <StackPanel Orientation="Horizontal" Height="120" VerticalAlignment="Top" Grid.Row="0" Margin="3">
+                                    <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8"
+                                            MouseLeftButtonUp="Border_MouseLeftButtonUp">
                                         <Grid>
                                             <Grid Margin="3">
                                                 <Grid.ColumnDefinitions>
@@ -199,20 +213,28 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0" Margin="3">
-                                                    <Label Content="KEKW"></Label>
+                                                <Grid Grid.Column="0" Margin="3" VerticalAlignment="Top">
+                                                    <Label Content="KEKW" MinWidth="42"></Label>
                                                 </Grid>
-                                                <Grid Grid.Column="1" Margin="3">
+                                                <Grid Grid.Column="1" Margin="3" VerticalAlignment="Top">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
-                                                    <TextBox Grid.Row="0"/>
-                                                    <TextBox Grid.Row="1"/>
+                                                    <TextBox Grid.Row="0" Text="00:00:00.0000" MinWidth="87"/>
+                                                    <TextBox Grid.Row="1" Text="00:00:00.0000" MinWidth="87"/>
                                                 </Grid>
                                                 <Grid Grid.Column="2" Margin="3">
-                                                    <TextBlock Width="200" Text="KOKW"></TextBlock>
+                                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                                        <RichTextBox Width="250" Height="106">
+                                                            <FlowDocument>
+                                                                <Paragraph>
+                                                                    KOKW
+                                                                </Paragraph>
+                                                            </FlowDocument>
+                                                        </RichTextBox>
+                                                    </ScrollViewer>
                                                 </Grid>
                                                 <Grid Grid.Column="3" Margin="3">
                                                     <Grid.RowDefinitions>
@@ -258,7 +280,8 @@
                                         </Grid>
                                     </Border>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="100" VerticalAlignment="Top" Grid.Row="1" Margin="3">
+                                <StackPanel Orientation="Horizontal" Height="100" HorizontalAlignment="Left"
+                                            VerticalAlignment="Top" Grid.Row="1" Grid.Column="0" Margin="3">
                                     <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8">
                                         <Grid>
                                             <Grid Margin="3">
@@ -601,6 +624,11 @@
                 <DataGrid.Resources>
                     <Style TargetType="DataGridRow">
                         <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="AntiqueWhite"/>
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>

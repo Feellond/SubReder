@@ -14,10 +14,6 @@ namespace SubRed.Sub_formats
 {
     static class AssSubtitle
     {
-        private static string[] separator = { "&&" };
-        private static string[] separatorForText = { "\\N", "\\n", "\n" };
-        private static string[] textFormatSplit = { "Name", "Fontname", "Fontsize", "PrimaryColour", "SecondaryColour", "OutlineColour", "BackColour", "" };
-
         public static void Save(string filename, SubProject project)
         {
             try
@@ -67,7 +63,14 @@ namespace SubRed.Sub_formats
                     sw.Write(style.BorderStyle.ToString() + ",");
                     sw.Write(style.Outline.ToString() + ",");
                     sw.Write(style.Shadow.ToString() + ",");
-                    sw.Write(style.Alignment.ToString() + ",");
+
+                    int alignmentNumber = style.HorizontalAlignment;
+                    if (style.VerticalAlignment == 1)
+                        alignmentNumber += 4;
+                    else if (style.VerticalAlignment == 2)
+                        alignmentNumber += 8;
+
+                    sw.Write(alignmentNumber.ToString() + ",");
                     sw.Write(style.MarginL.ToString() + ",");
                     sw.Write(style.MarginR.ToString() + ",");
                     sw.Write(style.MarginV.ToString() + ",");
@@ -177,6 +180,23 @@ namespace SubRed.Sub_formats
                                     #region Стили [V4+ Styles]
                                     case "Style":
                                         var splitStyle = lineSplit[1].Split(',');
+
+                                        int alignmentNumber = Convert.ToInt32(splitStyle[18]);
+                                        int horizontalNumber = 0, verticalNumber = 0;
+                                        if (alignmentNumber > 8)
+                                        {
+                                            alignmentNumber -= 8;
+                                            verticalNumber = 2;
+                                        }
+                                        else if (alignmentNumber > 5)
+                                        {
+                                            alignmentNumber -= 5;
+                                            verticalNumber = 1;
+
+                                        }
+                                        else verticalNumber = 3;
+                                        horizontalNumber = alignmentNumber;
+
                                         project.SubtitleStyleList.Add(new SubtitleStyle 
                                         {
                                             Name = splitStyle[0],
@@ -197,7 +217,8 @@ namespace SubRed.Sub_formats
                                             BorderStyle = Convert.ToInt32(splitStyle[15]),
                                             Outline = Convert.ToInt32(splitStyle[16]),
                                             Shadow = Convert.ToInt32(splitStyle[17]),
-                                            Alignment = Convert.ToInt32(splitStyle[18]),
+                                            HorizontalAlignment = horizontalNumber,
+                                            VerticalAlignment = verticalNumber,
                                             MarginL = Convert.ToInt32(splitStyle[19]),
                                             MarginR = Convert.ToInt32(splitStyle[20]),
                                             MarginV = Convert.ToInt32(splitStyle[21]),
@@ -213,12 +234,11 @@ namespace SubRed.Sub_formats
                                         project.SubtitlesList.Add(new Subtitle
                                         {
                                             Id = numSubs,
-                                            Marked = Convert.ToInt32(splitDialogue[0]),
-                                            Layer = Convert.ToInt32(splitDialogue[1]),
-                                            Start = TimeSpan.Parse(splitDialogue[2]),   //00:00:00.00
-                                            End = TimeSpan.Parse(splitDialogue[3]),
-                                            Style = project.SubtitleStyleList.Find(x => x.Name == splitDialogue[4]) ?? new SubtitleStyle(),
-                                            Name = splitDialogue[5],
+                                            Layer = Convert.ToInt32(splitDialogue[0]),
+                                            Start = TimeSpan.Parse(splitDialogue[1]),   //00:00:00.00
+                                            End = TimeSpan.Parse(splitDialogue[2]),
+                                            Style = project.SubtitleStyleList.Find(x => x.Name == splitDialogue[3]) ?? new SubtitleStyle(),
+                                            Name = splitDialogue[4],
                                             Effect = splitDialogue[8],
                                             Text = splitDialogue[9]
                                         });
