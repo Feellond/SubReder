@@ -42,48 +42,50 @@ namespace SubRed.Sub_formats
 
         public static string Load(string filename, SubProject project)
         {
+            string sub = "";
             try
             {
                 string line = "";
                 string[] separator = { "-->" };
+                int n;
 
+                sub = "TextFormat: Start, End, Text&&";
                 // Read the file and display it line by line.  
                 System.IO.StreamReader file = new System.IO.StreamReader(filename);
-                subList = new List<Subtitle>();
                 while ((line = file.ReadLine()) != null)
                 {
-                    Subtitle sub = new Subtitle();
-                    if (int.TryParse(line, out int n))
+                    sub = sub + "Dialogue: ";
+                    if (int.TryParse(line, out n))
                     {
                         // запись времени начала и конца
                         string[] time;
                         line = file.ReadLine(); // чтение времени
                         time = line.Split(separator, StringSplitOptions.None);
-
-                        sub.Start = TimeSpan.ParseExact(time[0].Trim().Replace(",", "."), "hh:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture); 
-                        sub.End = TimeSpan.ParseExact(time[1].Trim().Replace(",", "."), "hh:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture);
+                        sub = sub + time[0].Trim().Replace(",", ".") + ", ";  // начало
+                        sub = sub + time[1].Trim().Replace(",", ".") + ", ";  // конец
 
                         line = file.ReadLine();
-                        sub.Text = "";
                         while (true)
                         {
-                            sub.Text += line;   // запись первой строки
+                            sub = sub + line;   // запись первой строки
                             line = file.ReadLine(); // берем вторую строку
                             if (line != null && line != "" && line != Environment.NewLine) // если не конец строки
-                                sub.Text += "\\N";
+                                sub += "\\N";
                             else
                                 break;  // иначе выходим из цикла
                         }
                     }
-
+                    sub = sub + "&&";
                 }
 
                 file.Close();
             }
             catch
             {
-                MessageBox.Show("Ошибка чтения .srt формата", "Ошибка чтения", MessageBoxButton.OK, MessageBoxImage.Error);
+                
             }
+
+            return sub;
         }
 
     }
