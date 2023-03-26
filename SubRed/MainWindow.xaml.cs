@@ -45,6 +45,10 @@ namespace SubRed
         int SelectedIndexOfSubtitle;
         #endregion
 
+        private Border? prevBorder;
+        private System.Windows.Media.Color defaultBackgroundColor = Colors.Gainsboro;
+        private System.Windows.Media.Color selectedBackgroundColor = Colors.SteelBlue;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -53,7 +57,9 @@ namespace SubRed
 
             UIdispatcher = this.Dispatcher;
 
+            SelectedIndexOfSubtitle = -1;
             RestartVideoPlayer();
+            UpdateWindow();
         }
 
         private void RestartVideoPlayer(string SubFileName = "")
@@ -73,6 +79,8 @@ namespace SubRed
             LastFilePlay = Properties.Settings.Default.LastFilePlay;
             LastTime = Properties.Settings.Default.LastTime;
 
+            if (player.SourceProvider.MediaPlayer != null) player.SourceProvider.MediaPlayer.ResetMedia();
+            //player.SourceProvider.MediaPlayer.ResetPlayer();
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 player.SourceProvider.CreatePlayer(libDirectory/* pass your player parameters here */, options);
@@ -128,40 +136,46 @@ namespace SubRed
                 sp.SetValue(Grid.RowProperty, index);
 
                 Border border = new Border {
-                    Background = new SolidColorBrush(Colors.GhostWhite),
+                    Background = new SolidColorBrush(defaultBackgroundColor),
                     BorderBrush = new SolidColorBrush(Colors.Silver),
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(8, 8, 8, 8),
                     Name = "SubtitleBorder_" + index.ToString(),
                 };
                 border.MouseLeftButtonUp += Border_MouseLeftButtonUp;
+                try
+                {
+                    this.RegisterName(border.Name, border);
+                }
+                catch { }
 
                 Grid globalGrid = new Grid();
                 Grid innerGrid = new Grid { Margin = new Thickness(3) };
-                innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto});
+                innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
                 innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
                 innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
                 innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
                 Grid labelGrid = new Grid { Margin = new Thickness(3), VerticalAlignment = VerticalAlignment.Top };
                 labelGrid.SetValue(Grid.ColumnProperty, 0);
-                Label idLabel = new Label { 
+                Label idLabel = new Label {
                     Name = "idLabel_" + index.ToString(),
                     Content = index.ToString(),
-                    MinWidth = 42
+                    MinWidth = 42,
+                    HorizontalContentAlignment = HorizontalAlignment.Center
                 };
                 labelGrid.Children.Add(idLabel);
                 innerGrid.Children.Add(labelGrid);
-                
+
                 Grid timeGrid = new Grid { Margin = new Thickness(3), VerticalAlignment = VerticalAlignment.Top };
                 timeGrid.SetValue(Grid.ColumnProperty, 1);
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                TextBox beginTextBox = new TextBox { Name = "beginTextBox_" + index.ToString(), MinWidth=87,
+                TextBox beginTextBox = new TextBox { Name = "beginTextBox_" + index.ToString(), MinWidth = 87,
                     Text = currentSubRedProject.SubtitlesList[index].Start.ToString("hh\\:mm\\:ss\\.FFFF") };
                 beginTextBox.SetValue(Grid.RowProperty, 0);
-                TextBox endTextBox = new TextBox { Name = "endTextBox_" + index.ToString(), MinWidth=87,
+                TextBox endTextBox = new TextBox { Name = "endTextBox_" + index.ToString(), MinWidth = 87,
                     Text = currentSubRedProject.SubtitlesList[index].End.ToString("hh\\:mm\\:ss\\.FFFF")
                 };
                 endTextBox.SetValue(Grid.RowProperty, 1);
@@ -170,12 +184,13 @@ namespace SubRed
                 innerGrid.Children.Add(timeGrid);
 
                 Grid textBlockGrid = new Grid { Margin = new Thickness(3) };
+                textBlockGrid.SetValue(Grid.ColumnProperty, 2);
                 ScrollViewer scrollViewer = new ScrollViewer
                 {
                     VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                     HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
                 };
-                RichTextBox richTextBox = new RichTextBox { Width = 250, Name = "subtitleRichTextBox_" + index.ToString()};
+                RichTextBox richTextBox = new RichTextBox { Width = 250, Name = "subtitleRichTextBox_" + index.ToString() };
                 richTextBox.AppendText(currentSubRedProject.SubtitlesList[index].Text);
                 scrollViewer.Content = richTextBox;
                 textBlockGrid.Children.Add(scrollViewer);
@@ -183,6 +198,7 @@ namespace SubRed
 
                 #region Правая колонка
                 Grid selectionGrid = new Grid { Margin = new Thickness(3) };
+                selectionGrid.SetValue(Grid.ColumnProperty, 3);
                 selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
@@ -195,15 +211,15 @@ namespace SubRed
                 styleSelectComboBox.SetValue(Grid.RowProperty, 0);
                 styleSelectComboBox.SetValue(Grid.ColumnProperty, 0);
                 styleSelectComboBox.SetValue(Grid.ColumnSpanProperty, 4);
-                ComboBoxItem itemSelected = new ComboBoxItem { Name = "item1", IsSelected = true};
+                ComboBoxItem itemSelected = new ComboBoxItem { Name = "item1", IsSelected = true };
                 StackPanel panelForItem = new StackPanel();
-                TextBlock blockForPanel = new TextBlock {Text = "---"};
+                TextBlock blockForPanel = new TextBlock { Text = "---" };
                 panelForItem.Children.Add(blockForPanel);
                 itemSelected.Content = panelForItem;
                 styleSelectComboBox.Items.Add(itemSelected);
                 selectionGrid.Children.Add(styleSelectComboBox);
 
-                Label hLabel = new Label {Content = "H"};
+                Label hLabel = new Label { Content = "H" };
                 hLabel.SetValue(Grid.RowProperty, 1);
                 hLabel.SetValue(Grid.ColumnProperty, 0);
                 selectionGrid.Children.Add(hLabel);
@@ -211,9 +227,9 @@ namespace SubRed
                 ComboBox hSelectComboBox = new ComboBox();
                 hSelectComboBox.SetValue(Grid.RowProperty, 1);
                 hSelectComboBox.SetValue(Grid.ColumnProperty, 1);
-                itemSelected = new ComboBoxItem { Name = "hItem1", IsSelected = true};
+                itemSelected = new ComboBoxItem { Name = "hItem1", IsSelected = true };
                 panelForItem = new StackPanel();
-                blockForPanel = new TextBlock { Text = "Центр"};
+                blockForPanel = new TextBlock { Text = "Центр" };
                 panelForItem.Children.Add(blockForPanel);
                 itemSelected.Content = panelForItem;
                 hSelectComboBox.Items.Add(itemSelected);
@@ -258,7 +274,8 @@ namespace SubRed
                 innerGrid.Children.Add(selectionGrid);
 
                 globalGrid.Children.Add(innerGrid);
-                sp.Children.Add(globalGrid);
+                border.Child = globalGrid;
+                sp.Children.Add(border);
                 subListGrid.Children.Add(sp);
             }
         }
@@ -289,11 +306,12 @@ namespace SubRed
             if (ESWindow.ShowDialog() == true)
             {
                 currentSubRedProject.SubtitlesList = new List<Subtitle>();
-                currentSubRedProject.SubtitlesList.AddRange(ESWindow.globalListOfSubs);
+                currentSubRedProject.SubtitlesList.AddRange(ESWindow.globalProject.SubtitlesList);
                 UpdateWindow();
             }
         }
 
+        #region Работа с видеофайлом VLC
         private void MediaPlayer_TimeChanged(object sender, Vlc.DotNet.Core.VlcMediaPlayerTimeChangedEventArgs e)
         {
             if (isSliderDragStarted)
@@ -379,6 +397,19 @@ namespace SubRed
             long time = (long)slider.Value;
             ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Time = time);
         }
+        private void slider_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            isSliderDragStarted = false;
+            if (player.SourceProvider.MediaPlayer.State == MediaStates.Playing)
+                ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Pause());
+
+            int frameNum = (int)slider.Value;
+            player.SourceProvider.MediaPlayer.Time = (long)(frameNum);
+            
+            ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Play());
+        }
+        #endregion
+
         #region Методы загрузки и сохранения субтитров
         private void SrtSave_Click(object sender, RoutedEventArgs e)
         {
@@ -421,27 +452,21 @@ namespace SubRed
                 SubFormats.SelectFormat(openFileDialog.FileName, currentSubRedProject, true, format);
             }
 
-            if (player.SourceProvider.MediaPlayer.Video != null)
-                LoadSubFile(openFileDialog.FileName);
+            if (player.SourceProvider.MediaPlayer.Length >= 0)
+                RestartVideoPlayer(openFileDialog.FileName);
+
+            UpdateWindow();
         }
         #endregion
-        #region Select subtitle in form methods
+
+        #region Методы выбора субтитров в таблице и в списке
         private void Row_Click(object sender, MouseButtonEventArgs e)
         {
             try
             {
-                if (player.SourceProvider.MediaPlayer.State == MediaStates.Playing)
-                    ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Pause());
-
                 Subtitle dataRow = (Subtitle)SubtitleGrid.SelectedItem;
-                int frameNum = (int)(dataRow.FrameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond);
-                slider.Value = frameNum;
-                player.SourceProvider.MediaPlayer.Time = (long)(frameNum);
-
-                SelectedIndexOfSubtitle = dataRow.Id;
-                //------------------------//
-
-                scrollViewerSubListGrid.ScrollToVerticalOffset(100 * SelectedIndexOfSubtitle);
+                var foundedBorder = this.FindName("SubtitleBorder_" + SelectedIndexOfSubtitle) as Border;
+                SelecSubtitle(foundedBorder, dataRow.Id);
             }
             catch (Exception ex)
             {
@@ -451,24 +476,37 @@ namespace SubRed
         // TODO необходимо проверить, работает ли
         private void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            Border? prevBorder = subListGrid.FindName("SubtitleBorder" + SelectedIndexOfSubtitle.ToString()) as Border;
-            if (prevBorder != null) prevBorder.Background = new SolidColorBrush(Colors.GhostWhite);
+            if (prevBorder != null) prevBorder.Background = new SolidColorBrush(defaultBackgroundColor);
 
-            Border border = e.Source as Border; 
-            border.Background = new SolidColorBrush(Colors.Lavender);
-            SelectedIndexOfSubtitle = Convert.ToInt32(border.Name.Split('_')[1]);   // SubtitleBorder_1 -> (string)1 -> (int)1
+            Border border = e.Source as Border;
+            int currIndex = Convert.ToInt32(border.Name.Split('_')[1]);   // SubtitleBorder_1 -> (string)1 -> (int)1
+            SelecSubtitle(border, currIndex);
+        }
 
-            SubtitleGrid.SelectedIndex = SelectedIndexOfSubtitle;
-            SubtitleGrid.UpdateLayout();
-            SubtitleGrid.ScrollIntoView(SubtitleGrid.SelectedItem);
-            //------------------------//
+        private void SelecSubtitle(Border? border, int currIndex)
+        {
+            if (SelectedIndexOfSubtitle != currIndex)
+            {
+                if (border != null) border.Background = new SolidColorBrush(selectedBackgroundColor);
+                SelectedIndexOfSubtitle = currIndex;
+                prevBorder = border;
 
-            if (player.SourceProvider.MediaPlayer.State == MediaStates.Playing)
-                ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Pause());
+                SubtitleGrid.SelectedIndex = SelectedIndexOfSubtitle;
+                SubtitleGrid.UpdateLayout();
+                SubtitleGrid.ScrollIntoView(SubtitleGrid.SelectedItem);
 
-            int frameNum = (int)(currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].FrameBeginNum * player.SourceProvider.MediaPlayer.FramesPerSecond);
-            slider.Value = frameNum;
-            player.SourceProvider.MediaPlayer.Time = (long)(frameNum);
+                scrollViewerSubListGrid.ScrollToVerticalOffset(100 * SelectedIndexOfSubtitle);
+                //------------------------//
+
+                if (player.SourceProvider.MediaPlayer.State == MediaStates.Playing)
+                    ThreadPool.QueueUserWorkItem(_ => player.SourceProvider.MediaPlayer.Pause());
+
+                int frameNum = (int)(currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Start.TotalMilliseconds);
+                slider.Value = frameNum;
+                player.SourceProvider.MediaPlayer.Time = (long)(frameNum) * 1000;
+            }
+            else SelectedIndexOfSubtitle = -1;
+            
         }
         #endregion
 
@@ -660,8 +698,14 @@ namespace SubRed
                     }
                 }
             }
+
+            UpdateWindow();
         }
-        #endregion]
+
+
+
+        #endregion
+
         #endregion
     }
 }

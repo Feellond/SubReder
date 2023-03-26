@@ -20,7 +20,7 @@ namespace SubRed.Sub_formats
                 using (StreamWriter sw = new StreamWriter(filename, false, System.Text.Encoding.Default))
                 {
                     
-                    string[] subSplit = sub.Split(separator, StringSplitOptions.None);
+                    string[] subSplit = project.SubtitlesList[0].Text.Split(separator, StringSplitOptions.None);
 
                     sw.WriteLine("<!-- Converted at SubRed -->");
                     sw.WriteLine("<SAMI>");

@@ -40,7 +40,7 @@ namespace SubRed.Sub_formats
             }
         }
 
-        public static string Load(string filename, SubProject project)
+        public static void Load(string filename, SubProject project)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace SubRed.Sub_formats
 
                 // Read the file and display it line by line.  
                 System.IO.StreamReader file = new System.IO.StreamReader(filename);
-                subList = new List<Subtitle>();
+                project.SubtitlesList = new List<Subtitle>();
                 while ((line = file.ReadLine()) != null)
                 {
                     Subtitle sub = new Subtitle();
@@ -60,8 +60,8 @@ namespace SubRed.Sub_formats
                         line = file.ReadLine(); // чтение времени
                         time = line.Split(separator, StringSplitOptions.None);
 
-                        sub.Start = TimeSpan.ParseExact(time[0].Trim().Replace(",", "."), "hh:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture); 
-                        sub.End = TimeSpan.ParseExact(time[1].Trim().Replace(",", "."), "hh:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture);
+                        sub.Start = TimeSpan.ParseExact(time[0].Trim().Replace(",", "."), @"hh\:mm\:ss\.fff", System.Globalization.CultureInfo.InvariantCulture); 
+                        sub.End = TimeSpan.ParseExact(time[1].Trim().Replace(",", "."), @"hh\:mm\:ss\.fff", System.Globalization.CultureInfo.InvariantCulture);
 
                         line = file.ReadLine();
                         sub.Text = "";
@@ -74,6 +74,7 @@ namespace SubRed.Sub_formats
                             else
                                 break;  // иначе выходим из цикла
                         }
+                        project.SubtitlesList.Add(sub);
                     }
 
                 }

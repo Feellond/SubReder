@@ -41,8 +41,8 @@ namespace SubRed
     /// </summary>
     public partial class ExtractSubsWindow : Window
     {
-        public List<Subtitle> globalListOfSubs = new List<Subtitle>();
-        public List<Subtitle> tempGlobalListOfSubs = new List<Subtitle>();
+        public SubProject globalProject = new ();
+        public SubProject tempProject = new();
         public List<Subtitle> listOfSubs = new List<Subtitle>();
         public string filePath { get; set; }
         public bool isVideoOpened = false;
@@ -60,12 +60,12 @@ namespace SubRed
 
         public void ViewGrid()
         {
-            for (int i = 0; i < tempGlobalListOfSubs.Count; i++)
-                tempGlobalListOfSubs[i].Id = i + 1;
+            for (int i = 0; i < tempProject.SubtitlesList.Count; i++)
+                tempProject.SubtitlesList[i].Id = i + 1;
 
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
             this.SubtitleGrid.ItemsSource = null;
-            this.SubtitleGrid.ItemsSource = tempGlobalListOfSubs;
+            this.SubtitleGrid.ItemsSource = tempProject.SubtitlesList;
 
             imageProgressBar.Visibility = Visibility.Hidden;
         }
@@ -74,16 +74,16 @@ namespace SubRed
         {
             InitializeComponent();
             if (globalListOfSubs == null) globalListOfSubs = new List<Subtitle>();
-            tempGlobalListOfSubs = new List<Subtitle>();
-            this.globalListOfSubs.AddRange(globalListOfSubs);
-            this.tempGlobalListOfSubs.AddRange(globalListOfSubs);
+            tempProject.SubtitlesList = new List<Subtitle>();
+            this.globalProject.SubtitlesList.AddRange(globalListOfSubs);
+            this.tempProject.SubtitlesList.AddRange(globalListOfSubs);
 
             ViewGrid();
         }
 
         private void SaveJson_Click(object sender, RoutedEventArgs e)
         {
-            string json = JsonConvert.SerializeObject(tempGlobalListOfSubs);
+            string json = JsonConvert.SerializeObject(tempProject.SubtitlesList);
             try
             {
                 System.IO.File.WriteAllText(@"subtitleJson.txt", json);
@@ -202,7 +202,7 @@ namespace SubRed
                             if (fps / 2 < sumFrameNum && fps * 120 > sumFrameNum) // Если субтитр дольше секунды и меньше 2 минут
                             {
                                 //Запись в глобальную переменную субтитр
-                                tempGlobalListOfSubs.Add(new Subtitle()
+                                tempProject.SubtitlesList.Add(new Subtitle()
                                 {
                                     Text = sub.Text,
                                     Start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000)),
@@ -257,7 +257,7 @@ namespace SubRed
             {
                 if (filePath != "")
                 {
-                    tempGlobalListOfSubs.Clear();
+                    tempProject.SubtitlesList.Clear();
                     listOfSubs.Clear();
 
                     runButton.Visibility = Visibility.Hidden;
@@ -370,7 +370,7 @@ namespace SubRed
                             if (fps / 2 < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                             {
                                 //Запись в глобальную переменную субтитр
-                                tempGlobalListOfSubs.Add(new Subtitle()
+                                tempProject.SubtitlesList.Add(new Subtitle()
                                 {
                                     Text = sub.Text,
                                     Start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000)),
@@ -406,7 +406,7 @@ namespace SubRed
                         tempimg.ROI = region;
                         var text = SubtitleOCR.GetRegionsTextTesseract(tempimg, index.ToString());
                         if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
-                            tempGlobalListOfSubs.Add(new Subtitle()
+                            tempProject.SubtitlesList.Add(new Subtitle()
                             {
                                 Text = text,
                                 XCoord = region.X,
@@ -499,10 +499,10 @@ namespace SubRed
 
         private void okButton_Click(object sender, RoutedEventArgs e)
         {
-            if (tempGlobalListOfSubs.Count > 0)
+            if (tempProject.SubtitlesList.Count > 0)
             {
-                globalListOfSubs.Clear();
-                globalListOfSubs.AddRange(tempGlobalListOfSubs);
+                globalProject.SubtitlesList.Clear();
+                globalProject.SubtitlesList.AddRange(tempProject.SubtitlesList);
                 this.DialogResult = true;
                 CloseWindow();
             }
@@ -537,9 +537,9 @@ namespace SubRed
             if (saveFileDialog.ShowDialog() == true)
             {
                 if (format == "")
-                    SubFormats.SelectFormat(saveFileDialog.FileName, tempGlobalListOfSubs, false);
+                    SubFormats.SelectFormat(saveFileDialog.FileName, tempProject, false);
                 else
-                    SubFormats.SelectFormat(saveFileDialog.FileName, tempGlobalListOfSubs, false, format);
+                    SubFormats.SelectFormat(saveFileDialog.FileName, tempProject, false, format);
             }
         }
 

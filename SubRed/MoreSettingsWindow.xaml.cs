@@ -58,10 +58,10 @@ namespace SubRed
             SubtitleOCR.laplaceSeed = int.Parse(textBoxLaplaceSeed.Text);
             SubtitleOCR.morphSize = int.Parse(textBoxMorphSize.Text);
             SubtitleOCR.thresholdLaplace = int.Parse(textBoxThresholdLaplace.Text);
-            SubtitleOCR.dilateHeight = int.Parse(textBoxDilateHeight.Text);
+            /*SubtitleOCR.dilateHeight = int.Parse(textBoxDilateHeight.Text);
             SubtitleOCR.dilateWidth = int.Parse(textBoxDilateWidth.Text);
             SubtitleOCR.erodeHeight = int.Parse(textBoxErodeHeight.Text);
-            SubtitleOCR.erodeWidth = int.Parse(textBoxErodeWidth.Text);
+            SubtitleOCR.erodeWidth = int.Parse(textBoxErodeWidth.Text);*/
 
             ComboBoxItem ComboItem = (ComboBoxItem)comboBoxLanguage.SelectedItem;
             SubtitleOCR.OCRLanguageChange(ComboItem.Name);
@@ -74,10 +74,10 @@ namespace SubRed
             textBoxLaplaceSeed.Text = SubtitleOCR.laplaceSeed.ToString();
             textBoxMorphSize.Text = SubtitleOCR.morphSize.ToString();
             textBoxThresholdLaplace.Text = SubtitleOCR.thresholdLaplace.ToString();
-            textBoxDilateHeight.Text = SubtitleOCR.dilateHeight.ToString();
+            /*textBoxDilateHeight.Text = SubtitleOCR.dilateHeight.ToString();
             textBoxDilateWidth.Text = SubtitleOCR.dilateWidth.ToString();
             textBoxErodeHeight.Text = SubtitleOCR.erodeHeight.ToString();
-            textBoxErodeWidth.Text = SubtitleOCR.erodeWidth.ToString();
+            textBoxErodeWidth.Text = SubtitleOCR.erodeWidth.ToString();*/
 
             var lang = SubtitleOCR.ocrLanguage;
             switch (lang)

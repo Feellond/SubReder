@@ -33,7 +33,7 @@ namespace SubRed
 
         public Subtitle()
         {
-            Id = -1;
+            Id = 0;
             Start = TimeSpan.Zero;
             End = TimeSpan.Zero;
             Duration = TimeSpan.Zero;
@@ -41,7 +41,7 @@ namespace SubRed
             FrameEndNum = 0;
             XCoord = 0;
             YCoord = 0;
-            Text = string.Empty;
+            Text = "Test Text";
 
             Style = new SubtitleStyle();
 

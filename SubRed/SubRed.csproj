@@ -8,6 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="icons\bold.png" />
+    <None Remove="icons\center-align.png" />
+    <None Remove="icons\copy.png" />
+    <None Remove="icons\cut.png" />
+    <None Remove="icons\italic.png" />
+    <None Remove="icons\left-align.png" />
+    <None Remove="icons\paste.png" />
+    <None Remove="icons\plus.png" />
+    <None Remove="icons\right-align.png" />
+    <None Remove="icons\strikethrough.png" />
+    <None Remove="icons\underline.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Emgu.CV" Version="4.6.0.5131" />
     <PackageReference Include="Emgu.CV.Bitmap" Version="4.6.0.5131" />
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.6.0.5131" />
@@ -37,6 +51,20 @@
 
   <ItemGroup>
     <Folder Include="SubFormats\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="icons\bold.png" />
+    <Resource Include="icons\center-align.png" />
+    <Resource Include="icons\copy.png" />
+    <Resource Include="icons\cut.png" />
+    <Resource Include="icons\italic.png" />
+    <Resource Include="icons\left-align.png" />
+    <Resource Include="icons\paste.png" />
+    <Resource Include="icons\plus.png" />
+    <Resource Include="icons\right-align.png" />
+    <Resource Include="icons\strikethrough.png" />
+    <Resource Include="icons\underline.png" />
   </ItemGroup>
 
 </Project>

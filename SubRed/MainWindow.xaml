@@ -33,7 +33,7 @@
                         <MenuItem Header="В формате SRT" Click="SrtSave_Click"></MenuItem>
                     </MenuItem>
                     <Separator/>
-                    <MenuItem Header="Открыть видео"/>
+                    <MenuItem Header="Открыть видео" Click="Load_Click"/>
                     <MenuItem Header="Свойства проекта"/>
                     <Separator />
                     <MenuItem Header="Выход" ></MenuItem>
@@ -101,22 +101,22 @@
                         <Image Source="icons/left-align.png" Width="16" Height="16"></Image>
                     </Button>
                     <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="centerAlignButton" Click="centerAlignButton_Click">
-                        <Image Source="icons/center-align.png" Width="16" Height="16"></Image>
+                        <Image Source="/icons/center-align.png" Width="16" Height="16"></Image>
                     </Button>
                     <Button Grid.Row="2" Background="Transparent" BorderThickness="0" Name="rightAlignButton" Click="rightAlignButton_Click">
-                        <Image Source="icons/right-align.png" Width="16" Height="16"></Image>
+                        <Image Source="/icons/right-align.png" Width="16" Height="16"></Image>
                     </Button>
                     <Button Grid.Row="3" Background="Transparent" BorderThickness="0" Name="copyButton"
                             Command="ApplicationCommands.Copy" FocusManager.IsFocusScope="True">
-                        <Image Source="icons/copy.png" Width="16" Height="16"></Image>
+                        <Image Source="/icons/copy.png" Width="16" Height="16"></Image>
                     </Button>
                     <Button Grid.Row="4" Background="Transparent" BorderThickness="0" Name="cutButton" 
                             Command="ApplicationCommands.Cut" FocusManager.IsFocusScope="True">
-                        <Image Source="icons/cut.png" Width="16" Height="16"></Image>
+                        <Image Source="/icons/cut.png" Width="16" Height="16"></Image>
                     </Button>
                     <Button Grid.Row="5" Background="Transparent" BorderThickness="0" Name="pasteButton"
                             Command="ApplicationCommands.Paste" FocusManager.IsFocusScope="True">
-                        <Image Source="icons/paste.png" Width="16" Height="16"></Image>
+                        <Image Source="/icons/paste.png" Width="16" Height="16"></Image>
                     </Button>
                 </Grid>
                 <Grid Grid.Row="1" Margin="3">
@@ -141,7 +141,7 @@
                 </Grid>
             </Grid>
             <TabControl Name="tabControl" Grid.Column="1" Margin="3" SelectionChanged="TabControl_SelectionChanged" 
-                        MinHeight="300" MaxHeight="400">
+                        VerticalAlignment="Top" MinHeight="300" MaxHeight="400">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="Template">
@@ -203,8 +203,8 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <StackPanel Orientation="Horizontal" Height="120" VerticalAlignment="Top" Grid.Row="0" Margin="3">
-                                    <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8"
-                                            MouseLeftButtonUp="Border_MouseLeftButtonUp">
+                                    <Border Background="Gainsboro" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8"
+                                            MouseLeftButtonUp="Border_MouseLeftButtonUp" Name="SubtitleBorder_1">
                                         <Grid>
                                             <Grid Margin="3">
                                                 <Grid.ColumnDefinitions>
@@ -214,7 +214,7 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <Grid Grid.Column="0" Margin="3" VerticalAlignment="Top">
-                                                    <Label Content="KEKW" MinWidth="42"></Label>
+                                                    <Label Content="0" MinWidth="42" HorizontalContentAlignment="Center"></Label>
                                                 </Grid>
                                                 <Grid Grid.Column="1" Margin="3" VerticalAlignment="Top">
                                                     <Grid.RowDefinitions>
@@ -582,8 +582,9 @@
             <TextBlock Text="{Binding Value, ElementName=slider, StringFormat=\{0:F0\}}" 
                        Margin="5,0" Width="{Binding ActualWidth, ElementName=textBlock, Mode=OneWay}" 
                        Background="Transparent" Foreground="White"/>
-            <Slider Grid.Column="1" x:Name="slider" Maximum="0.1" Background="Transparent"
-                    Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"/>
+            <Slider Grid.Column="1" x:Name="slider" Maximum="0.1" Background="Transparent" 
+                    Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"
+                    IsMoveToPointEnabled="True" MouseUp="slider_MouseUp" />
             <TextBlock x:Name="textBlock" Grid.Column="2" Background="Transparent" Foreground="White"
                        Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
         </Grid>
@@ -622,6 +623,7 @@
                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
                         Grid.Row="0">
                 <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SteelBlue"/>
                     <Style TargetType="DataGridRow">
                         <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
                         <Style.Triggers>
@@ -632,15 +634,15 @@
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Begin" Binding="{Binding start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="End" Binding="{Binding end}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Duration" Binding="{Binding duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding frameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="FrameEndNum" Binding="{Binding frameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="xCoord" Binding="{Binding xCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="yCoord" Binding="{Binding yCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Text" Binding="{Binding text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Begin" Binding="{Binding Start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="End" Binding="{Binding End}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding FrameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="FrameEndNum" Binding="{Binding FrameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="xCoord" Binding="{Binding XCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="yCoord" Binding="{Binding YCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Text" Binding="{Binding Text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="TextWrapping" Value="Wrap"></Setter>
