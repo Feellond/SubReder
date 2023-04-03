@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="SubRed" Height="Auto" Width="Auto"
+        Title="SubRed" Height="675" Width="1394"
         xmlns:vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="5*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -26,11 +26,17 @@
                     <MenuItem Header="Открыть проект"></MenuItem>
                     <Separator />
                     <MenuItem Header="Загрузить субтитры">
-                        <MenuItem Header="В формате SRT" Click="SrtLoad_Click"></MenuItem>
+                        <MenuItem Header="В формате .srt" Click="SrtLoad_Click"></MenuItem>
+                        <MenuItem Header="В формате .ass" Click="AssLoad_Click"></MenuItem>
+                        <MenuItem Header="В формате .ssa" Click="SsaLoad_Click"></MenuItem>
+                        <MenuItem Header="В формате .smi" Click="SmiLoad_Click"></MenuItem>
                     </MenuItem>
                     <MenuItem Header="Сохранить субтитры"/>
                     <MenuItem Header="Сохранить субтитры как...">
-                        <MenuItem Header="В формате SRT" Click="SrtSave_Click"></MenuItem>
+                        <MenuItem Header="В формате .srt" Click="SrtSave_Click"></MenuItem>
+                        <MenuItem Header="В формате .ass" Click="AssSave_Click"></MenuItem>
+                        <MenuItem Header="В формате .ssa" Click="SsaSave_Click"></MenuItem>
+                        <MenuItem Header="В формате .smi" Click="SmiSave_Click"></MenuItem>
                     </MenuItem>
                     <Separator/>
                     <MenuItem Header="Открыть видео" Click="Load_Click"/>
@@ -74,7 +80,7 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" MinHeight="360" MinWidth="480">
+        <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" MinHeight="360" MinWidth="480" MaxHeight="720" MaxWidth="1080">
             <vlc:VlcControl x:Name="player" />
         </Grid>
         <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="1">
@@ -96,25 +102,29 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0" Name="leftAlignButton" Click="leftAlignButton_Click">
+                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0" Name="updateTabButton" Click="">
+                        
+                    </Button>
+                    <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="leftAlignButton" Click="leftAlignButton_Click">
                         <Image Source="icons/left-align.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="centerAlignButton" Click="centerAlignButton_Click">
+                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0" Name="centerAlignButton" Click="centerAlignButton_Click">
                         <Image Source="/icons/center-align.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0" Name="rightAlignButton" Click="rightAlignButton_Click">
+                    <Button Grid.Row="3" Background="Transparent" BorderThickness="0" Name="rightAlignButton" Click="rightAlignButton_Click">
                         <Image Source="/icons/right-align.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="3" Background="Transparent" BorderThickness="0" Name="copyButton"
+                    <Button Grid.Row="4" Background="Transparent" BorderThickness="0" Name="copyButton"
                             Command="ApplicationCommands.Copy" FocusManager.IsFocusScope="True">
                         <Image Source="/icons/copy.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="4" Background="Transparent" BorderThickness="0" Name="cutButton" 
+                    <Button Grid.Row="5" Background="Transparent" BorderThickness="0" Name="cutButton" 
                             Command="ApplicationCommands.Cut" FocusManager.IsFocusScope="True">
                         <Image Source="/icons/cut.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="5" Background="Transparent" BorderThickness="0" Name="pasteButton"
+                    <Button Grid.Row="6" Background="Transparent" BorderThickness="0" Name="pasteButton"
                             Command="ApplicationCommands.Paste" FocusManager.IsFocusScope="True">
                         <Image Source="/icons/paste.png" Width="16" Height="16"></Image>
                     </Button>
@@ -141,7 +151,7 @@
                 </Grid>
             </Grid>
             <TabControl Name="tabControl" Grid.Column="1" Margin="3" SelectionChanged="TabControl_SelectionChanged" 
-                        VerticalAlignment="Top" MinHeight="300" MaxHeight="400">
+                        VerticalAlignment="Top" MinHeight="300">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="Template">
@@ -170,8 +180,17 @@
                 <TabItem>
                     <TabItem.Template>
                         <ControlTemplate>
-                            <Button Background="Transparent">
-                                <Image Source="icons/plus.png" Height="16" Width="16"></Image>
+                            <Button Name="AddTabItemButton" Background="Transparent">
+                                <Button.Content>
+                                    <Image Source="icons/plus.png" Height="16" Width="16"></Image>
+                                </Button.Content>
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Name="engTabAddMenuItem" Header="Английский перевод" Click="engTabAddMenuItem_Click"/>
+                                        <MenuItem Name="chiTabAddMenuItem"  Header="Китайский первод" Click="chiTabAddMenuItem_Click"/>
+                                        <MenuItem Name="jpnTabAddMenuItem"  Header="Японский первод" Click="jpnTabAddMenuItem_Click"/>
+                                    </ContextMenu>
+                                </Button.ContextMenu>
                             </Button>
                         </ControlTemplate>
                     </TabItem.Template>
@@ -202,7 +221,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" Height="120" VerticalAlignment="Top" Grid.Row="0" Margin="3">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Row="0" Margin="3">
                                     <Border Background="Gainsboro" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8"
                                             MouseLeftButtonUp="Border_MouseLeftButtonUp" Name="SubtitleBorder_1">
                                         <Grid>
@@ -222,12 +241,12 @@
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
-                                                    <TextBox Grid.Row="0" Text="00:00:00.0000" MinWidth="87"/>
-                                                    <TextBox Grid.Row="1" Text="00:00:00.0000" MinWidth="87"/>
+                                                    <TextBox Grid.Row="0" Text="00:00:00.0000" MinWidth="87" Name="startSubtitleTextBox" TextChanged="startSubtitleTextBox_TextChanged"/>
+                                                    <TextBox Grid.Row="1" Text="00:00:00.0000" MinWidth="87" Name="endSubtitleTextBox" TextChanged="endSubtitleTextBox_TextChanged"/>
                                                 </Grid>
                                                 <Grid Grid.Column="2" Margin="3">
                                                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                                        <RichTextBox Width="250" Height="106">
+                                                        <RichTextBox Width="250" Height="106" Name="subtitleTextRichTextBox" TextChanged="subtitleTextRichTextBox_TextChanged">
                                                             <FlowDocument>
                                                                 <Paragraph>
                                                                     KOKW
@@ -248,7 +267,7 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Name="styleSelectComboBox" SelectionChanged="styleSelectComboBox_SelectionChanged">
                                                         <ComboBoxItem Selector.IsSelected="True">
                                                             <StackPanel>
                                                                 <TextBlock>---</TextBlock>
@@ -256,7 +275,7 @@
                                                         </ComboBoxItem>
                                                     </ComboBox>
                                                     <Label Content="H" Grid.Row="1" Grid.Column="0"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="1">
+                                                    <ComboBox Grid.Row="1" Grid.Column="1" Name="heightSelectComboBox" SelectionChanged="heightSelectComboBox_SelectionChanged">
                                                         <ComboBoxItem Selector.IsSelected="True">
                                                             <StackPanel>
                                                                 <TextBlock>Центр</TextBlock>
@@ -264,7 +283,7 @@
                                                         </ComboBoxItem>
                                                     </ComboBox>
                                                     <Label Content="V" Grid.Row="1" Grid.Column="2"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="3">
+                                                    <ComboBox Grid.Row="1" Grid.Column="3" Name="verticalSelectComboBox" SelectionChanged="verticalSelectComboBox_SelectionChanged">
                                                         <ComboBoxItem Selector.IsSelected="True">
                                                             <StackPanel>
                                                                 <TextBlock>Низ</TextBlock>
@@ -272,9 +291,9 @@
                                                         </ComboBoxItem>
                                                     </ComboBox>
                                                     <Label Content="X" Grid.Row="2" Grid.Column="0"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="1"/>
+                                                    <TextBox Grid.Row="2" Grid.Column="1" Name="xCoordTextBox" TextChanged="xCoordTextBox_TextChanged"/>
                                                     <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="3"/>
+                                                    <TextBox Grid.Row="2" Grid.Column="3" Name="yCoordTextBox" TextChanged="yCoordTextBox_TextChanged"/>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -588,7 +607,7 @@
             <TextBlock x:Name="textBlock" Grid.Column="2" Background="Transparent" Foreground="White"
                        Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
         </Grid>
-        <Grid Grid.Row="3" Grid.Column="0">
+        <Grid Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -603,16 +622,16 @@
             </Grid.ColumnDefinitions>
             <Button Name="LoadVideoButton" Content="Загрузить" Grid.Column="0" Click="Load_Click"/>
             <Button Name="StopVideoButton" Content="Стоп" Grid.Column="1" Click="Stop_Click"/>
-            <Button Name="BackVideoButton" Content="Prev 10" Grid.Column="2"/>
+            <Button Name="BackVideoButton" Content="Prev 10" Grid.Column="2" Click="BackVideoButton_Click"/>
             <Button Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="3" Click="StartPausePlay_Click"/>
-            <Button Name="ForwardVideoButton" Content="Next 10" Grid.Column="4"/>
-            <Button Name="EndVideoButton" Content="ToEnd" Grid.Column="5"/>
+            <Button Name="ForwardVideoButton" Content="Next 10" Grid.Column="4" Click="ForwardVideoButton_Click"/>
+            <Button Name="EndVideoButton" Content="ToEnd" Grid.Column="5" Grid.ColumnSpan="2" Click="EndVideoButton_Click"/>
             <TextBox Name="CurrentTimeVideoTextBox" Text="00:00:00:00" Grid.Column="6"/>
-            <TextBox Name="IdSubtitleTextBox" Text="-1" Grid.Column="7"/>
-            <Button Name="PrevSubtitleButton" Content="Prev" Grid.Column="8"/>
-            <Button Name="NextSubtitleButton" Content="Next" Grid.Column="9"/>
+            <TextBox Name="IdSubtitleTextBox" Text="-1" Grid.Column="7" TextChanged="IdSubtitleTextBox_TextChanged"/>
+            <Button Name="PrevSubtitleButton" Content="Prev" Grid.Column="8" Click="PrevSubtitleButton_Click" PreviewTextInput="NumberValidationTextBox"/>
+            <Button Name="NextSubtitleButton" Content="Next" Grid.Column="9" Click="NextSubtitleButton_Click"/>
         </Grid>
-        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="100" MaxHeight="200">
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="100">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>

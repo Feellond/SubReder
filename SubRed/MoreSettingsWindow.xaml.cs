@@ -58,40 +58,53 @@ namespace SubRed
             SubtitleOCR.laplaceSeed = int.Parse(textBoxLaplaceSeed.Text);
             SubtitleOCR.morphSize = int.Parse(textBoxMorphSize.Text);
             SubtitleOCR.thresholdLaplace = int.Parse(textBoxThresholdLaplace.Text);
-            /*SubtitleOCR.dilateHeight = int.Parse(textBoxDilateHeight.Text);
-            SubtitleOCR.dilateWidth = int.Parse(textBoxDilateWidth.Text);
-            SubtitleOCR.erodeHeight = int.Parse(textBoxErodeHeight.Text);
-            SubtitleOCR.erodeWidth = int.Parse(textBoxErodeWidth.Text);*/
+            SubtitleOCR.dilateHeight = int.Parse(textBoxDilateHeightRecognise.Text);
+            SubtitleOCR.dilateWidth = int.Parse(textBoxDilateWidthRecognise.Text);
+            SubtitleOCR.erodeHeight = int.Parse(textBoxErodeHeightRecognise.Text);
+            SubtitleOCR.erodeWidth = int.Parse(textBoxErodeWidthRecognise.Text);
 
             ComboBoxItem ComboItem = (ComboBoxItem)comboBoxLanguage.SelectedItem;
             SubtitleOCR.OCRLanguageChange(ComboItem.Name);
         }
         private void defaultButton_Click(object sender, RoutedEventArgs e)
         {
-            SubtitleOCR.ReturnDefaultValues();
-            textBoxGausSeed.Text = SubtitleOCR.gausSeed.ToString();
-            textBoxMeanSeed.Text = SubtitleOCR.meanSeed.ToString();
-            textBoxLaplaceSeed.Text = SubtitleOCR.laplaceSeed.ToString();
-            textBoxMorphSize.Text = SubtitleOCR.morphSize.ToString();
-            textBoxThresholdLaplace.Text = SubtitleOCR.thresholdLaplace.ToString();
-            /*textBoxDilateHeight.Text = SubtitleOCR.dilateHeight.ToString();
-            textBoxDilateWidth.Text = SubtitleOCR.dilateWidth.ToString();
-            textBoxErodeHeight.Text = SubtitleOCR.erodeHeight.ToString();
-            textBoxErodeWidth.Text = SubtitleOCR.erodeWidth.ToString();*/
-
-            var lang = SubtitleOCR.ocrLanguage;
-            switch (lang)
+            if (MessageBox.Show("Вернуть значения по умолчанию?", "Вернуть по умолчанию", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                case "eng":
-                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Английский")];
-                    break;
-                case "rus":
-                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Русский")];
-                    break;
-                default:
-                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[0];
-                    break;
+                SubtitleOCR.ReturnDefaultValues();
+                textBoxGausSeed.Text = SubtitleOCR.gausSeed.ToString();
+                textBoxMeanSeed.Text = SubtitleOCR.meanSeed.ToString();
+                textBoxLaplaceSeed.Text = SubtitleOCR.laplaceSeed.ToString();
+                textBoxMorphSize.Text = SubtitleOCR.morphSize.ToString();
+                textBoxThresholdLaplace.Text = SubtitleOCR.thresholdLaplace.ToString();
+                textBoxDilateHeightRecognise.Text = SubtitleOCR.dilateHeight.ToString();
+                textBoxDilateWidthRecognise.Text = SubtitleOCR.dilateWidth.ToString();
+                textBoxErodeHeightRecognise.Text = SubtitleOCR.erodeHeight.ToString();
+                textBoxErodeWidthRecognise.Text = SubtitleOCR.erodeWidth.ToString();
+
+                var lang = SubtitleOCR.ocrLanguage;
+                switch (lang)
+                {
+                    case "eng":
+                        comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Английский")];
+                        break;
+                    case "rus":
+                        comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Русский")];
+                        break;
+                    default:
+                        comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[0];
+                        break;
+                }
             }
+        }
+
+        private void acceptButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetOCRValues();
+        }
+
+        private void closeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

@@ -139,7 +139,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Label Grid.Row="0" Content="Высота расширения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                        <TextBox Grid.Row="1" Name="textBoxMorphSizeRecognise" TextWrapping="Wrap" Text="30" Width="50" Height="20"
+                        <TextBox Grid.Row="1" Name="textBoxDilateHeightRecognise" TextWrapping="Wrap" Text="30" Width="50" Height="20"
                                  PreviewTextInput="PreviewTextInputNumbers"/>
                         <Label Grid.Row="2" Content="Ширина расширения" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                         <TextBox Grid.Row="3" Name="textBoxDilateWidthRecognise" TextWrapping="Wrap" Text="70" Width="50" Height="20" 
@@ -175,9 +175,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="cancelButton" Grid.Column="0" Content="Подтвердить" MinWidth="86" Margin="3"/>
-            <Button x:Name="acceptButton" Grid.Column="1" Content="Отменить" MinWidth="86" Margin="3"/>
+            <Button x:Name="closeButton" Grid.Column="0" Content="Закрыть" MinWidth="86" Margin="3" Click="closeButton_Click"/>
+            <Button x:Name="defaultButton" Grid.Column="1" Content="По умолчанию" MinWidth="86" Margin="3" Click="defaultButton_Click"/>
+            <Button x:Name="acceptButton" Grid.Column="2" Content="Подтвердить" MinWidth="86" Margin="3" Click="acceptButton_Click"/>
         </Grid>
     </Grid>
 </Window>

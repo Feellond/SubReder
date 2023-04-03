@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -112,13 +113,13 @@ namespace SubRed
         /// <summary>
         /// Полное обновление всех данных в окне
         /// </summary>
-        private void UpdateWindow()
+        private async void UpdateWindow()
         {
             ViewGrid();
-            ViewSubtitleTab();
+            await ViewSubtitleTab(this.subListGrid);
         }
 
-        public void ViewSubtitleTab()
+        public async Task ViewSubtitleTab(Grid subListGrid)
         {
             subListGrid.Children.Clear();
             subListGrid.RowDefinitions.Clear();
@@ -173,12 +174,14 @@ namespace SubRed
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 TextBox beginTextBox = new TextBox { Name = "beginTextBox_" + index.ToString(), MinWidth = 87,
-                    Text = currentSubRedProject.SubtitlesList[index].Start.ToString("hh\\:mm\\:ss\\.FFFF") };
+                    Text = currentSubRedProject.SubtitlesList[index].Start.ToString("hh\\:mm\\:ss\\.FFFF"),};
                 beginTextBox.SetValue(Grid.RowProperty, 0);
+                beginTextBox.TextChanged += startSubtitleTextBox_TextChanged;
                 TextBox endTextBox = new TextBox { Name = "endTextBox_" + index.ToString(), MinWidth = 87,
                     Text = currentSubRedProject.SubtitlesList[index].End.ToString("hh\\:mm\\:ss\\.FFFF")
                 };
                 endTextBox.SetValue(Grid.RowProperty, 1);
+                endTextBox.TextChanged += endSubtitleTextBox_TextChanged;
                 timeGrid.Children.Add(beginTextBox);
                 timeGrid.Children.Add(endTextBox);
                 innerGrid.Children.Add(timeGrid);
@@ -192,6 +195,7 @@ namespace SubRed
                 };
                 RichTextBox richTextBox = new RichTextBox { Width = 250, Name = "subtitleRichTextBox_" + index.ToString() };
                 richTextBox.AppendText(currentSubRedProject.SubtitlesList[index].Text);
+                richTextBox.TextChanged += subtitleTextRichTextBox_TextChanged;
                 scrollViewer.Content = richTextBox;
                 textBlockGrid.Children.Add(scrollViewer);
                 innerGrid.Children.Add(textBlockGrid);
@@ -211,6 +215,7 @@ namespace SubRed
                 styleSelectComboBox.SetValue(Grid.RowProperty, 0);
                 styleSelectComboBox.SetValue(Grid.ColumnProperty, 0);
                 styleSelectComboBox.SetValue(Grid.ColumnSpanProperty, 4);
+                styleSelectComboBox.SelectionChanged += styleSelectComboBox_SelectionChanged;
                 ComboBoxItem itemSelected = new ComboBoxItem { Name = "item1", IsSelected = true };
                 StackPanel panelForItem = new StackPanel();
                 TextBlock blockForPanel = new TextBlock { Text = "---" };
@@ -227,6 +232,7 @@ namespace SubRed
                 ComboBox hSelectComboBox = new ComboBox();
                 hSelectComboBox.SetValue(Grid.RowProperty, 1);
                 hSelectComboBox.SetValue(Grid.ColumnProperty, 1);
+                hSelectComboBox.SelectionChanged += heightSelectComboBox_SelectionChanged;
                 itemSelected = new ComboBoxItem { Name = "hItem1", IsSelected = true };
                 panelForItem = new StackPanel();
                 blockForPanel = new TextBlock { Text = "Центр" };
@@ -243,6 +249,7 @@ namespace SubRed
                 ComboBox vSelectComboBox = new ComboBox();
                 vSelectComboBox.SetValue(Grid.RowProperty, 1);
                 vSelectComboBox.SetValue(Grid.ColumnProperty, 3);
+                vSelectComboBox.SelectionChanged += verticalSelectComboBox_SelectionChanged;
                 itemSelected = new ComboBoxItem { Name = "vItem1", IsSelected = true };
                 panelForItem = new StackPanel();
                 blockForPanel = new TextBlock { Text = "Низ" };
@@ -259,6 +266,7 @@ namespace SubRed
                 TextBox xTextBox = new TextBox();
                 xTextBox.SetValue(Grid.RowProperty, 2);
                 xTextBox.SetValue(Grid.ColumnProperty, 1);
+                xTextBox.TextChanged += xCoordTextBox_TextChanged;
                 selectionGrid.Children.Add(xTextBox);
 
                 Label yLabel = new Label { Content = "Y" };
@@ -269,6 +277,7 @@ namespace SubRed
                 TextBox yTextBox = new TextBox();
                 yTextBox.SetValue(Grid.RowProperty, 2);
                 yTextBox.SetValue(Grid.ColumnProperty, 3);
+                yTextBox.TextChanged += yCoordTextBox_TextChanged;
                 selectionGrid.Children.Add(yTextBox);
                 #endregion
                 innerGrid.Children.Add(selectionGrid);
@@ -323,6 +332,7 @@ namespace SubRed
                 if (isSliderDragStarted)
                     return;
                 slider.Value = player.SourceProvider.MediaPlayer.Time;
+                CurrentTimeVideoTextBox.Text = player.SourceProvider.MediaPlayer.Time.ToString();
                 if (LastTime + 20_000 < player.SourceProvider.MediaPlayer.Time)
                     Properties.Settings.Default.LastTime = LastTime = player.SourceProvider.MediaPlayer.Time + 10_000;
             });
@@ -411,23 +421,15 @@ namespace SubRed
         #endregion
 
         #region Методы загрузки и сохранения субтитров
-        private void SrtSave_Click(object sender, RoutedEventArgs e)
-        {
-            SaveSubFile(".srt");
-        }
-        private void AssSave_Click(object sender, RoutedEventArgs e)
-        {
-            SaveSubFile(".ass");
-        }
-        private void SrtLoad_Click(object sender, RoutedEventArgs e)
-        {
-            LoadSubFile(".srt");
-        }
-        private void AssLoad_Click(object sender, RoutedEventArgs e)
-        {
-            LoadSubFile(".ass");
-        }
-        private void SaveSubFile(string format = "")
+        private void SrtSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".srt");
+        private void AssSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".ass");
+        private void SsaSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".ssa");
+        private void SmiSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".smi");
+        private void SrtLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".srt");
+        private void AssLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".ass");
+        private void SsaLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".ssa");
+        private void SmiLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".smi");
+        private async void SaveSubFile(string format = "")
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -436,11 +438,11 @@ namespace SubRed
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                SubFormats.SelectFormat(saveFileDialog.FileName, currentSubRedProject, false, format);
+                await SubFormats.SelectFormat(saveFileDialog.FileName, currentSubRedProject, false, format);
             }
         }
 
-        private void LoadSubFile(string format = "")
+        private async void LoadSubFile(string format = "")
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -449,7 +451,7 @@ namespace SubRed
 
             if (openFileDialog.ShowDialog() == true)
             {
-                SubFormats.SelectFormat(openFileDialog.FileName, currentSubRedProject, true, format);
+                await SubFormats.SelectFormat(openFileDialog.FileName, currentSubRedProject, true, format);
             }
 
             if (player.SourceProvider.MediaPlayer.Length >= 0)
@@ -465,8 +467,8 @@ namespace SubRed
             try
             {
                 Subtitle dataRow = (Subtitle)SubtitleGrid.SelectedItem;
-                var foundedBorder = this.FindName("SubtitleBorder_" + SelectedIndexOfSubtitle) as Border;
-                SelecSubtitle(foundedBorder, dataRow.Id);
+                var newFoundedBorder = this.FindName("SubtitleBorder_" + dataRow.Id) as Border;
+                SelectSubtitle(newFoundedBorder, dataRow.Id);
             }
             catch (Exception ex)
             {
@@ -476,15 +478,15 @@ namespace SubRed
         // TODO необходимо проверить, работает ли
         private void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (prevBorder != null) prevBorder.Background = new SolidColorBrush(defaultBackgroundColor);
-
             Border border = e.Source as Border;
             int currIndex = Convert.ToInt32(border.Name.Split('_')[1]);   // SubtitleBorder_1 -> (string)1 -> (int)1
-            SelecSubtitle(border, currIndex);
+            SelectSubtitle(border, currIndex);
         }
 
-        private void SelecSubtitle(Border? border, int currIndex)
+        private void SelectSubtitle(Border? border, int currIndex)
         {
+            if (prevBorder != null) prevBorder.Background = new SolidColorBrush(defaultBackgroundColor);
+
             if (SelectedIndexOfSubtitle != currIndex)
             {
                 if (border != null) border.Background = new SolidColorBrush(selectedBackgroundColor);
@@ -506,7 +508,48 @@ namespace SubRed
                 player.SourceProvider.MediaPlayer.Time = (long)(frameNum) * 1000;
             }
             else SelectedIndexOfSubtitle = -1;
-            
+
+            IdSubtitleTextBox.Text = SelectedIndexOfSubtitle.ToString();
+            CurrentTimeVideoTextBox.Text = player.SourceProvider.MediaPlayer.Time.ToString();
+        }
+
+        private static readonly Regex _regex = new Regex("[^0-9]+"); //regex that matches disallowed text
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e) 
+            => e.Handled = _regex.IsMatch(e.Text);
+
+        private void IdSubtitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int.TryParse(IdSubtitleTextBox.Text, out int currIndex);
+            var foundedBorder = this.FindName("SubtitleBorder_" + currIndex) as Border;
+            SelectSubtitle(foundedBorder, currIndex);
+        }
+
+        private void PrevSubtitleButton_Click(object sender, RoutedEventArgs e)
+        {
+            int.TryParse(IdSubtitleTextBox.Text, out int currIndex);
+
+            if (currIndex > 0)
+            {
+                currIndex--;
+                IdSubtitleTextBox.Text = currIndex.ToString();
+
+                var foundedBorder = this.FindName("SubtitleBorder_" + currIndex) as Border;
+                SelectSubtitle(foundedBorder, currIndex);
+            }
+        }
+
+        private void NextSubtitleButton_Click(object sender, RoutedEventArgs e)
+        {
+            int.TryParse(IdSubtitleTextBox.Text, out int currIndex);
+
+            if (currIndex < currentSubRedProject.SubtitlesList.Count - 1)
+            {
+                currIndex++;
+                IdSubtitleTextBox.Text = currIndex.ToString();
+
+                var foundedBorder = this.FindName("SubtitleBorder_" + currIndex) as Border;
+                SelectSubtitle(foundedBorder, currIndex);
+            }
         }
         #endregion
 
@@ -564,6 +607,49 @@ namespace SubRed
                 else MessageBox.Show("Не выбран элемент для удаления", "Ошибка удаления", MessageBoxButton.OK, MessageBoxImage.Question);
             }
         }
+
+        #region Элементы редактирования субтитра в Panel
+        private void startSubtitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+        }
+
+        private void endSubtitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+        }
+
+        private void subtitleTextRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var richTextBox = sender as RichTextBox;
+        }
+
+        private void styleSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+        }
+
+        private void heightSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+        }
+
+        private void verticalSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+        }
+
+        private void xCoordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+        }
+
+        private void yCoordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+        }
+        #endregion
+
         #region Кнопки форматирования субтитров
         private void leftAlignButton_Click(object sender, RoutedEventArgs e)
         {
@@ -704,8 +790,57 @@ namespace SubRed
 
 
 
+
+
         #endregion
 
+        #endregion
+
+        private void BackVideoButton_Click(object sender, RoutedEventArgs e)
+        {
+            player.SourceProvider.MediaPlayer.Time -= 10 * 1000;
+        }
+
+        private void ForwardVideoButton_Click(object sender, RoutedEventArgs e)
+        {
+            player.SourceProvider.MediaPlayer.Time += 10 * 1000;
+        }
+
+        private void EndVideoButton_Click(object sender, RoutedEventArgs e)
+        {
+            player.SourceProvider.MediaPlayer.Time = player.SourceProvider.MediaPlayer.Length;
+        }
+
+        #region Создание вкладки с переводом субтитров
+        private void engTabAddMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            TabItem newTabItem = new TabItem
+            {
+                Header = "Eng",
+                Name = "Test"
+            };
+            tabControl.Items.Add(newTabItem);
+        }
+
+        private void chiTabAddMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            TabItem newTabItem = new TabItem
+            {
+                Header = "Chi",
+                Name = "Test"
+            };
+            tabControl.Items.Add(newTabItem);
+        }
+
+        private void jpnTabAddMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            TabItem newTabItem = new TabItem
+            {
+                Header = "Jpn",
+                Name = "Test"
+            };
+            tabControl.Items.Add(newTabItem);
+        }
         #endregion
     }
 }

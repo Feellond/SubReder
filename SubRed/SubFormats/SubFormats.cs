@@ -9,7 +9,7 @@ namespace SubRed.Sub_formats
     public static class SubFormats
     {
 
-        public static string SelectFormat(string filename, SubProject project, bool isLoadFunction, string format = "")
+        public static async Task SelectFormat(string filename, SubProject project, bool isLoadFunction, string format = "")
         {
             string[] formatSplit = filename.Split('.');
             switch (formatSplit[formatSplit.Length - 1])
@@ -38,10 +38,7 @@ namespace SubRed.Sub_formats
                     else
                         SmiSubtitle.Save(filename, project);
                     break;
-                default:
-                    return "";
             }
-            return "";
         }
     }
 }
