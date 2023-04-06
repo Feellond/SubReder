@@ -9,43 +9,43 @@ namespace SubRed
 {
     public class SubtitleStyle
     {
-        public string Name { get; set; }
-        public string Fontname { get; set; }
-        public int Fontsize { get; set; }
-        public string PrimaryColor { get; set; }
-        public string SecondaryColor { get; set;}
-        public string OutlineColor { get; set; }
-        public string BackColor { get; set; }
-        public bool Bold { get; set; }
-        public bool Italic { get; set; }
-        public bool Underline { get; set; }
-        public bool StrikeOut { get; set; }
-        public int ScaleX { get; set; }
-        public int ScaleY { get; set; }
-        public int Spacing { get; set; }
-        public int Angle { get; set; }
-        public int BorderStyle { get; set; }
-        public int Outline { get; set; }
-        public int Shadow { get; set; }
+        public string? Name { get; set; }
+        public string? Fontname { get; set; }
+        public int? Fontsize { get; set; }
+        public string? PrimaryColor { get; set; }
+        public string? SecondaryColor { get; set;}
+        public string? OutlineColor { get; set; }
+        public string? BackColor { get; set; }
+        public bool? Bold { get; set; }
+        public bool? Italic { get; set; }
+        public bool? Underline { get; set; }
+        public bool? StrikeOut { get; set; }
+        public int? ScaleX { get; set; }
+        public int? ScaleY { get; set; }
+        public int? Spacing { get; set; }
+        public int? Angle { get; set; }
+        public int? BorderStyle { get; set; }
+        public int? Outline { get; set; }
+        public int? Shadow { get; set; }
         /// <summary>
         /// Горизонтальное: 1=по левому краю, 2=по центру, 3=по правому краю.
         ///             Для вертикального выравнивания по верхнему краю, добавьте к значению горизонтального выравнивания 4. 
         ///             Для вертикального выравнивания по центру кадра, добавьте к значению горизонтального выравнивания 8.
         ///             Например. 5 = выравнивание по верхнему левому углу.
         /// </summary>
-        public int HorizontalAlignment { get; set; }
+        public int? HorizontalAlignment { get; set; }
         /// <summary>
         /// Горизонтальное: 1=вверху, 2=по центру, 3=снизу.
         ///             Для вертикального выравнивания по верхнему краю, добавьте к значению горизонтального выравнивания 4. 
         ///             Для вертикального выравнивания по центру кадра, добавьте к значению горизонтального выравнивания 8.
         ///             Например. 5 = выравнивание по верхнему левому углу.
         /// </summary>
-        public int VerticalAlignment { get; set; }
-        public int MarginL { get; set; }
-        public int MarginR { get; set;}
-        public int MarginV { get; set; }
-        public int AlphaLevel { get; set; }
-        public string Encoding { get; set; }
+        public int? VerticalAlignment { get; set; }
+        public int? MarginL { get; set; }
+        public int? MarginR { get; set;}
+        public int? MarginV { get; set; }
+        public int? AlphaLevel { get; set; }
+        public string? Encoding { get; set; }
 
         public SubtitleStyle() 
         {

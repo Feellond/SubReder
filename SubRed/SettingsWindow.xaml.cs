@@ -19,9 +19,85 @@ namespace SubRed
     /// </summary>
     public partial class SettingsWindow : Window
     {
+        public SubProject currentSubRedProject;
         public SettingsWindow()
         {
             InitializeComponent();
+        }
+        public SettingsWindow(SubProject project)
+        {
+            InitializeComponent();
+            this.currentSubRedProject = project;
+            nameTextBox.Text = currentSubRedProject.Title;
+            originalScriptTextBox.Text = currentSubRedProject.OriginalScript;
+            originalTranslationTextBox.Text = currentSubRedProject.OriginalTranslation;
+            scriptTypeTextBox.Text = currentSubRedProject.ScriptType;
+            collisionTextBox.Text = currentSubRedProject.Collisions;
+            timerTextBox.Text = currentSubRedProject.Timer;
+            syncTextBox.Text = currentSubRedProject.SyncPoint;
+
+            x_resolutionTextBox.Text = currentSubRedProject.PlayResX;
+            y_resolutionTextBox.Text = currentSubRedProject.PlayResY;
+        }
+
+        private void nameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            currentSubRedProject.Title = nameTextBox.Text;
+        }
+
+        private void originalScriptTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            currentSubRedProject.OriginalScript = originalScriptTextBox.Text;
+        }
+
+        private void originalTranslationTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            currentSubRedProject.OriginalTranslation = originalTranslationTextBox.Text;
+        }
+
+        private void scriptTypeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            currentSubRedProject.ScriptType = scriptTypeTextBox.Text;
+        }
+
+        private void collisionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            currentSubRedProject.Collisions = collisionTextBox.Text;
+        }
+
+        private void timerTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            currentSubRedProject.Timer = timerTextBox.Text;
+        }
+
+        private void syncTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            currentSubRedProject.SyncPoint = syncTextBox.Text;
+        }
+
+        private void fromVideoButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void changeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void filesButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

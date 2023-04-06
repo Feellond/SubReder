@@ -40,7 +40,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Часы" Grid.Column="0"/>
-            <TextBox x:Name="hoursTextBox" Text="" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="hoursTextBox" Text="0" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="2" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -48,7 +48,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Минуты" Grid.Column="0"/>
-            <TextBox x:Name="minutesTextBox" Text="" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="minutesTextBox" Text="0" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="3" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -56,7 +56,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Секунды" Grid.Column="0"/>
-            <TextBox x:Name="secondsTextBox" Text="" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="secondsTextBox" Text="5" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="4" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -64,15 +64,15 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Миллисекунды" Grid.Column="0"/>
-            <TextBox x:Name="milisecondsTextBox" Text="" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="milisecondsTextBox" Text="0" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="5" Margin="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="selectedButton" Content="Выделенные" Grid.Column="0" Margin="0 0 5 0" Width="90"/>
-            <Button x:Name="allButton" Content="Все" Grid.Column="1" Margin="5 0 0 0" Width="90"/>
+            <Button x:Name="selectedButton" Content="Выделенные" Grid.Column="0" Margin="0 0 5 0" Width="90" Click="selectedButton_Click"/>
+            <Button x:Name="allButton" Content="Все" Grid.Column="1" Margin="5 0 0 0" Width="90" Click="allButton_Click"/>
         </Grid>
     </Grid>
 </Window>

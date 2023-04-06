@@ -8,12 +8,12 @@
         Title="ResizeGridWindow" Height="Auto" Width="Auto">
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="3*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="0" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
+        <DataGrid Grid.Row="0" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False" MinHeight="200"
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
@@ -47,11 +47,11 @@
             <TextBox x:Name="xNameTextBox" Grid.Column="0" Width="100"/>
             <Label Content="x" Grid.Column="1"/>
             <TextBox x:Name="yNameTextBox" Grid.Column="2" Width="100"/>
-            <Button x:Name="changeAllButton" Content="Изменить все" Grid.Column="3" Margin="3"/>
-            <Button x:Name="openButton" Content="Открыть"  Grid.Column="4" Margin="3"/>
+            <Button x:Name="changeAllButton" Content="Изменить все" Grid.Column="3" Margin="3" Click="changeAllButton_Click"/>
+            <Button x:Name="openButton" Content="Открыть"  Grid.Column="4" Margin="3" Click="openButton_Click"/>
         </Grid>
         <Grid Grid.Row="4" HorizontalAlignment="Right" Margin="3">
-            <Button x:Name="closeButton" Content="Закрыть"/>
+            <Button x:Name="closeButton" Content="Закрыть" Click="closeButton_Click"/>
         </Grid>
     </Grid>
 </Window>

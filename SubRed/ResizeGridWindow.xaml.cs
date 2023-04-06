@@ -23,5 +23,20 @@ namespace SubRed
         {
             InitializeComponent();
         }
+
+        private void changeAllButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void openButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void closeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

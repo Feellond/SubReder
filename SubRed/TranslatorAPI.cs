@@ -10,7 +10,26 @@ namespace SubRed
 {
     public class TranslatorAPI
     {
-        public async Task<string> TranslateString(string text, string targetLanguage, string sourceLanguage = "auto")
+        private string targetLanguage;
+        public bool SetTargetLanguage(string language)
+        {
+            switch (language)
+            {
+                case "eng":
+                    targetLanguage = "";
+                    break;
+                case "chi":
+                    targetLanguage = "";
+                    break;
+                case "jpn":
+                    targetLanguage = "";
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+        public async Task<string> TranslateString(string text, string sourceLanguage = "auto")
         {
             if (text.Length > 0)
             {

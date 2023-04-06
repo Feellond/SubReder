@@ -16,6 +16,7 @@
     <None Remove="icons\left-align.png" />
     <None Remove="icons\paste.png" />
     <None Remove="icons\plus.png" />
+    <None Remove="icons\reload.png" />
     <None Remove="icons\right-align.png" />
     <None Remove="icons\strikethrough.png" />
     <None Remove="icons\underline.png" />
@@ -62,6 +63,7 @@
     <Resource Include="icons\left-align.png" />
     <Resource Include="icons\paste.png" />
     <Resource Include="icons\plus.png" />
+    <Resource Include="icons\reload.png" />
     <Resource Include="icons\right-align.png" />
     <Resource Include="icons\strikethrough.png" />
     <Resource Include="icons\underline.png" />

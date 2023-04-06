@@ -30,7 +30,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Наименование" Grid.Column="0"></Label>
-                        <TextBox x:Name="nameTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right"></TextBox>
+                        <TextBox x:Name="nameTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right" TextChanged="nameTextBox_TextChanged"></TextBox>
                     </Grid>
                     <Grid Grid.Row="1" Margin="0 3 3 0">
                         <Grid.ColumnDefinitions>
@@ -38,7 +38,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Оригинальный скрипт" Grid.Column="0"></Label>
-                        <TextBox x:Name="originalScriptTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right"></TextBox>
+                        <TextBox x:Name="originalScriptTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right" TextChanged="originalScriptTextBox_TextChanged"></TextBox>
                     </Grid>
                     <Grid Grid.Row="2" Margin="0 3 3 0">
                         <Grid.ColumnDefinitions>
@@ -46,7 +46,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Оригинальный перевод" Grid.Column="0"></Label>
-                        <TextBox x:Name="originalTranslationTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right"></TextBox>
+                        <TextBox x:Name="originalTranslationTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right" TextChanged="originalTranslationTextBox_TextChanged"></TextBox>
                     </Grid>
                     <Grid Grid.Row="3" Margin="0 3 3 0">
                         <Grid.ColumnDefinitions>
@@ -54,7 +54,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Тип скрипта" Grid.Column="0"></Label>
-                        <TextBox x:Name="scriptTypeTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right"></TextBox>
+                        <TextBox x:Name="scriptTypeTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right" TextChanged="scriptTypeTextBox_TextChanged"></TextBox>
                     </Grid>
                     <Grid Grid.Row="4" Margin="0 3 3 0">
                         <Grid.ColumnDefinitions>
@@ -62,7 +62,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Коллизия" Grid.Column="0"></Label>
-                        <TextBox x:Name="collisionTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right"></TextBox>
+                        <TextBox x:Name="collisionTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right" TextChanged="collisionTextBox_TextChanged"></TextBox>
                     </Grid>
                     <Grid Grid.Row="5" Margin="0 3 3 0">
                         <Grid.ColumnDefinitions>
@@ -70,7 +70,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Таймер" Grid.Column="0"></Label>
-                        <TextBox x:Name="timerTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right"></TextBox>
+                        <TextBox x:Name="timerTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right" TextChanged="timerTextBox_TextChanged"></TextBox>
                     </Grid>
                     <Grid Grid.Row="6" Margin="0 3 3 0">
                         <Grid.ColumnDefinitions>
@@ -78,7 +78,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Коллизия" Grid.Column="0"></Label>
-                        <TextBox x:Name="syncTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right"></TextBox>
+                        <TextBox x:Name="syncTextBox" Grid.Column="1" Width="250" HorizontalAlignment="Right" TextChanged="syncTextBox_TextChanged"></TextBox>
                     </Grid>
                 </Grid>
             </GroupBox>
@@ -99,9 +99,9 @@
                     <TextBox x:Name="x_resolutionTextBox" Width="100" Grid.Row="0" Grid.Column="0" Margin="3"></TextBox>
                     <Label Grid.Row="0" Grid.Column="1">x</Label>
                     <TextBox x:Name="y_resolutionTextBox" Width="100" Grid.Row="0" Grid.Column="2" Margin="3"></TextBox>
-                    <Button x:Name="fromVideoButton" Content="Из видео" Grid.Row="0" Grid.Column="3" Margin="3"></Button>
-                    <Button x:Name="changeButton" Content="Сменить" Grid.Row="1" Grid.Column="0" Margin="3"></Button>
-                    <Button x:Name="filesButton" Content="Файлы" Grid.Row="1" Grid.Column="2" Margin="3"></Button>
+                    <Button x:Name="fromVideoButton" Content="Из видео" Grid.Row="0" Grid.Column="3" Margin="3" Click="fromVideoButton_Click"></Button>
+                    <Button x:Name="changeButton" Content="Сменить" Grid.Row="1" Grid.Column="0" Margin="3" Click="changeButton_Click"></Button>
+                    <Button x:Name="filesButton" Content="Файлы" Grid.Row="1" Grid.Column="2" Margin="3" Click="filesButton_Click"></Button>
                     </Grid>
             </GroupBox>
         </Grid>
@@ -110,8 +110,8 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="saveButton" Content="Сохранить" Width="100" Grid.Column="0" Margin="5 10 5 5"/>
-            <Button x:Name="cancelButton" Content="Отмена" Width="100"  Grid.Column="1" Margin="5 10 5 5"/>
+            <Button x:Name="saveButton" Content="Сохранить" Width="100" Grid.Column="0" Margin="5 10 5 5" Click="saveButton_Click"/>
+            <Button x:Name="cancelButton" Content="Отмена" Width="100"  Grid.Column="1" Margin="5 10 5 5" Click="cancelButton_Click"/>
         </Grid>
     </Grid>
 </Window>

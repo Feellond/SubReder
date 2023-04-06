@@ -40,7 +40,7 @@
                     </MenuItem>
                     <Separator/>
                     <MenuItem Header="Открыть видео" Click="Load_Click"/>
-                    <MenuItem Header="Свойства проекта"/>
+                    <MenuItem Header="Свойства проекта" Click="ProjectSettingsMenuItem_Click"/>
                     <Separator />
                     <MenuItem Header="Выход" ></MenuItem>
                 </MenuItem>
@@ -104,8 +104,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0" Name="updateTabButton" Click="">
-                        
+                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0" Name="updateTabButton" Click="updateTabButton_Click">
+                        <Image Source="icons/reload.png" Width="16" Height="16"></Image>
                     </Button>
                     <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="leftAlignButton" Click="leftAlignButton_Click">
                         <Image Source="icons/left-align.png" Width="16" Height="16"></Image>
@@ -581,6 +581,11 @@
                     </TabItem.Content>
                 </TabItem>
                 <TabItem>
+                    <TabItem.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Удалить вкладку" Click="deleteMenuItem_Click"></MenuItem>
+                        </ContextMenu>
+                    </TabItem.ContextMenu>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>Перевод</TextBlock>
