@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="StyleListWindow" Height="450" Width="442">
+        Title="StyleListWindow" Height="Auto" Width="Auto">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,8 +13,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <GroupBox x:Name="groupBox" Header="GroupBox" Margin="5" Height="Auto" MinHeight="300">
-                <ListBox x:Name="listBox">
+            <GroupBox x:Name="stylesGroupBox" Header="Стили" Margin="5" Height="Auto" MinHeight="300">
+                <ListBox x:Name="stylesListBox">
                     
                 </ListBox>
             </GroupBox>
@@ -40,11 +40,7 @@
             </Grid>
         </Grid>
         <Grid Grid.Row="2">
-            <Button x:Name="closeButton" Content="Закрыть" Width="100" HorizontalAlignment="Right" Margin="5 10 5 0" Click="closeButton_Click"/>
+            <Button x:Name="closeButton" Content="Закрыть" Width="100" HorizontalAlignment="Right" Margin="5 10 5 5" Click="closeButton_Click"/>
         </Grid>
-        
-        
-        
-
     </Grid>
 </Window>

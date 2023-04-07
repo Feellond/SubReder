@@ -40,7 +40,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Часы" Grid.Column="0"/>
-            <TextBox x:Name="hoursTextBox" Text="0" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="hoursTextBox" Text="0" Width="120" Grid.Column="1" PreviewTextInput="IsTextAllowed"/>
         </Grid>
         <Grid Grid.Row="2" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -48,7 +48,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Минуты" Grid.Column="0"/>
-            <TextBox x:Name="minutesTextBox" Text="0" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="minutesTextBox" Text="0" Width="120" Grid.Column="1" PreviewTextInput="IsTextAllowed"/>
         </Grid>
         <Grid Grid.Row="3" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -56,7 +56,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Секунды" Grid.Column="0"/>
-            <TextBox x:Name="secondsTextBox" Text="5" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="secondsTextBox" Text="5" Width="120" Grid.Column="1" PreviewTextInput="IsTextAllowed"/>
         </Grid>
         <Grid Grid.Row="4" Margin="3" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -64,7 +64,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Миллисекунды" Grid.Column="0"/>
-            <TextBox x:Name="milisecondsTextBox" Text="0" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
+            <TextBox x:Name="milisecondsTextBox" Text="0" VerticalAlignment="Top" Width="120" Grid.Column="1" PreviewTextInput="IsTextAllowed"/>
         </Grid>
         <Grid Grid.Row="5" Margin="3" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>

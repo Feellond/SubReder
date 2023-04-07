@@ -645,7 +645,7 @@
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                        Grid.Row="0">
+                        Grid.Row="0" SelectionMode="Extended">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SteelBlue"/>
                     <Style TargetType="DataGridRow">

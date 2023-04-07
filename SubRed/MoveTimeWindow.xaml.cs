@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,19 +20,48 @@ namespace SubRed
     /// </summary>
     public partial class MoveTimeWindow : Window
     {
+        MainWindow mainWindow;
         public MoveTimeWindow()
         {
             InitializeComponent();
         }
+        public void LoadWindow(MainWindow window)
+        {
+            mainWindow = window;
+        }
+        private static readonly Regex _regex = new Regex("[^0-9]+"); //regex that matches disallowed text
+        private void IsTextAllowed(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = _regex.IsMatch(e.Text);
+        }
+        public TimeSpan GetTimeSpan()
+        {
+            int.TryParse(hoursTextBox.Text, out int hours);
+            int.TryParse(minutesTextBox.Text, out int minutes);
+            int.TryParse(secondsTextBox.Text, out int seconds);
+            int.TryParse(milisecondsTextBox.Text, out int miliseconds);
 
+            TimeSpan time = new TimeSpan(0, hours, minutes, seconds, miliseconds);
+            return time;
+        }
         private void allButton_Click(object sender, RoutedEventArgs e)
         {
-
+            TimeSpan time = GetTimeSpan();
+            foreach (Subtitle item in mainWindow.currentSubRedProject.SubtitlesList)
+            {
+                item.Start += time;
+                item.End += time;
+            }
         }
 
         private void selectedButton_Click(object sender, RoutedEventArgs e)
         {
-
+            TimeSpan time = GetTimeSpan();
+            foreach (Subtitle item in mainWindow.SubtitleGrid.SelectedItems)
+            {
+                mainWindow.currentSubRedProject.SubtitlesList[item.Id].Start += time;
+                mainWindow.currentSubRedProject.SubtitlesList[item.Id].End += time;
+            }
         }
     }
 }

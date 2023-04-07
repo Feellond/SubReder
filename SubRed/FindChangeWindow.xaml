@@ -16,10 +16,12 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Найти" Width="auto" Grid.Column="0"/>
-            <TextBox x:Name="findTextBox" Text="" Width="150" Grid.Column="1" Margin="5 0 0 0"/>
+            <TextBox x:Name="findTextBox" Text="" Width="150" Grid.Column="1" Margin="5 0 0 0" TextChanged="findTextBox_TextChanged"/>
             <Button x:Name="nextButton" Content="Следующий" Width="100" Grid.Column="2" Margin="5 0 0 0" Click="nextButton_Click"/>
+            <Label Name="foundedLabel" Content="0 из 0" Grid.Column="4" Margin="5 0 0 0 "/>
         </Grid>
         <Grid Grid.Row="1" Margin="5 5 5 5">
             <Grid.ColumnDefinitions>
@@ -29,7 +31,7 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Label Content="Заменить на" Width="auto" Grid.Column="0"/>
-            <TextBox x:Name="changeTextBox" Text="" Width="150" Grid.Column="1" Margin="5 0 0 0"/>
+            <TextBox x:Name="changeToTextBox" Text="" Width="150" Grid.Column="1" Margin="5 0 0 0"/>
             <Button x:Name="changeButton" Content="Заменить" Width="100" Grid.Column="2" Margin="5 0 0 0" Click="changeButton_Click"/>
             <Button x:Name="changeAllButton" Content="Заменить все" Width="100" Grid.Column="3" Margin="5 0 0 0" Click="changeAllButton_Click"/>
         </Grid>

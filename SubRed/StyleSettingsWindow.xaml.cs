@@ -19,6 +19,9 @@ namespace SubRed
     /// </summary>
     public partial class StyleSettingsWindow : Window
     {
+        public int currentIndex;
+        public SubProject currentProject;
+
         public SubtitleStyle currentStyle;
         public int? horizontalAlignment, verticalAlignment;
         public StyleSettingsWindow()
@@ -26,6 +29,13 @@ namespace SubRed
             InitializeComponent();
         }
 
+        public void LoadWindow(int index, SubProject project, SubtitleStyle style)
+        {
+            currentIndex = index;
+            currentProject = project;
+            currentStyle = style;
+
+        }
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             currentStyle.Name = StyleNameTextBox.Text;
@@ -47,6 +57,9 @@ namespace SubRed
             currentStyle.ScaleY = (int)y_NumericUpDown.Value;
             currentStyle.Angle = (int)RotationNumericUpDown.Value;
             currentStyle.Spacing = (int)IntervalNumericUpDown.Value;
+
+            currentProject.SubtitleStyleList[currentIndex] = currentStyle;
+            this.Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
