@@ -16,10 +16,10 @@ namespace SubRed
         public string? SecondaryColor { get; set;}
         public string? OutlineColor { get; set; }
         public string? BackColor { get; set; }
-        public bool? Bold { get; set; }
-        public bool? Italic { get; set; }
-        public bool? Underline { get; set; }
-        public bool? StrikeOut { get; set; }
+        public bool Bold { get; set; }
+        public bool Italic { get; set; }
+        public bool Underline { get; set; }
+        public bool StrikeOut { get; set; }
         public int? ScaleX { get; set; }
         public int? ScaleY { get; set; }
         public int? Spacing { get; set; }
@@ -67,7 +67,7 @@ namespace SubRed
             Outline = 1;
             Shadow = 1;
             HorizontalAlignment = 2;
-            VerticalAlignment = 3;
+            VerticalAlignment = 0;
             MarginL = 0;
             MarginR = 0;
             MarginV = 0;

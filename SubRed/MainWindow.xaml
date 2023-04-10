@@ -180,7 +180,7 @@
                 <TabItem>
                     <TabItem.Template>
                         <ControlTemplate>
-                            <Button Name="AddTabItemButton" Background="Transparent">
+                            <Button Name="AddTabItemButton" Background="Transparent" Click="AddTabItemButton_Click">
                                 <Button.Content>
                                     <Image Source="icons/plus.png" Height="16" Width="16"></Image>
                                 </Button.Content>
@@ -241,6 +241,7 @@
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
+                                                    
                                                     <TextBox Grid.Row="0" Text="00:00:00.0000" MinWidth="87" Name="startSubtitleTextBox" TextChanged="startSubtitleTextBox_TextChanged"/>
                                                     <TextBox Grid.Row="1" Text="00:00:00.0000" MinWidth="87" Name="endSubtitleTextBox" TextChanged="endSubtitleTextBox_TextChanged"/>
                                                 </Grid>
@@ -580,21 +581,6 @@
                         </ScrollViewer>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem>
-                    <TabItem.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Удалить вкладку" Click="deleteMenuItem_Click"></MenuItem>
-                        </ContextMenu>
-                    </TabItem.ContextMenu>
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock>Перевод</TextBlock>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <TabItem.Content>
-                        <TextBox Height="100" Width="100" Text="KEKW"></TextBox>
-                    </TabItem.Content>
-                </TabItem>
             </TabControl>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="0" Background="Transparent">
@@ -645,6 +631,7 @@
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      CanUserAddRows="False" CanUserDeleteRows="False"
                         Grid.Row="0" SelectionMode="Extended">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SteelBlue"/>

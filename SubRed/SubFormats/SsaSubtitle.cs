@@ -56,7 +56,7 @@ namespace SubRed.Sub_formats
                     sw.Write(style.Outline.ToString() + ",");
                     sw.Write(style.Shadow.ToString() + ",");
 
-                    int alignmentNumber = style.HorizontalAlignment;
+                    int? alignmentNumber = style.HorizontalAlignment;
                     if (style.VerticalAlignment == 1)
                         alignmentNumber += 4;
                     else if (style.VerticalAlignment == 2)

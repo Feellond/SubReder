@@ -41,10 +41,10 @@ namespace SubRed
             currentStyle.Name = StyleNameTextBox.Text;
             currentStyle.Fontname = FontNameTextBox.Text;
             currentStyle.Fontsize = (int)FontSizeNumericUpDown.Value;
-            currentStyle.Bold = BoldCheckBox.IsChecked;
-            currentStyle.Italic = CursiveCheckBox.IsChecked;
-            currentStyle.Underline = UnderlineCheckBox.IsChecked;
-            currentStyle.StrikeOut = CrossedCheckBox.IsChecked;
+            currentStyle.Bold = BoldCheckBox.IsChecked ?? false;
+            currentStyle.Italic = CursiveCheckBox.IsChecked ?? false;
+            currentStyle.Underline = UnderlineCheckBox.IsChecked ?? false;
+            currentStyle.StrikeOut = CrossedCheckBox.IsChecked ?? false;
             currentStyle.PrimaryColor = FirstColorPicker.ColorName; //Проверить цвета
             currentStyle.SecondaryColor = SecondColorPicker.ColorName; //Проверить цвета
             currentStyle.OutlineColor = ContourColorPicker.ColorName; //Проверить цвета

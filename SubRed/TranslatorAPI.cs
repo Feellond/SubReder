@@ -1,53 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SubRed
 {
-    public class TranslatorAPI
+    public static class TranslatorAPI
     {
-        private string targetLanguage;
-        public bool SetTargetLanguage(string language)
+        public static async Task<string> Translate(string text, string fromLang, string toLang)
         {
-            switch (language)
+            string url = $"https://api.mymemory.translated.net/get?q={HttpUtility.UrlEncode(text)}&langpair={fromLang}|{toLang}";
+
+            using (HttpClient client = new HttpClient())
             {
-                case "eng":
-                    targetLanguage = "";
-                    break;
-                case "chi":
-                    targetLanguage = "";
-                    break;
-                case "jpn":
-                    targetLanguage = "";
-                    break;
-                default:
-                    return false;
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
+                return result.responseData.translatedText;
             }
-            return true;
-        }
-        public async Task<string> TranslateString(string text, string sourceLanguage = "auto")
-        {
-            if (text.Length > 0)
-            {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("https://libretranslate.com");
-                    var content = new FormUrlEncodedContent(new[]
-                    {
-                        new KeyValuePair<string, string>("q", text),
-                        new KeyValuePair<string, string>("source", sourceLanguage),
-                        new KeyValuePair<string, string>("target", targetLanguage)
-                    });
-                    var result = await client.PostAsync("/translate", content);
-                    string resultContent = await result.Content.ReadAsStringAsync();
-                    return resultContent;
-                }
-            }
-            else return "Error: Строка должна быть не пустой";
         }
         //https://libretranslate.com/
         //https://github.com/Grizley56/GoogleTranslateFreeApi

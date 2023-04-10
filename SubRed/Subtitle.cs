@@ -41,7 +41,7 @@ namespace SubRed
             FrameEndNum = 0;
             XCoord = 0;
             YCoord = 0;
-            Text = "Test Text";
+            Text = "Как оно работает? Тест переводчика. Что он выдаст в этот раз?";
 
             Style = new SubtitleStyle();
 
