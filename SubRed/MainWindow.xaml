@@ -104,9 +104,6 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Background="Transparent" BorderThickness="0" Name="updateTabButton" Click="updateTabButton_Click">
-                        <Image Source="icons/reload.png" Width="16" Height="16"></Image>
-                    </Button>
                     <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="leftAlignButton" Click="leftAlignButton_Click">
                         <Image Source="icons/left-align.png" Width="16" Height="16"></Image>
                     </Button>
@@ -232,22 +229,26 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0" Margin="3" VerticalAlignment="Top">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Column="0" Grid.Row="0" Margin="3" VerticalAlignment="Top">
                                                     <Label Content="0" MinWidth="42" HorizontalContentAlignment="Center"></Label>
                                                 </Grid>
-                                                <Grid Grid.Column="1" Margin="3" VerticalAlignment="Top">
+                                                <Grid Grid.Column="1" Grid.Row="0" Margin="3" VerticalAlignment="Top">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
-                                                    
-                                                    <TextBox Grid.Row="0" Text="00:00:00.0000" MinWidth="87" Name="startSubtitleTextBox" TextChanged="startSubtitleTextBox_TextChanged"/>
-                                                    <TextBox Grid.Row="1" Text="00:00:00.0000" MinWidth="87" Name="endSubtitleTextBox" TextChanged="endSubtitleTextBox_TextChanged"/>
+
+                                                    <TextBox Grid.Row="0" Text="00:00:00.0000" MinWidth="87" Name="startSubtitleTextBox"/>
+                                                    <TextBox Grid.Row="1" Text="00:00:00.0000" MinWidth="87" Name="endSubtitleTextBox" />
                                                 </Grid>
-                                                <Grid Grid.Column="2" Margin="3">
+                                                <Grid Grid.Column="2" Grid.Row="0" Margin="3">
                                                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                                        <RichTextBox Width="250" Height="106" Name="subtitleTextRichTextBox" TextChanged="subtitleTextRichTextBox_TextChanged">
+                                                        <RichTextBox Width="250" Height="106" Name="subtitleRichTextBox">
                                                             <FlowDocument>
                                                                 <Paragraph>
                                                                     KOKW
@@ -256,7 +257,7 @@
                                                         </RichTextBox>
                                                     </ScrollViewer>
                                                 </Grid>
-                                                <Grid Grid.Column="3" Margin="3">
+                                                <Grid Grid.Column="3" Grid.Row="0" Margin="3">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
@@ -268,7 +269,7 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Name="styleSelectComboBox" SelectionChanged="styleSelectComboBox_SelectionChanged">
+                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Name="styleComboBox" >
                                                         <ComboBoxItem Selector.IsSelected="True">
                                                             <StackPanel>
                                                                 <TextBlock>---</TextBlock>
@@ -276,7 +277,7 @@
                                                         </ComboBoxItem>
                                                     </ComboBox>
                                                     <Label Content="H" Grid.Row="1" Grid.Column="0"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="1" Name="heightSelectComboBox" SelectionChanged="heightSelectComboBox_SelectionChanged">
+                                                    <ComboBox Grid.Row="1" Grid.Column="1" Name="heightSelectComboBox" >
                                                         <ComboBoxItem Selector.IsSelected="True">
                                                             <StackPanel>
                                                                 <TextBlock>Центр</TextBlock>
@@ -284,7 +285,7 @@
                                                         </ComboBoxItem>
                                                     </ComboBox>
                                                     <Label Content="V" Grid.Row="1" Grid.Column="2"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="3" Name="verticalSelectComboBox" SelectionChanged="verticalSelectComboBox_SelectionChanged">
+                                                    <ComboBox Grid.Row="1" Grid.Column="3" Name="verticalSelectComboBox">
                                                         <ComboBoxItem Selector.IsSelected="True">
                                                             <StackPanel>
                                                                 <TextBlock>Низ</TextBlock>
@@ -292,286 +293,19 @@
                                                         </ComboBoxItem>
                                                     </ComboBox>
                                                     <Label Content="X" Grid.Row="2" Grid.Column="0"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="1" Name="xCoordTextBox" TextChanged="xCoordTextBox_TextChanged"/>
+                                                    <TextBox Grid.Row="2" Grid.Column="1" Name="xCoordTextBox"/>
                                                     <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="3" Name="yCoordTextBox" TextChanged="yCoordTextBox_TextChanged"/>
+                                                    <TextBox Grid.Row="2" Grid.Column="3" Name="yCoordTextBox"/>
                                                 </Grid>
-                                            </Grid>
-                                        </Grid>
-                                    </Border>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="100" HorizontalAlignment="Left"
-                                            VerticalAlignment="Top" Grid.Row="1" Grid.Column="0" Margin="3">
-                                    <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8">
-                                        <Grid>
-                                            <Grid Margin="3">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0" Margin="3">
-                                                    <Label Content="KEKW"></Label>
-                                                </Grid>
-                                                <Grid Grid.Column="1" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <TextBox Grid.Row="0"/>
-                                                    <TextBox Grid.Row="1"/>
-                                                </Grid>
-                                                <Grid Grid.Column="2" Margin="3">
-                                                    <TextBox Width="200" Text="KOKW"></TextBox>
-                                                </Grid>
-                                                <Grid Grid.Column="3" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
+                                                <Grid Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>---</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="H" Grid.Row="1" Grid.Column="0"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="1">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Центр</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="V" Grid.Row="1" Grid.Column="2"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="3">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Низ</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="X" Grid.Row="2" Grid.Column="0"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="1"/>
-                                                    <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="3"/>
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                    </Border>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="100" VerticalAlignment="Top" Grid.Row="2" Margin="3">
-                                    <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8">
-                                        <Grid>
-                                            <Grid Margin="3">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0" Margin="3">
-                                                    <Label Content="KEKW"></Label>
-                                                </Grid>
-                                                <Grid Grid.Column="1" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <TextBox Grid.Row="0"/>
-                                                    <TextBox Grid.Row="1"/>
-                                                </Grid>
-                                                <Grid Grid.Column="2" Margin="3">
-                                                    <TextBox Width="200" Text="KOKW"></TextBox>
-                                                </Grid>
-                                                <Grid Grid.Column="3" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>---</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="H" Grid.Row="1" Grid.Column="0"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="1">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Центр</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="V" Grid.Row="1" Grid.Column="2"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="3">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Низ</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="X" Grid.Row="2" Grid.Column="0"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="1"/>
-                                                    <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="3"/>
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                    </Border>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="100" VerticalAlignment="Top" Grid.Row="3" Margin="3">
-                                    <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8">
-                                        <Grid>
-                                            <Grid Margin="3">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0" Margin="3">
-                                                    <Label Content="KEKW"></Label>
-                                                </Grid>
-                                                <Grid Grid.Column="1" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <TextBox Grid.Row="0"/>
-                                                    <TextBox Grid.Row="1"/>
-                                                </Grid>
-                                                <Grid Grid.Column="2" Margin="3">
-                                                    <TextBox Width="200" Text="KOKW"></TextBox>
-                                                </Grid>
-                                                <Grid Grid.Column="3" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>---</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="H" Grid.Row="1" Grid.Column="0"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="1">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Центр</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="V" Grid.Row="1" Grid.Column="2"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="3">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Низ</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="X" Grid.Row="2" Grid.Column="0"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="1"/>
-                                                    <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="3"/>
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                    </Border>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="100" VerticalAlignment="Top" Grid.Row="4" Margin="3">
-                                    <Border Background="GhostWhite" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8">
-                                        <Grid>
-                                            <Grid Margin="3">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0" Margin="3">
-                                                    <Label Content="KEKW"></Label>
-                                                </Grid>
-                                                <Grid Grid.Column="1" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <TextBox Grid.Row="0"/>
-                                                    <TextBox Grid.Row="1"/>
-                                                </Grid>
-                                                <Grid Grid.Column="2" Margin="3">
-                                                    <TextBox Width="200" Text="KOKW"></TextBox>
-                                                </Grid>
-                                                <Grid Grid.Column="3" Margin="3">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>---</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="H" Grid.Row="1" Grid.Column="0"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="1">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Центр</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="V" Grid.Row="1" Grid.Column="2"/>
-                                                    <ComboBox Grid.Row="1" Grid.Column="3">
-                                                        <ComboBoxItem Selector.IsSelected="True">
-                                                            <StackPanel>
-                                                                <TextBlock>Низ</TextBlock>
-                                                            </StackPanel>
-                                                        </ComboBoxItem>
-                                                    </ComboBox>
-                                                    <Label Content="X" Grid.Row="2" Grid.Column="0"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="1"/>
-                                                    <Label Content="Y" Grid.Row="2" Grid.Column="2"/>
-                                                    <TextBox Grid.Row="2" Grid.Column="3"/>
+                                                    <Button Grid.Column="0" Content="Принять" Width="60" Margin="0 0 10 0" Background="DarkGreen" Foreground="White"
+                                                            Click="Accept_Click"/>
+                                                    <Button Grid.Column="1" Content="Отмена"  Width="60" Background="DarkRed" Foreground="White"
+                                                            Click="Cancel_Click"/>
                                                 </Grid>
                                             </Grid>
                                         </Grid>

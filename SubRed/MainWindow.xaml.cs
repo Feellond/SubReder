@@ -1,8 +1,10 @@
-﻿using Microsoft.Win32;
+﻿using Emgu.CV.Flann;
+using Microsoft.Win32;
 using SubRed.Sub_formats;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.DirectoryServices.ActiveDirectory;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -36,6 +38,7 @@ namespace SubRed
 
         #region Оконные переменные
         int SelectedIndexOfSubtitle;
+        string currentSubFileName;
         #endregion
 
         private Border? prevBorder;
@@ -44,19 +47,27 @@ namespace SubRed
 
         public MainWindow()
         {
-            InitializeComponent();
-
             currentSubRedProject = new SubProject();
-
+            SelectedIndexOfSubtitle = -1;
+            InitializeComponent();
             UIdispatcher = this.Dispatcher;
 
-            SelectedIndexOfSubtitle = -1;
-            RestartVideoPlayer();
+            WindowFirstLoad();
+        }
+
+        public async void WindowFirstLoad()
+        {
+            await SubFormats.SelectFormat("currentProject.ass", currentSubRedProject, false, ".ass");
+
+            RestartVideoPlayer("currentProject.ass");
             UpdateWindow();
         }
 
         private void RestartVideoPlayer(string SubFileName = "")
         {
+            if (SubFileName != "")
+                currentSubFileName = SubFileName;
+
             var currentAssembly = Assembly.GetEntryAssembly();
             var currentDirectory = new FileInfo(currentAssembly.Location).DirectoryName;
             // Default installation path of VideoLAN.LibVLC.Windows
@@ -66,7 +77,7 @@ namespace SubRed
                 // VLC options can be given here. Please refer to the VLC command line documentation.
                 "--no-sub-autodetect-file",
                 "--sub-autodetect-fuzzy=1",
-                "--sub-file=" + SubFileName
+                "--sub-file=" + currentSubFileName
             };
 
             LastFilePlay = Properties.Settings.Default.LastFilePlay;
@@ -99,6 +110,7 @@ namespace SubRed
         /// </summary>
         private async void UpdateWindow()
         {
+            await SubFormats.SelectFormat(currentSubFileName, currentSubRedProject, false, ".ass");
             ViewGrid();
             ViewSubtitleTab(this.subListGrid);
             RestartVideoPlayer();
@@ -128,31 +140,32 @@ namespace SubRed
                     CornerRadius = new CornerRadius(8, 8, 8, 8),
                     Name = "SubtitleBorder_" + currentSubRedProject.SubtitlesList[index].Id.ToString(),
                 };
-                border.MouseLeftButtonUp += Border_MouseLeftButtonUp;
-                try
-                {
-                    this.RegisterName(border.Name, border);
-                }
-                catch { /*Следовательно уже создано и зарегистрировано имя*/}
+                if (!useTranslator) border.MouseLeftButtonUp += Border_MouseLeftButtonUp;
+
+                try { this.UnregisterName(border.Name); } catch { }
+                this.RegisterName(border.Name, border);
 
                 Grid globalGrid = new Grid();
-                CreateBorder(currentSubRedProject.SubtitlesList[index].Id.ToString(), useTranslator, "en", language, globalGrid);
+                CreateBorder(currentSubRedProject.SubtitlesList[index].Id.ToString() + (useTranslator ? "_" + language : ""), useTranslator, language, globalGrid);
                 border.Child = globalGrid;
                 sp.Children.Add(border);
                 subGrid.Children.Add(sp);
             }
         }
 
-        public async void CreateBorder(string index, bool useTranslator, string languageFrom, string languageTo, Grid globalGrid)
+        public async void CreateBorder(string index, bool useTranslator, string languageTo, Grid globalGrid)
         {
             Grid innerGrid = new Grid { Margin = new Thickness(3) };
             innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
             innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
             innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
             innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            innerGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            innerGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
 
             Grid labelGrid = new Grid { Margin = new Thickness(3), VerticalAlignment = VerticalAlignment.Top };
             labelGrid.SetValue(Grid.ColumnProperty, 0);
+            labelGrid.SetValue(Grid.RowProperty, 0);
             Label idLabel = new Label
             {
                 Name = "idLabel_" + index,
@@ -165,6 +178,7 @@ namespace SubRed
 
             Grid timeGrid = new Grid { Margin = new Thickness(3), VerticalAlignment = VerticalAlignment.Top };
             timeGrid.SetValue(Grid.ColumnProperty, 1);
+            timeGrid.SetValue(Grid.RowProperty, 0);
             timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             timeGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
@@ -183,7 +197,7 @@ namespace SubRed
                 };
 
             beginTextBox.SetValue(Grid.RowProperty, 0);
-            beginTextBox.TextChanged += startSubtitleTextBox_TextChanged;
+            if (!useTranslator) beginTextBox.TextChanged += startSubtitleTextBox_TextChanged;
             TextBox endTextBox = new TextBox
             {
                 Name = "endTextBox_" + index.ToString(),
@@ -199,165 +213,231 @@ namespace SubRed
                 };
 
             endTextBox.SetValue(Grid.RowProperty, 1);
-            endTextBox.TextChanged += endSubtitleTextBox_TextChanged;
+            if (!useTranslator) endTextBox.TextChanged += endSubtitleTextBox_TextChanged;
             timeGrid.Children.Add(beginTextBox);
             timeGrid.Children.Add(endTextBox);
             innerGrid.Children.Add(timeGrid);
 
             Grid textBlockGrid = new Grid { Margin = new Thickness(3) };
             textBlockGrid.SetValue(Grid.ColumnProperty, 2);
+            textBlockGrid.SetValue(Grid.RowProperty, 0);
             ScrollViewer scrollViewer = new ScrollViewer
             {
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
             };
-            RichTextBox richTextBox = new RichTextBox { Width = 250, Name = "subtitleRichTextBox_" + index.ToString() };
+            RichTextBox richTextBox = new RichTextBox { Width = 250, Name = "subtitleTextRichTextBox_" + index.ToString() };
             if (int.TryParse(index, out int textValue))
             {
                 if (!useTranslator)
                     richTextBox.AppendText(currentSubRedProject.SubtitlesList[textValue].Text);
                 else
                 {
-                    var translatedText = await TranslatorAPI.Translate(currentSubRedProject.SubtitlesList[textValue].Text, "ru", languageTo);
+                    var translatedText = await TranslatorAPI.Translate(currentSubRedProject.SubtitlesList[textValue].Text, languageTo);
                     richTextBox.AppendText(translatedText);
                 }
             }
 
-            richTextBox.TextChanged += subtitleTextRichTextBox_TextChanged;
             scrollViewer.Content = richTextBox;
+            if (!useTranslator) richTextBox.TextChanged += subtitleTextRichTextBox_TextChanged;
             textBlockGrid.Children.Add(scrollViewer);
             innerGrid.Children.Add(textBlockGrid);
 
             #region Правая колонка
-            Grid selectionGrid = new Grid { Margin = new Thickness(3) };
-            selectionGrid.SetValue(Grid.ColumnProperty, 3);
-            selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-            selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-            selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-
-            ComboBox styleSelectComboBox = new ComboBox { Name = "StyleSelectComboBox_" + index.ToString() };
-            styleSelectComboBox.SetValue(Grid.RowProperty, 0);
-            styleSelectComboBox.SetValue(Grid.ColumnProperty, 0);
-            styleSelectComboBox.SetValue(Grid.ColumnSpanProperty, 4);
-            styleSelectComboBox.SelectionChanged += styleSelectComboBox_SelectionChanged;
-
-            int iter = 0;
-            foreach (var style in currentSubRedProject.SubtitleStyleList)
+            if (!useTranslator)
             {
-                ComboBoxItem item = new ComboBoxItem { Name = style.Name };
-                if (iter == 0) 
-                    item = new ComboBoxItem { Name = style.Name, IsSelected = true };
+                Grid selectionGrid = new Grid { Margin = new Thickness(3) };
+                selectionGrid.SetValue(Grid.ColumnProperty, 3);
+                selectionGrid.SetValue(Grid.RowProperty, 0);
+                selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                selectionGrid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+                selectionGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
-                StackPanel panel = new StackPanel();
-                TextBlock block = new TextBlock { Text = style.Name };
-                panel.Children.Add(block);
-                item.Content = panel;
-                styleSelectComboBox.Items.Add(item);
-                iter++;
+                ComboBox styleSelectComboBox = new ComboBox { Name = "StyleSelectComboBox_" + index.ToString() };
+                styleSelectComboBox.SetValue(Grid.RowProperty, 0);
+                styleSelectComboBox.SetValue(Grid.ColumnProperty, 0);
+                styleSelectComboBox.SetValue(Grid.ColumnSpanProperty, 4);
+
+                int iter = 0;
+                foreach (var style in currentSubRedProject.SubtitleStyleList)
+                {
+                    ComboBoxItem item = new ComboBoxItem { Name = style.Name.Replace(" ", "") };
+                    if (iter == 0)
+                        item = new ComboBoxItem { Name = style.Name.Replace(" ", ""), IsSelected = true };
+
+                    StackPanel panel = new StackPanel();
+                    TextBlock block = new TextBlock { Text = style.Name.Replace(" ", "") };
+                    panel.Children.Add(block);
+                    item.Content = panel;
+                    styleSelectComboBox.Items.Add(item);
+                    iter++;
+                }
+
+                selectionGrid.Children.Add(styleSelectComboBox);
+
+                Label hLabel = new Label { Content = "H" };
+                hLabel.SetValue(Grid.RowProperty, 1);
+                hLabel.SetValue(Grid.ColumnProperty, 0);
+                selectionGrid.Children.Add(hLabel);
+
+                ComboBox hSelectComboBox = new ComboBox { Name = "hSelectComboBox_" + index.ToString() };
+                hSelectComboBox.SetValue(Grid.RowProperty, 1);
+                hSelectComboBox.SetValue(Grid.ColumnProperty, 1);
+
+                ComboBoxItem itemSelected1 = new ComboBoxItem { Name = "Left" };
+                ComboBoxItem itemSelected2 = new ComboBoxItem { Name = "Center", IsSelected = true };
+                ComboBoxItem itemSelected3 = new ComboBoxItem { Name = "Right" };
+
+                StackPanel panelForItem = new StackPanel {Name = "panelUpForItem_" + index.ToString() };
+                TextBlock blockForPanel = new TextBlock { Text = "Вверх" };
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected1.Content = panelForItem;
+
+                panelForItem = new StackPanel { Name = "panelCenterForItem_" + index.ToString() };
+                blockForPanel = new TextBlock { Text = "Центр" };
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected2.Content = panelForItem;
+
+                panelForItem = new StackPanel { Name = "panelDownForItem_" + index.ToString() };
+                blockForPanel = new TextBlock { Text = "Низ" };
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected3.Content = panelForItem;
+
+                hSelectComboBox.Items.Add(itemSelected1);
+                hSelectComboBox.Items.Add(itemSelected2);
+                hSelectComboBox.Items.Add(itemSelected3);
+
+                hSelectComboBox.SelectionChanged += horizontalSelectComboBox_SelectionChanged;
+                selectionGrid.Children.Add(hSelectComboBox);
+
+                Label vLabel = new Label {Content = "V" };
+                vLabel.SetValue(Grid.RowProperty, 1);
+                vLabel.SetValue(Grid.ColumnProperty, 2);
+                selectionGrid.Children.Add(vLabel);
+
+                ComboBox vSelectComboBox = new ComboBox { Name = "vSelectComboBox_" + index.ToString() };
+                vSelectComboBox.SetValue(Grid.RowProperty, 1);
+                vSelectComboBox.SetValue(Grid.ColumnProperty, 3);
+
+                itemSelected1 = new ComboBoxItem { Name = "Up" };
+                itemSelected2 = new ComboBoxItem { Name = "Center" };
+                itemSelected3 = new ComboBoxItem { Name = "Down", IsSelected = true };
+
+                panelForItem = new StackPanel();
+                blockForPanel = new TextBlock { Text = "Слева" };
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected1.Content = panelForItem;
+
+                panelForItem = new StackPanel();
+                blockForPanel = new TextBlock { Text = "Центр" };
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected2.Content = panelForItem;
+
+                panelForItem = new StackPanel();
+                blockForPanel = new TextBlock { Text = "Справа" };
+                panelForItem.Children.Add(blockForPanel);
+                itemSelected3.Content = panelForItem;
+
+                vSelectComboBox.Items.Add(itemSelected1);
+                vSelectComboBox.Items.Add(itemSelected2);
+                vSelectComboBox.Items.Add(itemSelected3);
+                vSelectComboBox.SelectionChanged += verticalSelectComboBox_SelectionChanged;
+
+                selectionGrid.Children.Add(vSelectComboBox);
+
+                Label xLabel = new Label { Content = "X" };
+                xLabel.SetValue(Grid.RowProperty, 2);
+                xLabel.SetValue(Grid.ColumnProperty, 0);
+                selectionGrid.Children.Add(xLabel);
+
+                TextBox xTextBox = new TextBox { Name = "xTextBox_" + index.ToString() };
+                xTextBox.SetValue(Grid.RowProperty, 2);
+                xTextBox.SetValue(Grid.ColumnProperty, 1);
+                xTextBox.TextChanged += xCoordTextBox_TextChanged;
+                selectionGrid.Children.Add(xTextBox);
+
+                Label yLabel = new Label { Content = "Y" };
+                yLabel.SetValue(Grid.RowProperty, 2);
+                yLabel.SetValue(Grid.ColumnProperty, 2);
+                selectionGrid.Children.Add(yLabel);
+
+                TextBox yTextBox = new TextBox { Name = "yTextBox_" + index.ToString() };
+                yTextBox.SetValue(Grid.RowProperty, 2);
+                yTextBox.SetValue(Grid.ColumnProperty, 3);
+                yTextBox.TextChanged += yCoordTextBox_TextChanged;
+                selectionGrid.Children.Add(yTextBox);
+
+                if (!useTranslator) styleSelectComboBox.SelectionChanged += styleSelectComboBox_SelectionChanged;
+                innerGrid.Children.Add(selectionGrid);
+
+                try { this.UnregisterName(styleSelectComboBox.Name); } catch { }
+                try { this.UnregisterName(hSelectComboBox.Name); } catch { }
+                try { this.UnregisterName(vSelectComboBox.Name); } catch { }
+                try { this.UnregisterName(xTextBox.Name); } catch { }
+                try { this.UnregisterName(yTextBox.Name); } catch { }
+                
+                this.RegisterName(styleSelectComboBox.Name, styleSelectComboBox);
+                this.RegisterName(hSelectComboBox.Name, hSelectComboBox);
+                this.RegisterName(vSelectComboBox.Name, vSelectComboBox);
+                this.RegisterName(xTextBox.Name, xTextBox);
+                this.RegisterName(yTextBox.Name, yTextBox);
             }
-
-            selectionGrid.Children.Add(styleSelectComboBox);
-
-            Label hLabel = new Label { Content = "H" };
-            hLabel.SetValue(Grid.RowProperty, 1);
-            hLabel.SetValue(Grid.ColumnProperty, 0);
-            selectionGrid.Children.Add(hLabel);
-
-            ComboBox hSelectComboBox = new ComboBox();
-            hSelectComboBox.SetValue(Grid.RowProperty, 1);
-            hSelectComboBox.SetValue(Grid.ColumnProperty, 1);
-            hSelectComboBox.SelectionChanged += heightSelectComboBox_SelectionChanged;
-
-            ComboBoxItem itemSelected1 = new ComboBoxItem { Name = "Up"};
-            ComboBoxItem itemSelected2 = new ComboBoxItem { Name = "Center"};
-            ComboBoxItem itemSelected3 = new ComboBoxItem { Name = "Down", IsSelected = true };
-
-            StackPanel panelForItem = new StackPanel();
-            TextBlock blockForPanel = new TextBlock { Text = "Вверх" };
-            panelForItem.Children.Add(blockForPanel);
-            itemSelected1.Content = panelForItem;
-
-            panelForItem = new StackPanel();
-            blockForPanel = new TextBlock { Text = "Центр" };
-            panelForItem.Children.Add(blockForPanel);
-            itemSelected2.Content = panelForItem;
-
-            panelForItem = new StackPanel();
-            blockForPanel = new TextBlock { Text = "Низ" };
-            panelForItem.Children.Add(blockForPanel);
-            itemSelected3.Content = panelForItem;
-
-            hSelectComboBox.Items.Add(itemSelected1);
-            hSelectComboBox.Items.Add(itemSelected2);
-            hSelectComboBox.Items.Add(itemSelected3);
-
-            selectionGrid.Children.Add(hSelectComboBox);
-
-            Label vLabel = new Label { Content = "V" };
-            vLabel.SetValue(Grid.RowProperty, 1);
-            vLabel.SetValue(Grid.ColumnProperty, 2);
-            selectionGrid.Children.Add(vLabel);
-
-            ComboBox vSelectComboBox = new ComboBox();
-            vSelectComboBox.SetValue(Grid.RowProperty, 1);
-            vSelectComboBox.SetValue(Grid.ColumnProperty, 3);
-            vSelectComboBox.SelectionChanged += verticalSelectComboBox_SelectionChanged;
-
-            itemSelected1 = new ComboBoxItem { Name = "Left"};
-            itemSelected2 = new ComboBoxItem { Name = "Center", IsSelected = true };
-            itemSelected3 = new ComboBoxItem { Name = "Right"};
-
-            panelForItem = new StackPanel();
-            blockForPanel = new TextBlock { Text = "Слева" };
-            panelForItem.Children.Add(blockForPanel);
-            itemSelected1.Content = panelForItem;
-
-            panelForItem = new StackPanel();
-            blockForPanel = new TextBlock { Text = "Центр" };
-            panelForItem.Children.Add(blockForPanel);
-            itemSelected2.Content = panelForItem;
-
-            panelForItem = new StackPanel();
-            blockForPanel = new TextBlock { Text = "Справа" };
-            panelForItem.Children.Add(blockForPanel);
-            itemSelected3.Content = panelForItem;
-
-            vSelectComboBox.Items.Add(itemSelected1);
-            vSelectComboBox.Items.Add(itemSelected2);
-            vSelectComboBox.Items.Add(itemSelected3);
-
-            selectionGrid.Children.Add(vSelectComboBox);
-
-            Label xLabel = new Label { Content = "X" };
-            xLabel.SetValue(Grid.RowProperty, 2);
-            xLabel.SetValue(Grid.ColumnProperty, 0);
-            selectionGrid.Children.Add(xLabel);
-
-            TextBox xTextBox = new TextBox();
-            xTextBox.SetValue(Grid.RowProperty, 2);
-            xTextBox.SetValue(Grid.ColumnProperty, 1);
-            xTextBox.TextChanged += xCoordTextBox_TextChanged;
-            selectionGrid.Children.Add(xTextBox);
-
-            Label yLabel = new Label { Content = "Y" };
-            yLabel.SetValue(Grid.RowProperty, 2);
-            yLabel.SetValue(Grid.ColumnProperty, 2);
-            selectionGrid.Children.Add(yLabel);
-
-            TextBox yTextBox = new TextBox();
-            yTextBox.SetValue(Grid.RowProperty, 2);
-            yTextBox.SetValue(Grid.ColumnProperty, 3);
-            yTextBox.TextChanged += yCoordTextBox_TextChanged;
-            selectionGrid.Children.Add(yTextBox);
             #endregion
-            innerGrid.Children.Add(selectionGrid);
+
+            //Две кнопки принять и отмена
+            Grid buttonGrid = new Grid();
+            buttonGrid.SetValue(Grid.ColumnProperty, 3);
+            buttonGrid.SetValue(Grid.RowProperty, 1);
+            buttonGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            buttonGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+
+            Button acceptButton = new Button {
+                Name = "acceptButton" + index.ToString(),
+                Content = "Принять",
+                Width = 60,
+                Margin = new Thickness(0, 0, 10, 0),
+                Background = new SolidColorBrush(Colors.DarkGreen),
+                Foreground = new SolidColorBrush(Colors.White)
+            };
+            acceptButton.SetValue(Grid.ColumnProperty, 0);
+            acceptButton.Click += Accept_Click;
+
+            Button cancelButton = new Button
+            {
+                Name = "cancelButton" + index.ToString(),
+                Content = "Отмена",
+                Width = 60,
+                Background = new SolidColorBrush(Colors.DarkRed),
+                Foreground = new SolidColorBrush(Colors.White)
+            };
+            cancelButton.SetValue(Grid.ColumnProperty, 0);
+            cancelButton.Click += Cancel_Click;
+
+            buttonGrid.Children.Add(acceptButton);
+            buttonGrid.Children.Add(cancelButton);
+            innerGrid.Children.Add(buttonGrid);
 
             globalGrid.Children.Add(innerGrid);
-            //return globalGrid;
+
+
+            try { this.UnregisterName(idLabel.Name); } catch { }
+            try { this.UnregisterName(beginTextBox.Name); } catch { }
+            try { this.UnregisterName(endTextBox.Name); } catch { }
+            try { this.UnregisterName(richTextBox.Name); } catch { }
+            try { this.UnregisterName(acceptButton.Name); } catch { }
+            try { this.UnregisterName(cancelButton.Name); } catch { }
+
+            this.RegisterName(idLabel.Name, idLabel);
+            this.RegisterName(beginTextBox.Name, beginTextBox);
+            this.RegisterName(endTextBox.Name, endTextBox);
+            this.RegisterName(richTextBox.Name, richTextBox);
+            this.RegisterName(acceptButton.Name, acceptButton);
+            this.RegisterName(cancelButton.Name, cancelButton);
+
         }
 
         /// <summary>
@@ -538,6 +618,7 @@ namespace SubRed
             if (openFileDialog.ShowDialog() == true)
             {
                 await SubFormats.SelectFormat(openFileDialog.FileName, currentSubRedProject, true, format);
+                currentSubFileName = openFileDialog.FileName;
             }
 
             if (player.SourceProvider.MediaPlayer.Length >= 0)
@@ -707,136 +788,145 @@ namespace SubRed
         #endregion
 
         #region Элементы редактирования субтитра в Panel
+        private void Accept_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            string index = button.Name.Split('_').Last();
+            if (int.TryParse(index, out int result))
+            {
+                var foundedSubtitle = currentSubRedProject.SubtitlesList.Find(x => x.Id == result);
+                var indexOfSubtitle = currentSubRedProject.SubtitlesList.IndexOf(foundedSubtitle);
+
+                foundedSubtitle.Start = TimeSpan.Parse(((TextBox)this.FindName("startSubtitleTextBox_" + result.ToString())).Text);
+                foundedSubtitle.End = TimeSpan.Parse(((TextBox)this.FindName("endSubtitleTextBox_" + result.ToString())).Text);
+
+                var richTextBox = ((RichTextBox)this.FindName("subtitleTextRichTextBox_" + result.ToString()));
+                string richText = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd).Text;
+                foundedSubtitle.Text = richText;
+
+                var comboBox = (ComboBox)this.FindName("styleSelectComboBox_" + result.ToString());
+                foundedSubtitle.Style = currentSubRedProject.SubtitleStyleList.Find(x => x.Name == ((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name);
+
+                comboBox = (ComboBox)this.FindName("hSelectComboBox_" + result.ToString());
+                switch (((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name)
+                {
+                    case "Left":
+                        foundedSubtitle.Style.HorizontalAlignment = 0;
+                        break;
+                    case "Center":
+                        foundedSubtitle.Style.HorizontalAlignment = 1;
+                        break;
+                    case "Right":
+                        foundedSubtitle.Style.HorizontalAlignment = 2;
+                        break;
+                }
+
+                comboBox = (ComboBox)this.FindName("vSelectComboBox_" + result.ToString());
+                switch (((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name)
+                {
+                    case "Up":
+                        foundedSubtitle.Style.VerticalAlignment = 4;
+                        break;
+                    case "Center":
+                        foundedSubtitle.Style.VerticalAlignment = 8;
+                        break;
+                    case "Down":
+                        foundedSubtitle.Style.VerticalAlignment = 0;
+                        break;
+                }
+                var style = currentSubRedProject.SubtitleStyleList.Find(x => x.Name == foundedSubtitle.Style.Name);
+                var indexOfStyle = currentSubRedProject.SubtitleStyleList.IndexOf(style);
+                currentSubRedProject.SubtitleStyleList[indexOfStyle] = foundedSubtitle.Style;
+
+                foundedSubtitle.XCoord = int.Parse(((TextBox)this.FindName("xTextBox_" + result.ToString())).Text);
+                foundedSubtitle.YCoord = int.Parse(((TextBox)this.FindName("yTextBox_" + result.ToString())).Text);
+
+                currentSubRedProject.SubtitlesList[indexOfSubtitle] = foundedSubtitle;
+
+                UpdateWindow();
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            string index = button.Name.Split('_').Last();
+            if (int.TryParse(index, out int result))
+            {
+                button = (Button)this.FindName("acceptButton_" + index.ToString());
+                if (button != null) button.Visibility = Visibility.Hidden;
+
+                button = (Button)this.FindName("cancelButton_" + index.ToString());
+                if (button != null) button.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void ShowAcceptCancelButtons(string index)
+        {
+            if (int.TryParse(index, out int result))
+            {
+                var button = (Button)this.FindName("acceptButton_" + index.ToString());
+                if (button != null) button.Visibility = Visibility.Visible;
+
+                button = (Button)this.FindName("cancelButton_" + index.ToString());
+                if (button != null) button.Visibility = Visibility.Visible;
+            }
+        }
+
         private void startSubtitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = sender as TextBox;
-            try
-            {
-                TimeSpan newTime = TimeSpan.Parse(textBox.Text);
-                var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(textBox.Name.Split('_')[1]));
-                var index = currentSubRedProject.SubtitlesList.IndexOf(sub);
-                currentSubRedProject.SubtitlesList[index].Start = newTime;
-                UpdateWindow();
-            }
-            catch { 
-                
-            }
+            string index = textBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
 
         private void endSubtitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = sender as TextBox;
-            try
-            {
-                TimeSpan newTime = TimeSpan.Parse(textBox.Text);
-                var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(textBox.Name.Split('_')[1]));
-                var index = currentSubRedProject.SubtitlesList.IndexOf(sub);
-                currentSubRedProject.SubtitlesList[index].End = newTime;
-                UpdateWindow();
-            }
-            catch
-            {
-
-            }
+            string index = textBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
 
         private void subtitleTextRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var richTextBox = sender as RichTextBox;
-            var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(richTextBox.Name.Split('_')[1]));
-            var index = currentSubRedProject.SubtitlesList.IndexOf(sub);
-
-            string richText = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd).Text;
-            currentSubRedProject.SubtitlesList[index].Text = richText;
-            UpdateWindow();
+            string index = richTextBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
 
         private void styleSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = sender as ComboBox;
-            var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(comboBox.Name.Split('_')[1]));
-            var index = currentSubRedProject.SubtitlesList.IndexOf(sub);
-
-            sub.Style = currentSubRedProject.SubtitleStyleList.Find(x => x.Name == ((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name);
-            currentSubRedProject.SubtitlesList[index] = sub;
-            UpdateWindow();
+            string index = comboBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
 
-        private void heightSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void horizontalSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = sender as ComboBox;
-            var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(comboBox.Name.Split('_')[1]));
-            var indexSub = currentSubRedProject.SubtitlesList.IndexOf(sub);
-
-            var style = currentSubRedProject.SubtitleStyleList.Find(x => x.Name == sub.Style.Name);
-            var indexStyle = currentSubRedProject.SubtitleStyleList.IndexOf(style);
-
-            switch (((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name)
-            {
-                case "Left":
-                    style.HorizontalAlignment = 0;
-                    break;
-                case "Center":
-                    style.HorizontalAlignment = 1;
-                    break;
-                case "Right":
-                    style.HorizontalAlignment = 2;
-                    break;
-            }
-
-            currentSubRedProject.SubtitleStyleList[indexStyle] = style;
-            currentSubRedProject.SubtitlesList[indexSub].Style = style;
-
-            UpdateWindow();
+            string index = comboBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
 
         private void verticalSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = sender as ComboBox;
-            var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(comboBox.Name.Split('_')[1]));
-            var indexSub = currentSubRedProject.SubtitlesList.IndexOf(sub);
-
-            var style = currentSubRedProject.SubtitleStyleList.Find(x => x.Name == sub.Style.Name);
-            var indexStyle = currentSubRedProject.SubtitleStyleList.IndexOf(style);
-
-            switch(((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name)
-            {
-                case "Up":
-                    style.VerticalAlignment = 4;
-                    break;
-                case "Center":
-                    style.VerticalAlignment = 8;
-                    break;
-                case "Down":
-                    style.VerticalAlignment = 0;
-                    break;
-            }
-
-            currentSubRedProject.SubtitleStyleList[indexStyle] = style;
-            currentSubRedProject.SubtitlesList[indexSub].Style = style;
-            UpdateWindow();
+            string index = comboBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
 
         private void xCoordTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = sender as TextBox;
-            var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(textBox.Name.Split('_')[1]));
-            var index = currentSubRedProject.SubtitlesList.IndexOf(sub);
-
-            sub.XCoord = int.Parse(textBox.Text);
-            currentSubRedProject.SubtitlesList[index] = sub;
-            UpdateWindow();
+            string index = textBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
 
         private void yCoordTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = sender as TextBox;
-            var sub = currentSubRedProject.SubtitlesList.Find(x => x.Id == int.Parse(textBox.Name.Split('_')[1]));
-            var index = currentSubRedProject.SubtitlesList.IndexOf(sub);
-
-            sub.YCoord = int.Parse(textBox.Text);
-            currentSubRedProject.SubtitlesList[index] = sub;
-            UpdateWindow();
+            string index = textBox.Name.Split('_').Last();
+            ShowAcceptCancelButtons(index);
         }
         #endregion
 
@@ -1027,12 +1117,6 @@ namespace SubRed
                 if (MessageBox.Show("Удалить вкладку?", "Удаление вкладки", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     tabControl.Items.RemoveAt(tabControl.SelectedIndex);                
         }
-
-        private void updateTabButton_Click(object sender, RoutedEventArgs e)
-        {
-            UpdateWindow();
-        }
-
         #endregion
 
         private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1049,5 +1133,7 @@ namespace SubRed
             contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
             contextMenu.IsOpen = true;
         }
+
+        
     }   
 }

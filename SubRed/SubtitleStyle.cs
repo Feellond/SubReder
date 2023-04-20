@@ -72,6 +72,7 @@ namespace SubRed
             MarginR = 0;
             MarginV = 0;
             AlphaLevel = 0;
+            Encoding = "";
         }
 
         /*
