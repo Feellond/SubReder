@@ -5,25 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="SubRed" Height="675" Width="1394"
+        Title="SubRed" Height="600" Width="1150"
         xmlns:vlc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
             <Menu Height="30" VerticalAlignment="Top">
                 <MenuItem Header="Файл">
-                    <MenuItem Header="Новый проект" ></MenuItem>
-                    <MenuItem Header="Открыть проект"></MenuItem>
+                    <MenuItem Header="Новый проект" Click="NewProjectMenuItem_Click"></MenuItem>
                     <Separator />
                     <MenuItem Header="Загрузить субтитры">
                         <MenuItem Header="В формате .srt" Click="SrtLoad_Click"></MenuItem>
@@ -31,7 +30,7 @@
                         <MenuItem Header="В формате .ssa" Click="SsaLoad_Click"></MenuItem>
                         <MenuItem Header="В формате .smi" Click="SmiLoad_Click"></MenuItem>
                     </MenuItem>
-                    <MenuItem Header="Сохранить субтитры"/>
+                    <MenuItem Header="Сохранить субтитры" Click="SaveProjectMenuItem_Click"/>
                     <MenuItem Header="Сохранить субтитры как...">
                         <MenuItem Header="В формате .srt" Click="SrtSave_Click"></MenuItem>
                         <MenuItem Header="В формате .ass" Click="AssSave_Click"></MenuItem>
@@ -42,48 +41,40 @@
                     <MenuItem Header="Открыть видео" Click="Load_Click"/>
                     <MenuItem Header="Свойства проекта" Click="ProjectSettingsMenuItem_Click"/>
                     <Separator />
-                    <MenuItem Header="Выход" ></MenuItem>
+                    <MenuItem Header="Выход" Click="CloseProjectMenuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Редактирование">
-                    <MenuItem Header="Отменить" ></MenuItem>
-                    <MenuItem Header="Вернуть"></MenuItem>
+                    <MenuItem Header="Отменить" Click="BackMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Вернуть" Click="ForwardMenuItem_Click"></MenuItem>
                     <Separator />
-                    <MenuItem Header="Вырезать"></MenuItem>
-                    <MenuItem Header="Копировать"></MenuItem>
-                    <MenuItem Header="Вставить"></MenuItem>
-                    <MenuItem Header="Удалить"></MenuItem>
+                    <MenuItem Header="Вырезать" Click="CutRowMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Копировать" Click="CopyRowMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Вставить" Click="PutInMSMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Удалить" Click="DeleteRowMenuItem_Click"></MenuItem>
                     <Separator />
-                    <MenuItem Header="Найти и заменить"></MenuItem>
+                    <MenuItem Header="Найти и заменить" Click="FindAndChangeMenuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Субтитры" >
-                    <MenuItem Header="Стили" ></MenuItem>
-                    <MenuItem Header="Эффекты" ></MenuItem>
-                    <MenuItem Header="Сместить время на" ></MenuItem>
-                    <MenuItem Header="Передать текст в MS Word" ></MenuItem>
-                    <MenuItem Header="Перенумеровать" ></MenuItem>
-                    <MenuItem Header="Отсортировать время и перенумеровать" ></MenuItem>
+                    <MenuItem Header="Стили" Click="StyleMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Сместить время на" Click="MoveTimeMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Передать текст в MS Word" Click="PutInMSMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Перенумеровать" Click="RenumMenuItem_Click"></MenuItem>
+                    <MenuItem Header="Отсортировать время и перенумеровать" Click="RenumAndSortMenuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Автоматизация" >
                     <MenuItem Header="Извлечь встроенные субтитры" Click="ExtractSubsFromFile_Click"></MenuItem>
-                    <MenuItem Header="Очистить теги"></MenuItem>
-                    <MenuItem Header="Удаление тегов"></MenuItem>
-                    <MenuItem Header="Выделить пересечения"></MenuItem>
-                    <MenuItem Header="Проверить и исправить"></MenuItem>
+                    <MenuItem Header="Выделить пересечения" Click="TimeCrossedSelectMenuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Вид" >
-                    <MenuItem Header="Только субтитры"></MenuItem>
-                    <MenuItem Header="Видео+субтитры"></MenuItem>
-                    <MenuItem Header="Аудиодорожка"></MenuItem>
+                    <MenuItem Name="SubtitleGridMenuItem"  Header="Таблица субтитров" IsChecked="True" Click="SubtitleGridMenuItem_Click"></MenuItem>
+                    <MenuItem Name="VideoMenuItem" Header="Элемент видео" IsChecked="True" Click="VideoMenuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Помощь" >
-                    <MenuItem Header="О программе" ></MenuItem>
+                    <MenuItem Header="О программе" Click="AboutMenuItem_Click"></MenuItem>
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" MinHeight="360" MinWidth="480" MaxHeight="720" MaxWidth="1080">
-            <vlc:VlcControl x:Name="player" />
-        </Grid>
-        <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="1">
+        <Grid Name="SubtitleListGrid" Grid.Row="1" Grid.Column="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -199,15 +190,25 @@
                         </StackPanel>
                     </TabItem.Header>
                     <TabItem.Content>
-                        <ScrollViewer Name="scrollViewerSubListGrid">
+                        <ScrollViewer Name="scrollViewerSubListGrid" VerticalScrollBarVisibility="Auto">
                             <Grid x:Name="subListGrid">
                                 <Grid.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Add"
+                                        <MenuItem Header="Добавить новый"
                                               Click="Add_OnClick"
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
-                                        <MenuItem Header="Delete"
+                                        <MenuItem Header="Удалить"
                                               Click="Delete_OnClick"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
+                                        <Separator/>
+                                        <MenuItem Header="Перевести фразу на английский"
+                                              Click="TranslateEng_OnClick"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
+                                        <MenuItem Header="Перевести фразу на китайский"
+                                              Click="TranslateChi_OnClick"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
+                                        <MenuItem Header="Перевести фразу на японский"
+                                              Click="TranslateJap_OnClick"
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
                                     </ContextMenu>
                                 </Grid.ContextMenu>
@@ -219,7 +220,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Row="0" Margin="3">
-                                    <Border Background="Gainsboro" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8"
+                                    <Border Background="LightCyan" BorderBrush="Silver" BorderThickness="1" CornerRadius="8,8,8,8"
                                             MouseLeftButtonUp="Border_MouseLeftButtonUp" Name="SubtitleBorder_1">
                                         <Grid>
                                             <Grid Margin="3">
@@ -248,7 +249,7 @@
                                                 </Grid>
                                                 <Grid Grid.Column="2" Grid.Row="0" Margin="3">
                                                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                                        <RichTextBox Width="250" Height="106" Name="subtitleRichTextBox">
+                                                        <RichTextBox Width="250" Height="106" Name="subtitleTextRichTextBox_1">
                                                             <FlowDocument>
                                                                 <Paragraph>
                                                                     KOKW
@@ -302,9 +303,9 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <Button Grid.Column="0" Content="Принять" Width="60" Margin="0 0 10 0" Background="DarkGreen" Foreground="White"
+                                                    <Button Grid.Column="0" Content="Принять" Width="60" Margin="0 0 10 0" Background="White" Foreground="Black"
                                                             Click="Accept_Click"/>
-                                                    <Button Grid.Column="1" Content="Отмена"  Width="60" Background="DarkRed" Foreground="White"
+                                                    <Button Grid.Column="1" Content="Отмена"  Width="60" Background="White" Foreground="Black"
                                                             Click="Cancel_Click"/>
                                                 </Grid>
                                             </Grid>
@@ -317,77 +318,103 @@
                 </TabItem>
             </TabControl>
         </Grid>
-        <Grid Grid.Row="2" Grid.Column="0" Background="Transparent">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Value, ElementName=slider, StringFormat=\{0:F0\}}" 
+        <Grid Name="VideoGrid" Grid.Row="1" Grid.Column="0" Background="Black" Margin="0 0 0 3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" MinHeight="360" MinWidth="480" MaxHeight="720" MaxWidth="1080">
+                <vlc:VlcControl x:Name="player" />
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="0" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Value, ElementName=slider, StringFormat=\{0:F0\}}" 
                        Margin="5,0" Width="{Binding ActualWidth, ElementName=textBlock, Mode=OneWay}" 
                        Background="Transparent" Foreground="White"/>
-            <Slider Grid.Column="1" x:Name="slider" Maximum="0.1" Background="Transparent" 
+                <Slider Grid.Column="1" x:Name="slider" Maximum="0.1" Background="Transparent" 
                     Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"
                     IsMoveToPointEnabled="True" MouseUp="slider_MouseUp" />
-            <TextBlock x:Name="textBlock" Grid.Column="2" Background="Transparent" Foreground="White"
+                <TextBlock x:Name="textBlock" Grid.Column="2" Background="Transparent" Foreground="White"
                        Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Background="Transparent" Margin="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Name="LoadVideoButton" Content="Загрузить" Grid.Column="0" Click="Load_Click"/>
+                <Button Name="StopVideoButton" Content="Стоп" Grid.Column="1" Click="Stop_Click"/>
+                <Button Name="BackVideoButton" Content="Prev 10" Grid.Column="2" Click="BackVideoButton_Click"/>
+                <Button Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="3" Click="StartPausePlay_Click"/>
+                <Button Name="ForwardVideoButton" Content="Next 10" Grid.Column="4" Click="ForwardVideoButton_Click"/>
+                <Button Name="EndVideoButton" Content="ToEnd" Grid.Column="5" Grid.ColumnSpan="2" Click="EndVideoButton_Click"/>
+                <TextBox Name="CurrentTimeVideoTextBox" Text="00:00:00:00" Grid.Column="6"/>
+                <TextBox Name="IdSubtitleTextBox" Text="-1" Grid.Column="7" TextChanged="IdSubtitleTextBox_TextChanged"/>
+                <Button Name="PrevSubtitleButton" Content="Prev" Grid.Column="8" Click="PrevSubtitleButton_Click" PreviewTextInput="NumberValidationTextBox"/>
+                <Button Name="NextSubtitleButton" Content="Next" Grid.Column="9" Click="NextSubtitleButton_Click"/>
+            </Grid>
         </Grid>
-        <Grid Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Button Name="LoadVideoButton" Content="Загрузить" Grid.Column="0" Click="Load_Click"/>
-            <Button Name="StopVideoButton" Content="Стоп" Grid.Column="1" Click="Stop_Click"/>
-            <Button Name="BackVideoButton" Content="Prev 10" Grid.Column="2" Click="BackVideoButton_Click"/>
-            <Button Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="3" Click="StartPausePlay_Click"/>
-            <Button Name="ForwardVideoButton" Content="Next 10" Grid.Column="4" Click="ForwardVideoButton_Click"/>
-            <Button Name="EndVideoButton" Content="ToEnd" Grid.Column="5" Grid.ColumnSpan="2" Click="EndVideoButton_Click"/>
-            <TextBox Name="CurrentTimeVideoTextBox" Text="00:00:00:00" Grid.Column="6"/>
-            <TextBox Name="IdSubtitleTextBox" Text="-1" Grid.Column="7" TextChanged="IdSubtitleTextBox_TextChanged"/>
-            <Button Name="PrevSubtitleButton" Content="Prev" Grid.Column="8" Click="PrevSubtitleButton_Click" PreviewTextInput="NumberValidationTextBox"/>
-            <Button Name="NextSubtitleButton" Content="Next" Grid.Column="9" Click="NextSubtitleButton_Click"/>
-        </Grid>
-        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" MinHeight="100">
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="Transparent"></GridSplitter>
+        <GridSplitter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" Background="Transparent"></GridSplitter>
+        <Grid Name="SubtitleDataGridGrid" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" MinHeight="100" Margin="0 1 0 0" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <DataGrid Style="{x:Null}" x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
                         ScrollViewer.CanContentScroll="True" 
-                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      CanUserAddRows="False" CanUserDeleteRows="False"
+                        CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                         Grid.Row="0" SelectionMode="Extended">
                 <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SteelBlue"/>
-                    <Style TargetType="DataGridRow">
-                        <EventSetter Event="MouseDoubleClick" Handler="Row_Click"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF0000"/>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <EventSetter Event="PreviewMouseDown" Handler="Row_Click"/>
+                    </Style>
+                    <Style TargetType="DataGridCell">
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="AntiqueWhite"/>
+                                <Setter Property="Background" Value="Green"/>
+                                <Setter Property="Foreground" Value="Yellow"/>
+                                <Setter Property="BorderBrush" Value="Aqua"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter Property="BorderBrush" Value="Red" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </DataGrid.Resources>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Дублирование" Click="DuplicateRowMenuItem_Click"/>
+                        <MenuItem Header="Копировать" Click="CopyRowMenuItem_Click"/>
+                        <MenuItem Header="Вырезать" Click="CutRowMenuItem_Click"/>
+                        <MenuItem Header="Вставить" Click="PasteRowMenuItem_Click"/>
+                        <MenuItem Header="Удалить" Click="DeleteRowMenuItem_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Begin" Binding="{Binding Start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="End" Binding="{Binding End}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="FrameBeginNum" Binding="{Binding FrameBeginNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="FrameEndNum" Binding="{Binding FrameEndNum}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="xCoord" Binding="{Binding XCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="yCoord" Binding="{Binding YCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Text" Binding="{Binding Text}" Width="Auto" MinWidth="200"  FontFamily="Tahoma">
+                    <DataGridTextColumn Header="Начало" Binding="{Binding Start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Конец" Binding="{Binding End}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Длительность" Binding="{Binding Duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="x" Binding="{Binding XCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="y" Binding="{Binding YCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Текст" Binding="{Binding Text}" Width="*"  FontFamily="Tahoma">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="TextWrapping" Value="Wrap"></Setter>

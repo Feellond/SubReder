@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="FindChangeWindow" Height="auto" Width="auto">
+        Title="FindChangeWindow" Height="auto" Width="auto" MaxHeight="120" MaxWidth="480"
+        ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

@@ -77,8 +77,8 @@ namespace SubRed.Sub_formats
                 {
                     sw.Write("Dialogue: ");
                     sw.Write(dialogue.Marked + ",");
-                    sw.Write(dialogue.Start.ToString("hh\\:mm\\:ss\\.FFFF") + ",");
-                    sw.Write(dialogue.End.ToString("hh\\:mm\\:ss\\.FFFF") + ",");
+                    sw.Write(dialogue.Start.ToString("hh\\:mm\\:ss\\.ffff") + ",");
+                    sw.Write(dialogue.End.ToString("hh\\:mm\\:ss\\.ffff") + ",");
                     sw.Write(dialogue.Style.Name + ",");
                     sw.Write(dialogue.Name + ",");
                     sw.Write(dialogue.Style.MarginL.ToString() + ",");
@@ -89,9 +89,9 @@ namespace SubRed.Sub_formats
                     sw.WriteLine();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Ошибка сохранения .ass формата субтитров", "Ошибка сохранения .ass", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка сохранения .ass формата субтитров\n" + ex.Message, "Ошибка сохранения .ass", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -189,29 +189,34 @@ namespace SubRed.Sub_formats
                                         else verticalNumber = 3;
                                         horizontalNumber = alignmentNumber;
 
-                                        project.SubtitleStyleList.Add(new SubtitleStyle
-                                        {
-                                            Name = splitStyle[0],
-                                            Fontname = splitStyle[1],
-                                            Fontsize = Convert.ToInt32(splitStyle[2]),
-                                            PrimaryColor = splitStyle[3],
-                                            SecondaryColor = splitStyle[4],
-                                            OutlineColor = splitStyle[5],
-                                            BackColor = splitStyle[6],
-                                            Bold = splitStyle[7] == "0" ? false : true,
-                                            Italic = splitStyle[8] == "0" ? false : true,
-                                            Underline = splitStyle[9] == "0" ? false : true,
-                                            BorderStyle = Convert.ToInt32(splitStyle[15]),
-                                            Outline = Convert.ToInt32(splitStyle[16]),
-                                            Shadow = Convert.ToInt32(splitStyle[17]),
-                                            HorizontalAlignment = horizontalNumber,
-                                            VerticalAlignment = verticalNumber,
-                                            MarginL = Convert.ToInt32(splitStyle[19]),
-                                            MarginR = Convert.ToInt32(splitStyle[20]),
-                                            MarginV = Convert.ToInt32(splitStyle[21]),
-                                            AlphaLevel = Convert.ToInt32(splitStyle[22]),
-                                            Encoding = splitStyle[23]
-                                        });
+                                        var style = new SubtitleStyle();
+                                        style.Name = splitStyle[0];
+                                        style.Fontname = splitStyle[1];
+                                        style.Fontsize = Convert.ToInt32(splitStyle[2]);
+                                        style.PrimaryColor = splitStyle[3];
+                                        style.SecondaryColor = splitStyle[4];
+                                        style.OutlineColor = splitStyle[5];
+                                        style.BackColor = splitStyle[6];
+                                        style.Bold = splitStyle[7] == "0" ? false : true;
+                                        style.Italic = splitStyle[8] == "0" ? false : true;
+                                        style.Underline = splitStyle[9] == "0" ? false : true;
+                                        style.StrikeOut = splitStyle[10] == "0" ? false : true;
+                                        style.ScaleX = Convert.ToInt32(splitStyle[11]);
+                                        style.ScaleY = Convert.ToInt32(splitStyle[12]);
+                                        style.Spacing = Convert.ToInt32(splitStyle[13]);
+                                        style.Angle = Convert.ToDouble(splitStyle[14]);
+                                        style.BorderStyle = Convert.ToInt32(splitStyle[15]);
+                                        style.Outline = Convert.ToDouble(splitStyle[16].Replace('.', ','));
+                                        style.Shadow = Convert.ToDouble(splitStyle[17]);
+                                        style.HorizontalAlignment = horizontalNumber;
+                                        style.VerticalAlignment = verticalNumber;
+                                        style.MarginL = Convert.ToInt32(splitStyle[19]);
+                                        style.MarginR = Convert.ToInt32(splitStyle[20]);
+                                        style.MarginV = Convert.ToInt32(splitStyle[21]);
+                                        style.AlphaLevel = Convert.ToInt32(splitStyle[22]);
+                                        style.Encoding = splitStyle[22];
+
+                                        project.SubtitleStyleList.Add(style);
                                         break;
                                     #endregion
                                     #region Субтитры [Events]
@@ -236,9 +241,9 @@ namespace SubRed.Sub_formats
                 }
                 file.Close();
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Ошибка загрузки .ass формата субтитров", "Ошибка загрузки .ass", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка загрузки .ass формата субтитров\n" + ex.Message, "Ошибка загрузки .ass", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

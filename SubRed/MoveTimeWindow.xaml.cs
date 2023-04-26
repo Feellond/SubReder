@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SubRed
 {
@@ -57,10 +58,22 @@ namespace SubRed
         private void selectedButton_Click(object sender, RoutedEventArgs e)
         {
             TimeSpan time = GetTimeSpan();
-            foreach (Subtitle item in mainWindow.SubtitleGrid.SelectedItems)
+
+            if (mainWindow.SubtitleGridMenuItem.IsChecked == false || mainWindow.SubtitleGrid.Visibility == Visibility.Collapsed)
             {
-                mainWindow.currentSubRedProject.SubtitlesList[item.Id].Start += time;
-                mainWindow.currentSubRedProject.SubtitlesList[item.Id].End += time;
+                if (mainWindow.SelectedIndexOfSubtitle >= 0)
+                {
+                    mainWindow.currentSubRedProject.SubtitlesList[mainWindow.SelectedIndexOfSubtitle].Start += time;
+                    mainWindow.currentSubRedProject.SubtitlesList[mainWindow.SelectedIndexOfSubtitle].End += time;
+                }
+            }
+            else
+            {
+                foreach (Subtitle item in mainWindow.SubtitleGrid.SelectedItems)
+                {
+                    mainWindow.currentSubRedProject.SubtitlesList[item.Id].Start += time;
+                    mainWindow.currentSubRedProject.SubtitlesList[item.Id].End += time;
+                }
             }
         }
     }

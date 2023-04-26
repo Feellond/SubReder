@@ -19,12 +19,13 @@ namespace SubRed
     /// </summary>
     public partial class SettingsWindow : Window
     {
+        public MainWindow mainWindow;
         public SubProject currentSubRedProject;
         public SettingsWindow()
         {
             InitializeComponent();
         }
-        public SettingsWindow(SubProject project)
+        public SettingsWindow(SubProject project, MainWindow mainWindow)
         {
             InitializeComponent();
             this.currentSubRedProject = project;
@@ -38,6 +39,8 @@ namespace SubRed
 
             x_resolutionTextBox.Text = currentSubRedProject.PlayResX;
             y_resolutionTextBox.Text = currentSubRedProject.PlayResY;
+
+            this.mainWindow = mainWindow;
         }
 
         private void nameTextBox_TextChanged(object sender, TextChangedEventArgs e)

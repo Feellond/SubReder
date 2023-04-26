@@ -57,8 +57,21 @@ namespace SubRed
 
             SubtitlesList = new List<Subtitle>
             {
+                new Subtitle() { Style = SubtitleStyleList[0]},
                 new Subtitle() { Style = SubtitleStyleList[0]}
             };
+            SubtitleRenum();
+        }
+
+        public void SubtitleRenum()
+        {
+            for (int index = 0; index < SubtitlesList.Count; index++)
+                SubtitlesList[index].Id = index;
+        }
+
+        public void SubtitleSort()
+        {
+            SubtitlesList = SubtitlesList.OrderBy(x => x.Start).ToList();
         }
     }
 }

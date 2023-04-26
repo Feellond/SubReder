@@ -30,10 +30,10 @@ namespace SubRed
             InitializeComponent();
         }
 
-        public void LoadWindow(SubProject project, List<SubtitleStyle> newStylesList)
+        public void LoadWindow(SubProject project)
         {
             currentProject = project;
-            stylesList = new List<SubtitleStyle>(newStylesList);
+            stylesList = new List<SubtitleStyle>(project.SubtitleStyleList);
             foreach (var style in stylesList)
                 stylesListBox.Items.Add(style.Name);
         }

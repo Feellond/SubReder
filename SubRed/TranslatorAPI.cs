@@ -4,75 +4,97 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
+using System.Windows;
 
 namespace SubRed
 {
     public static class TranslatorAPI
     {
+        public static string userProxy = "";
         public static string DetectTextLanguage(string inputText)
         {
-            string text = inputText;
-            text = text.ToLower();
+            int isRussianCount = 0, isEnglishCount = 0, isChineseCount = 0, isJapaneseCount = 0;
 
-            // Создание массивов символов для каждого языка
-            char[] russianLetters = { 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я' };
-            char[] englishLetters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
-
-            // Счетчики символов для каждого языка
-            int russianCount = 0;
-            int englishCount = 0;
-
-            // Перебор символов входной строки
-            for (int i = 0; i < text.Length; i++)
+            foreach (char c in inputText)
             {
-                char c = text[i];
-
-                // Проверка, является ли символ русской буквой
-                if (Array.IndexOf(russianLetters, char.ToLower(c)) != -1)
+                if (c >= 'А' && c <= 'я')
                 {
-                    russianCount++;
+                    isRussianCount++;
                 }
-
-                // Проверка, является ли символ английской буквой
-                if (Array.IndexOf(englishLetters, char.ToLower(c)) != -1)
+                else if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
                 {
-                    englishCount++;
+                    isEnglishCount++;
+                }
+                else if (c >= '\u4e00' && c <= '\u9fff')
+                {
+                    isChineseCount++;
+                }
+                else if (c >= '\u3040' && c <= '\u309f' || c >= '\u30a0' && c <= '\u30ff')
+                {
+                    isJapaneseCount++;
                 }
             }
 
-            // Определение языка по количеству символов каждого языка
-            if (russianCount > englishCount)
-            {
-                return "ru";
-            }
-            else
-            {
+            if (isEnglishCount > isRussianCount && isEnglishCount > isChineseCount && isEnglishCount > isJapaneseCount)
                 return "en";
-            }
+            if (isChineseCount > isRussianCount && isChineseCount > isEnglishCount && isChineseCount > isJapaneseCount)
+                return "zh";
+            if (isJapaneseCount > isRussianCount && isJapaneseCount > isChineseCount && isJapaneseCount > isEnglishCount)
+                return "ja";
+
+            return "ru";
         }
         public static async Task<string> Translate(string text, string toLang)
         {
             string fromLang = DetectTextLanguage(text);
-            
-
             string url = $"https://api.mymemory.translated.net/get?q={HttpUtility.UrlEncode(text)}&langpair={fromLang}|{toLang}";
 
-            var proxy = new WebProxy
+            if (userProxy != null && userProxy != "" && userProxy.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0] != "")
             {
-                Address = new Uri($"http://172.104.241."),   //задавать свой proxy сервер
-                BypassProxyOnLocal = false,
-                UseDefaultCredentials = false
-            };
+                try
+                {
+                    var proxy = new WebProxy
+                    {
+                        Address = new Uri(userProxy),   //задавать свой proxy сервер
+                        BypassProxyOnLocal = false,
+                        UseDefaultCredentials = false
+                    };
+                    // Create a client handler that uses the proxy
+                    var httpClientHandler = new HttpClientHandler
+                    {
+                        Proxy = proxy,
+                    };
+                    // Disable SSL verification
+                    httpClientHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-            using (HttpClient client = new HttpClient())
+                    using (HttpClient client = new HttpClient(handler: httpClientHandler, disposeHandler: true))
+                    {
+                        HttpResponseMessage response = await client.GetAsync(url);
+                        response.EnsureSuccessStatusCode();
+                        string responseBody = await response.Content.ReadAsStringAsync();
+
+                        dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
+                        return result.responseData.translatedText;
+                    }
+                } catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка перевода текста. Возможно не правильно введен proxi. Попробуйте оставить пустой proxi",
+                        "Ошибка перевода", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                return "Ошибка перевода текста.";
+            }
+            else
             {
-                
-                HttpResponseMessage response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
 
-                dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
-                return result.responseData.translatedText;
+                    dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
+                    return result.responseData.translatedText;
+                }
             }
         }
         //https://libretranslate.com/

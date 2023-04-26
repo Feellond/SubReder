@@ -21,7 +21,7 @@ namespace SubRed
     public partial class FindChangeWindow : Window
     {
         MainWindow mainWindow;
-        List<int> foundedIdList;
+        List<int> foundedIdList = new();
         int currentIndex;
         public FindChangeWindow()
         {
@@ -30,17 +30,27 @@ namespace SubRed
 
         public void LoadWindow(MainWindow window)
         {
+            foundedIdList = new();
             mainWindow = window;
+            mainWindow.currentSubRedProject.SubtitleRenum();
         }
 
         private void nextButton_Click(object sender, RoutedEventArgs e)
         {
+            DataGridRow row = (DataGridRow)mainWindow.SubtitleGrid.ItemContainerGenerator.ContainerFromIndex(foundedIdList[currentIndex]);
+            row.IsSelected = false;
 
+            currentIndex++;
+            if (currentIndex >= foundedIdList.Count) currentIndex = 0;
+            mainWindow.IdSubtitleTextBox.Text = foundedIdList[currentIndex].ToString();
+            foundedLabel.Content = (currentIndex + 1) + " из " + foundedIdList.Count;
         }
 
         private void changeButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var sub = mainWindow.currentSubRedProject.SubtitlesList[currentIndex];
+            sub.Text = sub.Text.Replace(findTextBox.Text, changeToTextBox.Text);
+            mainWindow.UpdateWindow();
         }
 
         private void changeAllButton_Click(object sender, RoutedEventArgs e)
@@ -49,6 +59,7 @@ namespace SubRed
             {
                 var sub = mainWindow.currentSubRedProject.SubtitlesList.Find(x => x.Id == id);
                 sub.Text = sub.Text.Replace(findTextBox.Text, changeToTextBox.Text);
+                mainWindow.UpdateWindow();
             }
         }
 
@@ -67,8 +78,8 @@ namespace SubRed
                 foundedLabel.Content = "0 из 0";
             else
             {
-                currentIndex++;
-                foundedLabel.Content = currentIndex + " из " + foundedIdList.Count;
+                mainWindow.IdSubtitleTextBox.Text = foundedIdList[currentIndex].ToString();
+                foundedLabel.Content = (currentIndex + 1) + " из " + foundedIdList.Count;
             }
         }
     }

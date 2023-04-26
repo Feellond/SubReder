@@ -23,10 +23,10 @@ namespace SubRed
         public int? ScaleX { get; set; }
         public int? ScaleY { get; set; }
         public int? Spacing { get; set; }
-        public int? Angle { get; set; }
+        public double? Angle { get; set; }
         public int? BorderStyle { get; set; }
-        public int? Outline { get; set; }
-        public int? Shadow { get; set; }
+        public double? Outline { get; set; }
+        public double? Shadow { get; set; }
         /// <summary>
         /// Горизонтальное: 1=по левому краю, 2=по центру, 3=по правому краю.
         ///             Для вертикального выравнивания по верхнему краю, добавьте к значению горизонтального выравнивания 4. 
@@ -73,6 +73,7 @@ namespace SubRed
             MarginV = 0;
             AlphaLevel = 0;
             Encoding = "";
+            Angle = 0;
         }
 
         /*

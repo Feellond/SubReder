@@ -31,6 +31,7 @@ namespace SubRed.Sub_formats
                         sw.WriteLine(sub.End.ToString());
 
                         sw.WriteLine(sub.Text);
+                        sw.WriteLine();
                     }
                 }
             }
@@ -60,8 +61,10 @@ namespace SubRed.Sub_formats
                         line = file.ReadLine(); // чтение времени
                         time = line.Split(separator, StringSplitOptions.None);
 
-                        sub.Start = TimeSpan.ParseExact(time[0].Trim().Replace(",", "."), @"hh\:mm\:ss\.fff", System.Globalization.CultureInfo.InvariantCulture); 
-                        sub.End = TimeSpan.ParseExact(time[1].Trim().Replace(",", "."), @"hh\:mm\:ss\.fff", System.Globalization.CultureInfo.InvariantCulture);
+                        try { sub.Start = TimeSpan.ParseExact(time[0].Trim().Replace(",", "."), @"hh\:mm\:ss\.ffff", System.Globalization.CultureInfo.InvariantCulture); }
+                        catch { sub.Start = TimeSpan.Parse(time[0].Trim().Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture); }
+                        try { sub.End = TimeSpan.ParseExact(time[1].Trim().Replace(",", "."), @"hh\:mm\:ss\.ffff", System.Globalization.CultureInfo.InvariantCulture); }
+                        catch { sub.End = TimeSpan.Parse(time[1].Trim().Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture); }
 
                         line = file.ReadLine();
                         sub.Text = "";
@@ -81,9 +84,9 @@ namespace SubRed.Sub_formats
 
                 file.Close();
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Ошибка чтения .srt формата", "Ошибка чтения", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка чтения .srt формата\n" + ex.Message, "Ошибка чтения", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
