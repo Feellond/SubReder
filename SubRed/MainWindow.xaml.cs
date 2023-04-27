@@ -259,6 +259,7 @@ namespace SubRed
                 Grid textBlockGrid = new Grid { Margin = new Thickness(3) };
                 textBlockGrid.SetValue(Grid.ColumnProperty, 2);
                 textBlockGrid.SetValue(Grid.RowProperty, 0);
+                textBlockGrid.SetValue(Grid.RowSpanProperty, 2);
                 ScrollViewer scrollViewer = new ScrollViewer
                 {
                     VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -303,14 +304,14 @@ namespace SubRed
                     int iter = 0;
                     foreach (var style in currentSubRedProject.SubtitleStyleList)
                     {
-                        ComboBoxItem item = new ComboBoxItem { Name = style.Name.Replace(" ", "") };
+                        ComboBoxItem item = new ComboBoxItem { Name = style.Name.Replace(" ", "_") };
                         if (iter == 0)
-                            item = new ComboBoxItem { Name = style.Name.Replace(" ", ""), IsSelected = true };
+                            item = new ComboBoxItem { Name = style.Name.Replace(" ", "_"), IsSelected = true, Content = style.Name};
 
-                        StackPanel panel = new StackPanel();
-                        TextBlock block = new TextBlock { Text = style.Name.Replace(" ", "") };
-                        panel.Children.Add(block);
-                        item.Content = panel;
+                        //StackPanel panel = new StackPanel();
+                        //TextBlock block = new TextBlock { Text = style.Name.Replace(" ", "_") };
+                        //panel.Children.Add(block);
+                        //item.Content = panel;
                         styleSelectComboBox.Items.Add(item);
                         iter++;
                     }
@@ -387,7 +388,7 @@ namespace SubRed
 
                     selectionGrid.Children.Add(vSelectComboBox);
 
-                    Label xLabel = new Label { Content = "X" };
+                    /*Label xLabel = new Label { Content = "X" };
                     xLabel.SetValue(Grid.RowProperty, 2);
                     xLabel.SetValue(Grid.ColumnProperty, 0);
                     selectionGrid.Children.Add(xLabel);
@@ -407,7 +408,7 @@ namespace SubRed
                     yTextBox.SetValue(Grid.RowProperty, 2);
                     yTextBox.SetValue(Grid.ColumnProperty, 3);
                     yTextBox.TextChanged += yCoordTextBox_TextChanged;
-                    selectionGrid.Children.Add(yTextBox);
+                    selectionGrid.Children.Add(yTextBox);*/
 
                     if (!useTranslator) styleSelectComboBox.SelectionChanged += styleSelectComboBox_SelectionChanged;
                     innerGrid.Children.Add(selectionGrid);
@@ -418,16 +419,16 @@ namespace SubRed
                     if (o != null) this.UnregisterName(hSelectComboBox.Name);
                     o = this.FindName(vSelectComboBox.Name);
                     if (o != null) this.UnregisterName(vSelectComboBox.Name);
-                    o = this.FindName(xTextBox.Name);
-                    if (o != null) this.UnregisterName(xTextBox.Name);
-                    o = this.FindName(yTextBox.Name);
-                    if (o != null) this.UnregisterName(yTextBox.Name);
+                    //o = this.FindName(xTextBox.Name);
+                    //if (o != null) this.UnregisterName(xTextBox.Name);
+                    //o = this.FindName(yTextBox.Name);
+                    //if (o != null) this.UnregisterName(yTextBox.Name);
 
                     this.RegisterName(styleSelectComboBox.Name, styleSelectComboBox);
                     this.RegisterName(hSelectComboBox.Name, hSelectComboBox);
                     this.RegisterName(vSelectComboBox.Name, vSelectComboBox);
-                    this.RegisterName(xTextBox.Name, xTextBox);
-                    this.RegisterName(yTextBox.Name, yTextBox);
+                    //this.RegisterName(xTextBox.Name, xTextBox);
+                    //this.RegisterName(yTextBox.Name, yTextBox);
                 }
                 #endregion
 
@@ -558,7 +559,7 @@ namespace SubRed
 
         protected bool isValueChanged = false;
 
-        private void Load_Click(object sender, RoutedEventArgs e)
+        private void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
@@ -647,14 +648,8 @@ namespace SubRed
         #endregion
 
         #region Методы загрузки и сохранения субтитров
-        private void SrtSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".srt");
-        private void AssSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".ass");
-        private void SsaSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".ssa");
-        private void SmiSave_Click(object sender, RoutedEventArgs e) => SaveSubFile(".smi");
-        private void SrtLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".srt");
-        private void AssLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".ass");
-        private void SsaLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".ssa");
-        private void SmiLoad_Click(object sender, RoutedEventArgs e) => LoadSubFile(".smi");
+        private void Save_Click(object sender, RoutedEventArgs e) => SaveSubFile(".srt");
+        private void Load_Click(object sender, RoutedEventArgs e) => LoadSubFile(".srt");
         private async void SaveSubFile(string format = "")
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -962,8 +957,9 @@ namespace SubRed
                 string richText = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd).Text;
                 foundedSubtitle.Text = richText;
 
-                var comboBox = (ComboBox)this.FindName("styleSelectComboBox_" + result.ToString());
-                foundedSubtitle.Style = currentSubRedProject.SubtitleStyleList.Find(x => x.Name == ((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name);
+                var comboBox = (ComboBox)this.FindName("StyleSelectComboBox_" + result.ToString());
+                var item = ((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Content as string;
+                foundedSubtitle.Style = currentSubRedProject.SubtitleStyleList.Find(x => x.Name == item);
 
                 comboBox = (ComboBox)this.FindName("hSelectComboBox_" + result.ToString());
                 switch (((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name)
@@ -996,14 +992,45 @@ namespace SubRed
                 var indexOfStyle = currentSubRedProject.SubtitleStyleList.IndexOf(style);
                 currentSubRedProject.SubtitleStyleList[indexOfStyle] = foundedSubtitle.Style;
 
-                foundedSubtitle.XCoord = int.Parse(((TextBox)this.FindName("xTextBox_" + result.ToString())).Text);
-                foundedSubtitle.YCoord = int.Parse(((TextBox)this.FindName("yTextBox_" + result.ToString())).Text);
+                /*string xCoord = ((TextBox)this.FindName("xTextBox_" + result.ToString())).Text;
+                string yCoord = ((TextBox)this.FindName("yTextBox_" + result.ToString())).Text;
+
+                if (xCoord != "" || yCoord != "")
+                {
+                    string x = xCoord != "" ? xCoord : "";
+                    string y = yCoord != "" ? yCoord : "";
+
+
+
+                    if (x != "") foundedSubtitle.XCoord = int.Parse(x);
+                    if (y != "") foundedSubtitle.YCoord = int.Parse(y);
+                }*/
 
                 currentSubRedProject.SubtitlesList[indexOfSubtitle] = foundedSubtitle;
 
                 UpdateWindow();
             }
         }
+
+        /*public void PutInSub(Subtitle sub, string action)
+        {
+            string text = sub.Text;
+            switch (action)
+            {
+                case "pos":
+                    int index = text.IndexOf("pos");
+                    if (index != -1)
+                    {
+
+                    }
+                    else
+                    {
+                        index = text.IndexOf('{');
+                        int indexSecond = text.IndexOf('}');
+                    }
+                    break;
+            }
+        }*/
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
@@ -1013,15 +1040,16 @@ namespace SubRed
             {
                 var foundedSubtitle = currentSubRedProject.SubtitlesList.Find(x => x.Id == result);
 
-                ((TextBox)this.FindName("startSubtitleTextBox_" + result.ToString())).Text = foundedSubtitle.Start.ToString("hh\\:mm\\:ss\\.FFFF");
-                ((TextBox)this.FindName("endSubtitleTextBox_" + result.ToString())).Text = foundedSubtitle.End.ToString("hh\\:mm\\:ss\\.FFFF");
+                ((TextBox)this.FindName("startSubtitleTextBox_" + result.ToString())).Text = foundedSubtitle.Start.ToString("hh\\:mm\\:ss\\.ffff");
+                ((TextBox)this.FindName("endSubtitleTextBox_" + result.ToString())).Text = foundedSubtitle.End.ToString("hh\\:mm\\:ss\\.ffff");
 
                 var richTextBox = ((RichTextBox)this.FindName("subtitleTextRichTextBox_" + result.ToString()));
                 richTextBox.Document.Blocks.Clear();
                 richTextBox.AppendText(foundedSubtitle.Text);
 
-                var comboBox = (ComboBox)this.FindName("styleSelectComboBox_" + result.ToString());
-                comboBox.SelectedItem = foundedSubtitle.Style.Name;
+                var comboBox = (ComboBox)this.FindName("StyleSelectComboBox_" + result.ToString());
+                ComboBoxItem item = (ComboBoxItem)comboBox.FindName(foundedSubtitle.Style.Name.Replace(" ", "_"));
+                comboBox.SelectedItem = item;
 
                 comboBox = (ComboBox)this.FindName("hSelectComboBox_" + result.ToString());
                 switch (foundedSubtitle.Style.HorizontalAlignment)
@@ -1051,8 +1079,8 @@ namespace SubRed
                         break;
                 }
 
-                ((TextBox)this.FindName("xTextBox_" + result.ToString())).Text = foundedSubtitle.XCoord.ToString();
-                ((TextBox)this.FindName("yTextBox_" + result.ToString())).Text = foundedSubtitle.YCoord.ToString();
+                //((TextBox)this.FindName("xTextBox_" + result.ToString())).Text = foundedSubtitle.XCoord.ToString();
+                //((TextBox)this.FindName("yTextBox_" + result.ToString())).Text = foundedSubtitle.YCoord.ToString();
 
                 button = (Button)this.FindName("acceptButton_" + index.ToString());
                 if (button != null) button.Visibility = Visibility.Hidden;

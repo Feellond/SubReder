@@ -32,6 +32,7 @@ namespace SubRed
                                                        //3: аналогично 0, но нижняя строка всегда будет длиннее верхней.
         public List<Subtitle> SubtitlesList { get; set; }
         public List<SubtitleStyle> SubtitleStyleList { get; set; }
+        public string Filename { get; set; }
 
         public SubProject() 
         {
