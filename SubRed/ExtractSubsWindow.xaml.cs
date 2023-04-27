@@ -1,36 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.Ocl;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Microsoft.Win32;
-using static System.Net.Mime.MediaTypeNames;
-using System.Configuration;
-using System.Web;
-using Tesseract;
-using System.Xml.Linq;
 using System.IO;
-using System.Security.Policy;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using SubRed.Sub_formats;
 
@@ -395,7 +376,7 @@ namespace SubRed
                     Mat img = CvInvoke.Imread(filePath);
 
                     EastDetector eastDetector = new EastDetector();
-                    eastDetector.EastDetect(img);
+                    //var listOfEastRegions = eastDetector.EastDetect(img);
 
                     var listOfRegions = SubtitleOCR.FindRegions(img);
                     var index = 0;
@@ -404,14 +385,27 @@ namespace SubRed
                         index++;
                         var tempimg = img.ToImage<Gray, Byte>();
                         tempimg.ROI = region;
-                        var text = SubtitleOCR.GetRegionsTextTesseract(tempimg, index.ToString());
-                        if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
-                            tempProject.SubtitlesList.Add(new Subtitle()
+                        bool foundedInEast = true;
+                        if (SubtitleOCR.useEast)
+                        {
+                            foundedInEast = false;
+                            if (eastDetector.EastDetect(tempimg.Mat).Count > 0)
                             {
-                                Text = text,
-                                XCoord = region.X,
-                                YCoord = region.Y
-                            });
+                                foundedInEast = true;
+                            }
+                        }
+
+                        if (foundedInEast)
+                        {
+                            var text = SubtitleOCR.GetRegionsTextTesseract(tempimg, index.ToString());
+                            if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                                tempProject.SubtitlesList.Add(new Subtitle()
+                                {
+                                    Text = text,
+                                    XCoord = region.X,
+                                    YCoord = region.Y
+                                });
+                        }
                     }
                 }
 

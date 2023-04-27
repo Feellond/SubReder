@@ -39,6 +39,8 @@ namespace SubRed
         public static int erodeHeight = 20;
         public static int erodeWidth = 65;
 
+        public static bool useEast = false;
+
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DeleteObject([In] IntPtr hObject);
@@ -193,58 +195,10 @@ namespace SubRed
                 { 0, -1, 0}
             };
             ConvolutionKernelF matrixKernel = new ConvolutionKernelF(matrix);
-
-            //CvInvoke.DestroyAllWindows();
-
-            //Mat kernel = new Mat(*size, DepthType.Default, *data);
-            //CvInvoke.Laplacian(tempPartImage, tempPartImage, DepthType.Default, 3);
-
-            //CvInvoke.Imshow("outputGray", tempPartImage);
-            //var laplace = tempPartImage.Laplace(3);
-            //CvInvoke.ConvertScaleAbs(laplace, tempLaplace, 1, 0);
-
             CvInvoke.Filter2D(tempPartImage, tempPartImage, matrixKernel, new System.Drawing.Point(-1, -1));
-            //CvInvoke.Imshow("filter2d" + n, tempPartImage);
             CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
-            //CvInvoke.Imshow("dilate" + n, tempPartImage);
             CvInvoke.Threshold(tempPartImage, tempPartImage, 20, 255, ThresholdType.Binary);
-            //CvInvoke.AdaptiveThreshold(tempPartImage, tempPartImage, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 7, 10);
-            //CvInvoke.Imshow("thresh" + n, tempPartImage);
-            //CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
             tempPartImage = tempPartImage.Not();
-            //CvInvoke.Imshow("not" + n, tempPartImage);
-            //CvInvoke.AdaptiveThreshold(tempLaplace, tempPartImage, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 7, 20);
-            //
-
-            //Mat white = Mat.Ones(tempLaplace.Rows, tempLaplace.Cols, DepthType.Default, 1);
-            //Mat dst = new Mat();
-            //CvInvoke.AbsDiff(white, tempLaplace.Mat, dst);
-
-            //tempPartImage = tempPartImage.Not();
-            //CvInvoke.Imshow("outputNOT", tempPartImage);
-            //CvInvoke.AbsDiff(tempPartImage, tempLaplace, tempPartImage);
-            //CvInvoke.Imshow("outputABSDiff", tempPartImage);
-
-            //CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
-            //CvInvoke.Imshow("outputDilate", tempPartImage);
-
-            /*tempPartImage = tempPartImage.SmoothGaussian(3);
-            CvInvoke.Threshold(tempPartImage, tempPartImage, 10, 1, ThresholdType.Binary);
-            //CvInvoke.Imshow("output??", tempPartImage);
-            CvInvoke.Multiply(tempPartImage, tempLaplace, tempPartImage, 100);
-            CvInvoke.Imshow("output??Mul", tempPartImage);*/
-
-            //CvInvoke.Threshold(tempPartImage, tempPartImage, 0, 255, ThresholdType.Binary);
-            //CvInvoke.Imshow("output??THRESH", tempPartImage);
-
-            //image.Source = ImageSourceFromBitmap(tempPartImage.ToBitmap<Gray, Byte>());
-            //CvInvoke.Imshow("outputThresh", tempPartImage);
-
-            /*string path = @".\tessdata\" + ocrLanguage;
-            var _ocr = new Emgu.CV.OCR.Tesseract(path, ocrLanguage, OcrEngineMode.Default);
-            _ocr.SetImage(tempPartImage);
-            _ocr.Recognize();
-            var returnText = _ocr.GetUTF8Text();*/
 
             var ocrengine = new TesseractEngine(@".\tessdata\" + ocrLanguage, ocrLanguage, EngineMode.TesseractAndLstm);
             var imgPix = Pix.LoadFromMemory(ImageToByte(tempPartImage.ToBitmap<Gray, Byte>()));

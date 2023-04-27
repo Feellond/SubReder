@@ -29,8 +29,8 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <ScrollViewer Grid.Column="0" Grid.Row="1">
-            <Grid Visibility="Hidden">
+        <ScrollViewer Grid.Column="0" Grid.Row="1" Visibility="Collapsed">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>

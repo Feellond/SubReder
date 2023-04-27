@@ -23,7 +23,7 @@ namespace SubRed
             string model = "frozen_east_text_detection.pb";
             net = DnnInvoke.ReadNet(model);
         }
-        public void EastDetect(Mat inputFrame)
+        public List<Rectangle> EastDetect(Mat inputFrame)
         {
             double confThreshold = 0.5;
             double nmsThreshold = 0.4;
@@ -53,6 +53,7 @@ namespace SubRed
             DnnInvoke.NMSBoxes(boxes, confidences, (float)confThreshold, (float)nmsThreshold, indices);
 
             PointF ratio = new PointF((float)((float)frame.Cols / (float)inpWidth), (float)((float)frame.Rows / (float)inpHeight));
+            List<Rectangle> boxList = new List<Rectangle>();
             for (int i = 0; i < indices.Size; i++)
             {
                 Rectangle box = boxes[indices[i]];
@@ -66,11 +67,13 @@ namespace SubRed
                 var p_y = vertices_y - 0.5 * vertices_height;
 
                 Rectangle box_in = new Rectangle(new Point((int)(p_x), (int)(p_y)), new Size((int)vertices_width, (int)vertices_height));
-                CvInvoke.Rectangle(frame, box_in, new MCvScalar(255, 255, 0), 4);
+                boxList.Add(box_in);
+                //CvInvoke.Rectangle(frame, box_in, new MCvScalar(255, 255, 0), 4);
             }
 
-            CvInvoke.Resize(frame, frame, new Size(1024, 720));
-            CvInvoke.Imshow("result", frame);
+            //CvInvoke.Resize(frame, frame, new Size(1024, 720));
+            //CvInvoke.Imshow("result", frame);
+            return boxList;
         }
 
         public void DecodeBox(Mat scores, Mat geometry, double scoreThresh, VectorOfRect detections, VectorOfFloat confidences)
