@@ -46,13 +46,13 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <CheckBox Name="BoldCheckBox" Grid.Column="0" Checked="BoldCheckBox_Checked"></CheckBox>
+                    <CheckBox Name="BoldCheckBox" Grid.Column="0" Checked="CheckBox_Checked" HorizontalAlignment="Right" Width="24"></CheckBox>
                     <Label Content="Жирный" Grid.Column="1"></Label>
-                    <CheckBox Name="CursiveCheckBox" Grid.Column="2" Checked="BoldCheckBox_Checked"></CheckBox>
+                    <CheckBox Name="CursiveCheckBox" Grid.Column="2" Checked="CheckBox_Checked"></CheckBox>
                     <Label Content="Курсив" Grid.Column="3"></Label>
-                    <CheckBox Name="UnderlineCheckBox" Grid.Column="4" Checked="BoldCheckBox_Checked"></CheckBox>
+                    <CheckBox Name="UnderlineCheckBox" Grid.Column="4" Checked="CheckBox_Checked"></CheckBox>
                     <Label Content="Подчеркивание" Grid.Column="5"></Label>
-                    <CheckBox Name="CrossedCheckBox" Grid.Column="6" Checked="BoldCheckBox_Checked"></CheckBox>
+                    <CheckBox Name="CrossedCheckBox" Grid.Column="6" Checked="CheckBox_Checked"></CheckBox>
                     <Label Content="Зачеркнутый" Grid.Column="7"></Label>
                 </Grid>
             </Grid>

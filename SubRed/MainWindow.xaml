@@ -59,6 +59,7 @@
                     <MenuItem Name="SubtitleGridMenuItem"  Header="Таблица субтитров" IsChecked="True" Click="SubtitleGridMenuItem_Click"></MenuItem>
                     <MenuItem Name="VideoMenuItem" Header="Элемент видео" IsChecked="True" Click="VideoMenuItem_Click"></MenuItem>
                 </MenuItem>
+                <MenuItem Name="MainWindowSettingsMenuItem" Header="Настройки" Click="MainWindowSettingsMenuItem_Click"></MenuItem>
                 <MenuItem Header="Помощь" >
                     <MenuItem Header="О программе" Click="AboutMenuItem_Click"></MenuItem>
                 </MenuItem>
@@ -88,7 +89,7 @@
                     <Button Grid.Row="1" Background="Transparent" BorderThickness="0" Name="leftAlignButton" Click="leftAlignButton_Click">
                         <Image Source="icons/left-align.png" Width="16" Height="16"></Image>
                     </Button>
-                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0" Name="centerAlignButton" Click="centerAlignButton_Click">
+                    <Button Grid.Row="2" Background="Transparent" BorderThickness="0" Name="centerAlignButton" Click="centerAlignButton_Click" Height="28" VerticalAlignment="Top">
                         <Image Source="/icons/center-align.png" Width="16" Height="16"></Image>
                     </Button>
                     <Button Grid.Row="3" Background="Transparent" BorderThickness="0" Name="rightAlignButton" Click="rightAlignButton_Click">

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Automation.Text;
+using System.Xml.Linq;
 
 namespace SubRed
 {
-    public class SubProject
+    public class SubProject : ICloneable
     {
         public string Title { get; set; }              //Название скрипта.
         public string OriginalScript { get; set; }     //Автор скрипта.
@@ -62,6 +63,24 @@ namespace SubRed
                 new Subtitle() { Style = SubtitleStyleList[0]}
             };
             SubtitleRenum();
+        }
+
+        public object Clone()
+        {
+            var clone = this.MemberwiseClone() as SubProject;
+            clone.SubtitlesList = new List<Subtitle>();
+            foreach (var sub in this.SubtitlesList)
+            {
+                clone.SubtitlesList.Add(sub.Clone() as Subtitle);
+            }
+
+            clone.SubtitleStyleList = new List<SubtitleStyle>();
+            foreach(var style in this.SubtitleStyleList)
+            {
+                clone.SubtitleStyleList.Add(style.Clone() as SubtitleStyle);
+            }
+
+            return clone;
         }
 
         public void SubtitleRenum()

@@ -123,6 +123,7 @@ namespace SubRed
         /// </summary>
         public async void UpdateWindow()
         {
+            currentSubRedProject.SubtitleRenum();
             _ = SubFormats.SelectFormat(currentSubFileName, currentSubRedProject, false, ".ass");
             ViewGrid();
             await ViewSubtitleTab(subListGrid);
@@ -132,6 +133,7 @@ namespace SubRed
                 ));*/
 
             RestartVideoPlayer();
+            HistorySave(currentSubRedProject.Clone() as SubProject);
         }
 
         public async Task ViewSubtitleTab(Grid subGrid, bool useTranslator = false, string language = "")
@@ -185,7 +187,11 @@ namespace SubRed
                 sp.Children.Add(border);
                 subGrid.Children.Add(sp);*/
             }
-
+            
+            if (SelectedIndexOfSubtitle >= 0)
+            {
+                SelectSubtitle(null, SelectedIndexOfSubtitle);
+            }
         }
 
         public async Task CreateBorder(string index, bool useTranslator, string languageTo, Grid globalGrid)
@@ -955,6 +961,8 @@ namespace SubRed
 
                 var richTextBox = ((RichTextBox)this.FindName("subtitleTextRichTextBox_" + result.ToString()));
                 string richText = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd).Text;
+                var splittedText = richText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+                richText = String.Join(Environment.NewLine, splittedText.ToArray());
                 foundedSubtitle.Text = richText;
 
                 var comboBox = (ComboBox)this.FindName("StyleSelectComboBox_" + result.ToString());
@@ -1180,9 +1188,28 @@ namespace SubRed
             if (SelectedIndexOfSubtitle >= 0)
             {
                 RichTextBox richTextBox = (RichTextBox)this.FindName("subtitleTextRichTextBox_" + SelectedIndexOfSubtitle.ToString());
-                richTextBox.HorizontalAlignment = HorizontalAlignment.Left;
 
-                currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.HorizontalAlignment = 3;
+                if (richTextBox != null)
+                {
+                    switch (alignment)
+                    {
+                        case 1:
+                            richTextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+                            EditingCommands.AlignLeft.Execute(null, richTextBox);
+                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.HorizontalAlignment = 0;
+                            break;
+                        case 2:
+                            richTextBox.HorizontalContentAlignment = HorizontalAlignment.Center;
+                            EditingCommands.AlignCenter.Execute(null, richTextBox);
+                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.HorizontalAlignment = 1;
+                            break;
+                        case 3:
+                            richTextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
+                            EditingCommands.AlignRight.Execute(null, richTextBox);
+                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.HorizontalAlignment = 2;
+                            break;
+                    }
+                }
             }
         }
 
@@ -1230,68 +1257,72 @@ namespace SubRed
 
                 if (text != null)
                 {
-                    var docStart = richTextBox.Document.ContentStart;
-
-                    var selectionStart = richTextBox.Selection.Start;
-                    var selectionEnd = richTextBox.Selection.End;
-
-                    //these will give you the positions needed to apply highlighting
-                    var indexStart = docStart.GetOffsetToPosition(selectionStart);
-                    var indexEnd = docStart.GetOffsetToPosition(selectionEnd);
-
-                    //these values will give you the absolute character positions relative to the very beginning of the text.
-                    TextRange start = new TextRange(docStart, selectionStart);
-                    TextRange end = new TextRange(docStart, selectionEnd);
-
-
-                    System.Drawing.FontStyle fontStyle = System.Drawing.FontStyle.Regular;
-                    switch (inTextString)
+                    if (text.Text != "")
                     {
-                        case "bold":
-                            fontStyle = System.Drawing.FontStyle.Bold;
-                            break;
-                        case "italic":
-                            fontStyle = System.Drawing.FontStyle.Italic;
-                            break;
-                        case "underline":
-                            fontStyle = System.Drawing.FontStyle.Underline;
-                            break;
-                        case "strikethrough":
-                            fontStyle = System.Drawing.FontStyle.Strikeout;
-                            break;
-                    }
+                        var docStart = richTextBox.Document.ContentStart;
 
-                    System.Drawing.Font font = new System.Drawing.Font(currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Fontname,
-                        (float)currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Fontsize, fontStyle);
-                    text.ApplyPropertyValue(RichTextBox.FontStyleProperty, font);
-                    currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].ChangeInTextAction(indexStart, indexEnd, inTextString);
+                        var selectionStart = richTextBox.Selection.Start;
+                        var selectionEnd = richTextBox.Selection.End;
+
+                        //these will give you the positions needed to apply highlighting
+                        var indexStart = docStart.GetOffsetToPosition(selectionStart);
+                        var indexEnd = docStart.GetOffsetToPosition(selectionEnd);
+
+                        //these values will give you the absolute character positions relative to the very beginning of the text.
+                        TextRange start = new TextRange(docStart, selectionStart);
+                        TextRange end = new TextRange(docStart, selectionEnd);
+
+
+                        System.Drawing.FontStyle fontStyle = System.Drawing.FontStyle.Regular;
+                        switch (inTextString)
+                        {
+                            case "bold":
+                                fontStyle = System.Drawing.FontStyle.Bold;
+                                break;
+                            case "italic":
+                                fontStyle = System.Drawing.FontStyle.Italic;
+                                break;
+                            case "underline":
+                                fontStyle = System.Drawing.FontStyle.Underline;
+                                break;
+                            case "strikethrough":
+                                fontStyle = System.Drawing.FontStyle.Strikeout;
+                                break;
+                        }
+
+                        System.Drawing.Font font = new System.Drawing.Font(currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Fontname,
+                            (float)currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Fontsize, fontStyle);
+                        text.ApplyPropertyValue(RichTextBox.FontStyleProperty, font);
+                        currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].ChangeInTextAction(indexStart, indexEnd, inTextString);
+
+                        return;
+                    }
                 }
-                else
+
+                switch (inTextString)
                 {
-                    switch (inTextString)
-                    {
-                        case "bold":
-                            richTextBox.FontWeight = FontWeights.Bold;
-                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Bold = true;
-                            break;
-                        case "italic":
-                            richTextBox.FontStyle = FontStyles.Italic;
-                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Italic = true;
-                            break;
-                        case "underline":
-                            richTextBox.SelectAll();
-                            richTextBox.Selection.ApplyPropertyValue(System.Windows.Documents.Inline.TextDecorationsProperty, TextDecorations.Underline);
-                            richTextBox.Selection.Select(richTextBox.Document.ContentStart, richTextBox.Document.ContentStart);
-                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Underline = true;
-                            break;
-                        case "strikethrough":
-                            richTextBox.SelectAll();
-                            richTextBox.Selection.ApplyPropertyValue(System.Windows.Documents.Inline.TextDecorationsProperty, TextDecorations.Strikethrough);
-                            richTextBox.Selection.Select(richTextBox.Document.ContentStart, richTextBox.Document.ContentStart);
-                            currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.StrikeOut = true;
-                            break;
-                    }
+                    case "bold":
+                        richTextBox.FontWeight = FontWeights.Bold;
+                        currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Bold = true;
+                        break;
+                    case "italic":
+                        richTextBox.FontStyle = FontStyles.Italic;
+                        currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Italic = true;
+                        break;
+                    case "underline":
+                        richTextBox.SelectAll();
+                        richTextBox.Selection.ApplyPropertyValue(System.Windows.Documents.Inline.TextDecorationsProperty, TextDecorations.Underline);
+                        richTextBox.Selection.Select(richTextBox.Document.ContentStart, richTextBox.Document.ContentStart);
+                        currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.Underline = true;
+                        break;
+                    case "strikethrough":
+                        richTextBox.SelectAll();
+                        richTextBox.Selection.ApplyPropertyValue(System.Windows.Documents.Inline.TextDecorationsProperty, TextDecorations.Strikethrough);
+                        richTextBox.Selection.Select(richTextBox.Document.ContentStart, richTextBox.Document.ContentStart);
+                        currentSubRedProject.SubtitlesList[SelectedIndexOfSubtitle].Style.StrikeOut = true;
+                        break;
                 }
+
             }
 
             UpdateWindow();
@@ -1445,11 +1476,11 @@ namespace SubRed
         #region Редактирование таблицы
         private void DuplicateRowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Subtitle? dataRow = (Subtitle)SubtitleGrid.SelectedItem;
+            Subtitle? dataRow = (Subtitle)SubtitleGrid.Items[SelectedIndexOfSubtitle];
             if (dataRow != null)
             {
-                HistorySave(currentSubRedProject);
-                currentSubRedProject.SubtitlesList.Insert(dataRow.Id, dataRow);
+                //HistorySave(currentSubRedProject.Clone() as SubProject);
+                currentSubRedProject.SubtitlesList.Insert(dataRow.Id, dataRow.Clone() as Subtitle);
                 UpdateWindow();
             }
         }
@@ -1463,10 +1494,10 @@ namespace SubRed
         }
         private void CutRowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Subtitle dataRow = (Subtitle)SubtitleGrid.SelectedItem;
+            Subtitle dataRow = (Subtitle)SubtitleGrid.Items[SelectedIndexOfSubtitle];
             if (dataRow != null)
             {
-                HistorySave(currentSubRedProject);
+                //HistorySave(currentSubRedProject);
                 copiedSubtitle = dataRow;
                 currentSubRedProject.SubtitlesList.RemoveAt(dataRow.Id);
                 UpdateWindow();
@@ -1476,24 +1507,24 @@ namespace SubRed
         {
             if (copiedSubtitle != null)
             {
-                HistorySave(currentSubRedProject);
+                //HistorySave(currentSubRedProject.Clone() as SubProject);
                 if (SelectedIndexOfSubtitle < 0)
                 {
-                    currentSubRedProject.SubtitlesList.Insert(0, copiedSubtitle);
+                    currentSubRedProject.SubtitlesList.Insert(0, copiedSubtitle.Clone() as Subtitle);
                 }
                 else
                 {
-                    currentSubRedProject.SubtitlesList.Insert(copiedSubtitle.Id, copiedSubtitle);
+                    currentSubRedProject.SubtitlesList.Insert(copiedSubtitle.Id, copiedSubtitle.Clone() as Subtitle);
                 }
                 UpdateWindow();
             }
         }
         private void DeleteRowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Subtitle dataRow = (Subtitle)SubtitleGrid.SelectedItem;
+            Subtitle dataRow = (Subtitle)SubtitleGrid.Items[SelectedIndexOfSubtitle];
             if (dataRow != null)
             {
-                HistorySave(currentSubRedProject);
+                //HistorySave(currentSubRedProject.Clone() as SubProject);
                 currentSubRedProject.SubtitlesList.RemoveAt(dataRow.Id);
                 UpdateWindow();
             }
@@ -1505,7 +1536,7 @@ namespace SubRed
                 subProjectHistory.RemoveAt(0);
 
             subProjectHistory.Add(subProject);
-            copiedIndexSubtitle = subProjectHistory.Count;
+            copiedIndexSubtitle = subProjectHistory.Count - 1;
         }
 
         private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1515,11 +1546,11 @@ namespace SubRed
 
         private void BackMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            copiedIndexSubtitle--;
             if (copiedIndexSubtitle < subProjectHistory.Count && copiedIndexSubtitle >= 0)
             {
-                currentSubRedProject = subProjectHistory[copiedIndexSubtitle];
+                currentSubRedProject = subProjectHistory[copiedIndexSubtitle].Clone() as SubProject;
                 UpdateWindow();
+                copiedIndexSubtitle--;
             }
         }
         private void ForwardMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1527,7 +1558,7 @@ namespace SubRed
             copiedIndexSubtitle++;
             if (copiedIndexSubtitle < subProjectHistory.Count && copiedIndexSubtitle >= 0)
             {
-                currentSubRedProject = subProjectHistory[copiedIndexSubtitle];
+                currentSubRedProject = subProjectHistory[copiedIndexSubtitle].Clone() as SubProject;
                 UpdateWindow();
             }
         }
@@ -1591,6 +1622,12 @@ namespace SubRed
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        private void MainWindowSettingsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MainSettingsWindow mainSettingsWindow = new MainSettingsWindow();
+            mainSettingsWindow.ShowDialog();
         }
     }
 }

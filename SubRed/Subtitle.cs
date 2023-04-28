@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace SubRed
 {
-    public class Subtitle
+    public class Subtitle : ICloneable
     {
         public int Id { get; set; }
         public TimeSpan Start { get; set; }
@@ -49,6 +44,14 @@ namespace SubRed
             Layer = 0;
             Name = string.Empty;
             Effect = string.Empty;
+        }
+
+        public object Clone()
+        {
+            Subtitle subtitle = MemberwiseClone() as Subtitle;
+            subtitle.Style = subtitle.Style.Clone() as SubtitleStyle;
+
+            return subtitle;
         }
 
         /// <summary>

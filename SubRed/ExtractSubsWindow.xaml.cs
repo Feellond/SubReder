@@ -238,6 +238,8 @@ namespace SubRed
             {
                 if (filePath != "")
                 {
+                    this.ResizeMode = ResizeMode.NoResize;
+
                     tempProject.SubtitlesList.Clear();
                     listOfSubs.Clear();
 
@@ -250,6 +252,7 @@ namespace SubRed
                     doOCR();
                 }
             }
+            this.ResizeMode = ResizeMode.CanResize;
         }
 
         private async void doOCR()

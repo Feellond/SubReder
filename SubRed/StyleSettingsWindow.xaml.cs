@@ -102,7 +102,7 @@ namespace SubRed
             PreviewLoad();
         }
 
-        private void SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<System.Drawing.Color?> e)
+        private void SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
         {
             PreviewLoad();
         }
