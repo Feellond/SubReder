@@ -25,7 +25,7 @@ namespace SubRed
     /// </summary>
     public partial class StyleSettingsWindow : Window
     {
-        public int currentIndex;
+        public int currentIndex = -1;
         public SubProject currentProject;
 
         public SubtitleStyle currentStyle;
@@ -41,10 +41,15 @@ namespace SubRed
             currentProject = project;
             currentStyle = style;
 
-            foreach (var fFamily in FontFamily.FamilyNames)
+            // Enumerate the current set of system fonts,
+            // and fill the combo box with the names of the fonts.
+            foreach (System.Windows.Media.FontFamily fontFamily in Fonts.SystemFontFamilies)
             {
-                FontNameComboBox.Items.Add(fFamily.Value);
+                //FontFamily.Source contains the font family name.
+                FontNameComboBox.Items.Add(fontFamily.Source);
             }
+
+            FontNameComboBox.SelectedIndex = 0;
 
             StyleNameTextBox.Text = currentStyle.Name;
             FontNameComboBox.Text = currentStyle.Fontname;
@@ -123,84 +128,107 @@ namespace SubRed
 
         public void PreviewLoad()
         {
-            Bitmap bmp = new Bitmap((int)ImageExample.ActualWidth, (int)ImageExample.ActualHeight);
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(70, 90, 90, 50);
-
-            Graphics g = Graphics.FromImage(bmp);
-
-            var backgroundColor = System.Drawing.Color.FromArgb(
-                BackgroundColor.SelectedColor.Value.A,
-                BackgroundColor.SelectedColor.Value.R,
-                BackgroundColor.SelectedColor.Value.G,
-                BackgroundColor.SelectedColor.Value.B);
-
-            var firstColor = System.Drawing.Color.FromArgb(
-                FirstColorPicker.SelectedColor.Value.A,
-                FirstColorPicker.SelectedColor.Value.R,
-                FirstColorPicker.SelectedColor.Value.G,
-                FirstColorPicker.SelectedColor.Value.B);
-
-            var secondColor = System.Drawing.Color.FromArgb(
-                SecondColorPicker.SelectedColor.Value.A,
-                SecondColorPicker.SelectedColor.Value.R,
-                SecondColorPicker.SelectedColor.Value.G,
-                SecondColorPicker.SelectedColor.Value.B);
-
-            var contourColor = System.Drawing.Color.FromArgb(
-                ContourColorPicker.SelectedColor.Value.A,
-                ContourColorPicker.SelectedColor.Value.R,
-                ContourColorPicker.SelectedColor.Value.G,
-                ContourColorPicker.SelectedColor.Value.B);
-
-            var shadowColor = System.Drawing.Color.FromArgb(
-                ShadowColorPicker.SelectedColor.Value.A,
-                ShadowColorPicker.SelectedColor.Value.R,
-                ShadowColorPicker.SelectedColor.Value.G,
-                ShadowColorPicker.SelectedColor.Value.B);
-
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.FillRectangle(new SolidBrush(backgroundColor), rect);
-
-            Font font = new Font(
-                   new System.Drawing.FontFamily(FontNameComboBox.Text),
-                   Convert.ToInt32(FontSizeNumericUpDown.Value),
-                   (BoldCheckBox.IsChecked ?? false) ? System.Drawing.FontStyle.Bold : System.Drawing.FontStyle.Regular
-            );
-
-            font = new Font(font, (CursiveCheckBox.IsChecked ?? false) ? font.Style ^ System.Drawing.FontStyle.Italic : font.Style);
-            font = new Font(font, (UnderlineCheckBox.IsChecked ?? false) ? font.Style ^ System.Drawing.FontStyle.Underline : font.Style);
-            font = new Font(font, (CrossedCheckBox.IsChecked ?? false) ? font.Style ^ System.Drawing.FontStyle.Strikeout : font.Style);
-
-            Font fontContour = new Font(
-                new System.Drawing.FontFamily(FontNameComboBox.Text),
-                   Convert.ToInt32(FontSizeNumericUpDown.Value + ContourNumericUpDown.Value),
-                   font.Style
-                ); ;
-
-            StringFormat format = new StringFormat(StringFormatFlags.NoClip);
-            format.Alignment = StringAlignment.Center;
-
-            var textSplit = SampleTextBox.Text.Remove(SampleTextBox.Text.IndexOf("\\n") + 1, 1).Split('\\');
-            for (int i = 0; i < textSplit.Length; i++)
+            if (ImageExample != null && currentIndex >= 0)
             {
-                PointF point = new PointF();
-                point.X = (float)(ImageExample.ActualWidth / 2);
-                point.Y = Convert.ToInt32((i * FontSizeNumericUpDown.Value + 10) + ImageExample.ActualHeight / 4);
-                string spacedText = spaced(textSplit[i], (int)IntervalNumericUpDown.Value);
+                Bitmap bmp = new Bitmap((int)ImageExample.Width, (int)ImageExample.Height);
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, (int)ImageExample.Width, (int)ImageExample.Height);
 
-                PointF pointShadow = new PointF(point.X + (int)ShadowNumericUpDown.Value, point.Y + (int)ShadowNumericUpDown.Value);
-                g.DrawString(spacedText, font, new SolidBrush(shadowColor), pointShadow, format);
+                Graphics g = Graphics.FromImage(bmp);
 
+                System.Drawing.Color? backgroundColor = null;
+                System.Drawing.Color? firstColor = null;
+                System.Drawing.Color? secondColor = null;
+                System.Drawing.Color? contourColor = null;
+                System.Drawing.Color? shadowColor = null;
 
-                g.DrawString(spacedText, fontContour, new SolidBrush(contourColor), point);
+                if (BackgroundColor.SelectedColor != null)
+                    backgroundColor = System.Drawing.Color.FromArgb(
+                        BackgroundColor.SelectedColor.Value.A,
+                        BackgroundColor.SelectedColor.Value.R,
+                        BackgroundColor.SelectedColor.Value.G,
+                        BackgroundColor.SelectedColor.Value.B);
 
+                if (FirstColorPicker.SelectedColor != null)
+                    firstColor = System.Drawing.Color.FromArgb(
+                        FirstColorPicker.SelectedColor.Value.A,
+                        FirstColorPicker.SelectedColor.Value.R,
+                        FirstColorPicker.SelectedColor.Value.G,
+                        FirstColorPicker.SelectedColor.Value.B);
 
-                g.DrawString(spacedText, font, new SolidBrush(firstColor), point);
+                if (SecondColorPicker.SelectedColor != null)
+                    secondColor = System.Drawing.Color.FromArgb(
+                        SecondColorPicker.SelectedColor.Value.A,
+                        SecondColorPicker.SelectedColor.Value.R,
+                        SecondColorPicker.SelectedColor.Value.G,
+                        SecondColorPicker.SelectedColor.Value.B);
+
+                if (ContourColorPicker.SelectedColor != null)
+                    contourColor = System.Drawing.Color.FromArgb(
+                        ContourColorPicker.SelectedColor.Value.A,
+                        ContourColorPicker.SelectedColor.Value.R,
+                        ContourColorPicker.SelectedColor.Value.G,
+                        ContourColorPicker.SelectedColor.Value.B);
+
+                if (ShadowColorPicker.SelectedColor != null)
+                    shadowColor = System.Drawing.Color.FromArgb(
+                        ShadowColorPicker.SelectedColor.Value.A,
+                        ShadowColorPicker.SelectedColor.Value.R,
+                        ShadowColorPicker.SelectedColor.Value.G,
+                        ShadowColorPicker.SelectedColor.Value.B);
+
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.FillRectangle(new SolidBrush(backgroundColor != null ? (System.Drawing.Color)backgroundColor : System.Drawing.Color.Transparent), rect);
+
+                Font font = new Font(
+                       new System.Drawing.FontFamily(FontNameComboBox.Text),
+                       //Convert.ToInt32(FontSizeNumericUpDown.Value),
+                       24,
+                       (BoldCheckBox.IsChecked ?? false) ? System.Drawing.FontStyle.Bold : System.Drawing.FontStyle.Regular
+                );
+
+                font = new Font(font, (CursiveCheckBox.IsChecked ?? false) ? font.Style ^ System.Drawing.FontStyle.Italic : font.Style);
+                font = new Font(font, (UnderlineCheckBox.IsChecked ?? false) ? font.Style ^ System.Drawing.FontStyle.Underline : font.Style);
+                font = new Font(font, (CrossedCheckBox.IsChecked ?? false) ? font.Style ^ System.Drawing.FontStyle.Strikeout : font.Style);
+
+                Font fontContour = new Font(
+                    new System.Drawing.FontFamily(FontNameComboBox.Text),
+                       font.Size + (int)ContourNumericUpDown.Value,
+                       font.Style
+                    ); ;
+
+                StringFormat format = new StringFormat(StringFormatFlags.NoClip);
+                format.Alignment = StringAlignment.Center;
+
+                var textSplit = SampleTextBox.Text.Remove(SampleTextBox.Text.IndexOf("\\n") + 1, 1).Split('\\');
+                for (int i = 0; i < textSplit.Length; i++)
+                {
+                    PointF point = new PointF();
+                    point.X = (float)(ImageExample.Width / 2);
+                    //point.Y = Convert.ToInt32((i * FontSizeNumericUpDown.Value + 24) + ImageExample.Height / 4);
+                    point.Y = Convert.ToInt32((i * 24) + ImageExample.Height / 4);
+                    string spacedText = spaced(textSplit[i], (int)IntervalNumericUpDown.Value);
+
+                    if (shadowColor != null)
+                    {
+                        PointF pointShadow = new PointF(point.X + (int)ShadowNumericUpDown.Value, point.Y + (int)ShadowNumericUpDown.Value);
+                        g.DrawString(spacedText, font, new SolidBrush((System.Drawing.Color)shadowColor), pointShadow, format);
+                    }
+
+                    if (contourColor != null)
+                    {
+                        g.DrawString(spacedText, fontContour, new SolidBrush((System.Drawing.Color)contourColor), point, format);
+                    }
+
+                    if (firstColor != null)
+                    {
+                        g.DrawString(spacedText, font, new SolidBrush((System.Drawing.Color)firstColor), point, format);
+                    }
+                }
+                g.Flush();
+                ImageExample.Source = ImageSourceFromBitmap(bmp);
             }
-            g.Flush();
-            ImageExample.Source = ImageSourceFromBitmap(bmp);
         }
 
         public string spaced(string text, int spacing)

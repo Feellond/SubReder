@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="StyleSettingsWindow" Height="Auto" Width="Auto">
+        Title="StyleSettingsWindow" Height="430" Width="770">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -173,7 +173,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Image Name="ImageExample" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Width="Auto" Height="Auto"></Image>
+                <Image Name="ImageExample" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Height="130" Width="340"></Image>
                 <TextBox Name="SampleTextBox"  Text="Sample Text\nExample" Grid.Column="0" Grid.Row="1" Margin="3" TextChanged="SampleTextBox_TextChanged"/>
                 <mah:ColorPicker Name="BackgroundColor" Grid.Row="1" Grid.Column="1" Margin="3" Width="100" SelectedColorChanged="SelectedColorChanged"
                                 SelectedColor="Green"></mah:ColorPicker>

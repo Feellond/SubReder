@@ -1570,8 +1570,8 @@ namespace SubRed
             {
                 for (int j = i; j < currentSubRedProject.SubtitlesList.Count; j++)
                 {
-                    if (currentSubRedProject.SubtitlesList[i].Start > currentSubRedProject.SubtitlesList[j].Start ||
-                        currentSubRedProject.SubtitlesList[i].End < currentSubRedProject.SubtitlesList[j].End)
+                    if (currentSubRedProject.SubtitlesList[i].Start >= currentSubRedProject.SubtitlesList[j].Start ||
+                        currentSubRedProject.SubtitlesList[i].End <= currentSubRedProject.SubtitlesList[j].End)
                     {
                         DataGridRow row1 = (DataGridRow)SubtitleGrid.ItemContainerGenerator.ContainerFromIndex(i);
                         row1.Foreground = new SolidColorBrush(Colors.Red);
