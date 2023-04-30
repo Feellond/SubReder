@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="ResizeGridWindow" Height="350" Width="410">
+        Title="Изменение разрешения" Height="350" Width="415">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"/>
@@ -35,8 +35,8 @@
             <TextBox x:Name="xNameTextBox" Grid.Column="0" Width="100"/>
             <Label Content="x" Grid.Column="1"/>
             <TextBox x:Name="yNameTextBox" Grid.Column="2" Width="100"/>
-            <Button x:Name="changeAllButton" Content="Изменить все" Grid.Column="3" Margin="3" Click="changeAllButton_Click"/>
-            <Button x:Name="openButton" Content="Открыть"  Grid.Column="4" Margin="3" Click="openButton_Click"/>
+            <Button x:Name="changeAllButton" Content="Изменить все" Grid.Column="3" Margin="3" Width="90" Click="changeAllButton_Click"/>
+            <Button x:Name="openButton" Content="Открыть"  Grid.Column="4" Margin="3" Width="90" Click="openButton_Click"/>
         </Grid>
         <Grid Grid.Row="4" HorizontalAlignment="Right" Margin="3">
             <Button x:Name="closeButton" Content="Закрыть" Click="closeButton_Click"/>

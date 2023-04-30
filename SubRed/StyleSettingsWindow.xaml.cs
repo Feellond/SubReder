@@ -58,10 +58,10 @@ namespace SubRed
             CursiveCheckBox.IsChecked = currentStyle.Italic;
             UnderlineCheckBox.IsChecked = currentStyle.Underline;
             CrossedCheckBox.IsChecked = currentStyle.StrikeOut;
-            FirstColorPicker.ColorName = currentStyle.PrimaryColor;
-            SecondColorPicker.ColorName = currentStyle.SecondaryColor;
-            ContourColorPicker.ColorName = currentStyle.OutlineColor;
-            ShadowColorPicker.ColorName = currentStyle.BackColor;
+            FirstColorPicker.ColorName = ColorTranslator.FromHtml(currentStyle.PrimaryColor.Replace("&H00", "").Insert(0, "#")).Name;
+            SecondColorPicker.ColorName = ColorTranslator.FromHtml(currentStyle.SecondaryColor.Replace("&H00", "").Insert(0, "#")).Name;
+            ContourColorPicker.ColorName = ColorTranslator.FromHtml(currentStyle.OutlineColor.Replace("&H00", "").Insert(0, "#")).Name;
+            ShadowColorPicker.ColorName = ColorTranslator.FromHtml(currentStyle.BackColor.Replace("&H00", "").Insert(0, "#")).Name;
             horizontalAlignment = currentStyle.HorizontalAlignment;
             verticalAlignment = currentStyle.VerticalAlignment;
             ContourNumericUpDown.Value = currentStyle.Outline;

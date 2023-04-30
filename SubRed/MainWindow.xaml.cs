@@ -285,6 +285,23 @@ namespace SubRed
 
                 scrollViewer.Content = richTextBox;
                 if (!useTranslator) richTextBox.TextChanged += subtitleTextRichTextBox_TextChanged;
+
+                switch (currentSubRedProject.SubtitlesList[textValue].Style.HorizontalAlignment)
+                {
+                    case 1:
+                        richTextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+                        EditingCommands.AlignLeft.Execute(null, richTextBox);
+                        break;
+                    case 2:
+                        richTextBox.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        EditingCommands.AlignCenter.Execute(null, richTextBox);
+                        break;
+                    case 3:
+                        richTextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
+                        EditingCommands.AlignRight.Execute(null, richTextBox);
+                        break;
+                }
+
                 textBlockGrid.Children.Add(scrollViewer);
                 innerGrid.Children.Add(textBlockGrid);
 
@@ -310,7 +327,7 @@ namespace SubRed
                     int iter = 0;
                     foreach (var style in currentSubRedProject.SubtitleStyleList)
                     {
-                        ComboBoxItem item = new ComboBoxItem { Name = style.Name.Replace(" ", "_") };
+                        ComboBoxItem item = new ComboBoxItem { Name = style.Name.Replace(" ", "_"), Content = style.Name };
                         if (iter == 0)
                             item = new ComboBoxItem { Name = style.Name.Replace(" ", "_"), IsSelected = true, Content = style.Name};
 
@@ -550,7 +567,8 @@ namespace SubRed
                 if (isSliderDragStarted)
                     return;
                 slider.Value = player.SourceProvider.MediaPlayer.Time;
-                CurrentTimeVideoTextBox.Text = player.SourceProvider.MediaPlayer.Time.ToString();
+                CurrentTimeVideoTextBox.Text = new TimeSpan(0, 0, (int)(player.SourceProvider.MediaPlayer.Time / 1000)).ToString(@"hh\:mm\:ss");
+                currentTimeTextBlock.Text = new TimeSpan(0, 0, (int)(player.SourceProvider.MediaPlayer.Time / 1000)).ToString(@"hh\:mm\:ss");
                 if (LastTime + 20_000 < player.SourceProvider.MediaPlayer.Time)
                     Properties.Settings.Default.LastTime = LastTime = player.SourceProvider.MediaPlayer.Time + 10_000;
             });
@@ -559,6 +577,11 @@ namespace SubRed
 
         private void MediaPlayer_LengthChanged(object sender, Vlc.DotNet.Core.VlcMediaPlayerLengthChangedEventArgs e)
         {
+            TimeSpan maxTime = new TimeSpan(0,0, (int)(player.SourceProvider.MediaPlayer.Length / 1000));
+            _ = Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                allTimeTextBlock.Text = maxTime.ToString(@"hh\:mm\:ss");
+            });
             ActionDispatcher(() => slider.Maximum = player.SourceProvider.MediaPlayer.Length);
             StateCheck();
         }
@@ -567,6 +590,7 @@ namespace SubRed
 
         private void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
+            RestartVideoPlayer();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
                 ThreadPool.QueueUserWorkItem(_ =>
@@ -973,13 +997,13 @@ namespace SubRed
                 switch (((ComboBoxItem)comboBox.Items[comboBox.SelectedIndex]).Name)
                 {
                     case "Left":
-                        foundedSubtitle.Style.HorizontalAlignment = 0;
-                        break;
-                    case "Center":
                         foundedSubtitle.Style.HorizontalAlignment = 1;
                         break;
-                    case "Right":
+                    case "Center":
                         foundedSubtitle.Style.HorizontalAlignment = 2;
+                        break;
+                    case "Right":
+                        foundedSubtitle.Style.HorizontalAlignment = 3;
                         break;
                 }
 
@@ -1000,45 +1024,11 @@ namespace SubRed
                 var indexOfStyle = currentSubRedProject.SubtitleStyleList.IndexOf(style);
                 currentSubRedProject.SubtitleStyleList[indexOfStyle] = foundedSubtitle.Style;
 
-                /*string xCoord = ((TextBox)this.FindName("xTextBox_" + result.ToString())).Text;
-                string yCoord = ((TextBox)this.FindName("yTextBox_" + result.ToString())).Text;
-
-                if (xCoord != "" || yCoord != "")
-                {
-                    string x = xCoord != "" ? xCoord : "";
-                    string y = yCoord != "" ? yCoord : "";
-
-
-
-                    if (x != "") foundedSubtitle.XCoord = int.Parse(x);
-                    if (y != "") foundedSubtitle.YCoord = int.Parse(y);
-                }*/
-
                 currentSubRedProject.SubtitlesList[indexOfSubtitle] = foundedSubtitle;
 
                 UpdateWindow();
             }
         }
-
-        /*public void PutInSub(Subtitle sub, string action)
-        {
-            string text = sub.Text;
-            switch (action)
-            {
-                case "pos":
-                    int index = text.IndexOf("pos");
-                    if (index != -1)
-                    {
-
-                    }
-                    else
-                    {
-                        index = text.IndexOf('{');
-                        int indexSecond = text.IndexOf('}');
-                    }
-                    break;
-            }
-        }*/
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubRed"
         mc:Ignorable="d"
-        Title="MainSettingsWindow" Height="85" Width="315">
+        Title="Настройки главного окна" Height="85" Width="315">
     <Grid>
         <Grid Margin="5">
             <Grid.ColumnDefinitions>

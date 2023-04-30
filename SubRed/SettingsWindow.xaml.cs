@@ -110,7 +110,8 @@ namespace SubRed
             ResizeGridWindow resizeGridWindow = new ResizeGridWindow();
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "All Files|*.*"
+                Filter = "All Files|*.*",
+                Multiselect = true
             };
 
             if (openFileDialog.ShowDialog() == true)

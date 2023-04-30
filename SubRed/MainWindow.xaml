@@ -324,14 +324,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Value, ElementName=slider, StringFormat=\{0:F0\}}" 
+                <TextBlock Text="00:00:00:00" Name="currentTimeTextBlock"
                        Margin="5,0" Width="{Binding ActualWidth, ElementName=textBlock, Mode=OneWay}" 
                        Background="Transparent" Foreground="White"/>
                 <Slider Grid.Column="1" x:Name="slider" Maximum="0.1" Background="Transparent" 
                     Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"
                     IsMoveToPointEnabled="True" MouseUp="slider_MouseUp" />
-                <TextBlock x:Name="textBlock" Grid.Column="2" Background="Transparent" Foreground="White"
-                       Text="{Binding Maximum, ElementName=slider, StringFormat=\{0:F0\}}" Margin="5,0"/>
+                <TextBlock Name="allTimeTextBlock" Grid.Column="2" Background="Transparent" Foreground="White"
+                       Text="00:00" Margin="5,0"/>
             </Grid>
             <Grid Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Background="Transparent" Margin="3">
                 <Grid.ColumnDefinitions>
@@ -400,11 +400,9 @@
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Начало" Binding="{Binding Start}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Конец" Binding="{Binding End}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="Длительность" Binding="{Binding Duration}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="x" Binding="{Binding XCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
-                    <DataGridTextColumn Header="y" Binding="{Binding YCoord}" Width="60"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Начало" Binding="{Binding Start}" Width="120"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Конец" Binding="{Binding End}" Width="120"  FontFamily="Tahoma"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Длительность" Binding="{Binding Duration}" Width="120"  FontFamily="Tahoma"></DataGridTextColumn>
                     <DataGridTextColumn Header="Текст" Binding="{Binding Text}" Width="*"  FontFamily="Tahoma">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">

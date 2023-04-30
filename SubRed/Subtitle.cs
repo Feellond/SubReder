@@ -30,7 +30,7 @@ namespace SubRed
         {
             Id = 0;
             Start = TimeSpan.Zero;
-            End = TimeSpan.Zero;
+            End = new TimeSpan(0, 0, 10);
             Duration = TimeSpan.Zero;
             FrameBeginNum = 0;
             FrameEndNum = 0;

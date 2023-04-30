@@ -45,12 +45,12 @@ namespace SubRed
         public SubtitleStyle() 
         {
             Name = "Default Style";
-            Fontname = "Times New Roman";
-            Fontsize = 12;
-            PrimaryColor = "FFFFFF";
-            SecondaryColor = "";
-            OutlineColor = "000000";
-            BackColor = "";
+            Fontname = "Arial";
+            Fontsize = 24;
+            PrimaryColor = "&H00FFFFFF";
+            SecondaryColor = "&H00FFFFFF";
+            OutlineColor = "&H00000000";
+            BackColor = "&H00000000";
             Bold = false;
             Italic = false;
             Underline = false;

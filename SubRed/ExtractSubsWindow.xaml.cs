@@ -46,6 +46,7 @@ namespace SubRed
 
             //https://social.msdn.microsoft.com/Forums/en-US/47ce71aa-5bde-482a-9574-764e45cb9031/bind-list-to-datagrid-in-wpf?forum=wpf
             this.SubtitleGrid.ItemsSource = null;
+            GC.Collect();
             this.SubtitleGrid.ItemsSource = tempProject.SubtitlesList;
 
             imageProgressBar.Visibility = Visibility.Hidden;
@@ -258,15 +259,6 @@ namespace SubRed
         private async void doOCR()
         {
             CvInvoke.DestroyAllWindows();
-            try
-            {
-                SetOCRValues();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("A handled exception just occurred: " + ex.Message, "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
             Mat previousFrame = new Mat();
             if (filePath != null)
             {
@@ -294,23 +286,39 @@ namespace SubRed
 
                         if (listOfSubs.Count == 0)
                         {
+                            EastDetector eastDetector = new EastDetector();
                             foreach (var region in listOfRegions)
                             {
                                 var tempimg = newFrame.ToImage<Gray, Byte>();
                                 tempimg.ROI = region;
                                 var text = SubtitleOCR.GetRegionsTextTesseract(tempimg);
-                                if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
-                                    listOfSubs.Add(new Subtitle()
+
+                                bool foundedInEast = true;
+                                if (SubtitleOCR.useEast)
+                                {
+                                    foundedInEast = false;
+                                    if (eastDetector.EastDetect(tempimg.Mat).Count > 0)
                                     {
-                                        Text = text,
-                                        FrameBeginNum = currentFrame,
-                                        FrameImage = tempimg.ToBitmap<Gray, Byte>(),
-                                        FrameRegion = region
-                                    });
+                                        foundedInEast = true;
+                                    }
+                                }
+
+                                if (foundedInEast)
+                                {
+                                    if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                                        listOfSubs.Add(new Subtitle()
+                                        {
+                                            Text = text,
+                                            FrameBeginNum = currentFrame,
+                                            FrameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                            FrameRegion = region
+                                        });
+                                }
                             }
                         }
                         else if (listOfRegions.Count > 0)
                         {
+                            EastDetector eastDetector = new EastDetector();
                             foreach (var region in listOfRegions)
                             {
                                 bool IsFoundSub = false;
@@ -329,14 +337,28 @@ namespace SubRed
                                     var tempimg = newFrame.ToImage<Gray, Byte>();
                                     tempimg.ROI = region;
                                     var text = SubtitleOCR.GetRegionsTextTesseract(tempimg);
-                                    if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
-                                        listOfSubs.Add(new Subtitle()
+
+                                    bool foundedInEast = true;
+                                    if (SubtitleOCR.useEast)
+                                    {
+                                        foundedInEast = false;
+                                        if (eastDetector.EastDetect(tempimg.Mat).Count > 0)
                                         {
-                                            Text = SubtitleOCR.GetRegionsTextTesseract(tempimg),
-                                            FrameBeginNum = currentFrame,
-                                            FrameImage = tempimg.ToBitmap<Gray, Byte>(),
-                                            FrameRegion = region
-                                        });
+                                            foundedInEast = true;
+                                        }
+                                    }
+
+                                    if (foundedInEast)
+                                    {
+                                        if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                                            listOfSubs.Add(new Subtitle()
+                                            {
+                                                Text = SubtitleOCR.GetRegionsTextTesseract(tempimg),
+                                                FrameBeginNum = currentFrame,
+                                                FrameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                                FrameRegion = region
+                                            });
+                                    }
                                 }
                             }
                         }
@@ -450,50 +472,6 @@ namespace SubRed
             
         }
 
-        private void SetOCRValues()
-        {
-            SubtitleOCR.gausSeed = int.Parse(textBoxGausSeed.Text);
-            SubtitleOCR.meanSeed = int.Parse(textBoxMeanSeed.Text);
-            SubtitleOCR.laplaceSeed = int.Parse(textBoxLaplaceSeed.Text);
-            SubtitleOCR.morphSize = int.Parse(textBoxMorphSize.Text);
-            SubtitleOCR.thresholdLaplace = int.Parse(textBoxThresholdLaplace.Text);
-            SubtitleOCR.dilateHeight = int.Parse(textBoxDilateHeight.Text);
-            SubtitleOCR.dilateWidth = int.Parse(textBoxDilateWidth.Text);
-            SubtitleOCR.erodeHeight = int.Parse(textBoxErodeHeight.Text);
-            SubtitleOCR.erodeWidth = int.Parse(textBoxErodeWidth.Text);
-
-            ComboBoxItem ComboItem = (ComboBoxItem)comboBoxLanguage.SelectedItem;
-            SubtitleOCR.OCRLanguageChange(ComboItem.Name);
-        }
-
-        private void defaultButton_Click(object sender, RoutedEventArgs e)
-        {
-            SubtitleOCR.ReturnDefaultValues();
-            textBoxGausSeed.Text = SubtitleOCR.gausSeed.ToString();
-            textBoxMeanSeed.Text = SubtitleOCR.meanSeed.ToString();
-            textBoxLaplaceSeed.Text = SubtitleOCR.laplaceSeed.ToString();
-            textBoxMorphSize.Text = SubtitleOCR.morphSize.ToString();
-            textBoxThresholdLaplace.Text = SubtitleOCR.thresholdLaplace.ToString();
-            textBoxDilateHeight.Text = SubtitleOCR.dilateHeight.ToString();
-            textBoxDilateWidth.Text = SubtitleOCR.dilateWidth.ToString();
-            textBoxErodeHeight.Text = SubtitleOCR.erodeHeight.ToString();
-            textBoxErodeWidth.Text = SubtitleOCR.erodeWidth.ToString();
-
-            var lang = SubtitleOCR.ocrLanguage;
-            switch (lang)
-            {
-                case "eng":
-                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Английский")];
-                    break;
-                case "rus":
-                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Русский")];
-                    break;
-                default:
-                    comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[0];
-                    break;
-            }
-        }
-
         private void okButton_Click(object sender, RoutedEventArgs e)
         {
             if (tempProject.SubtitlesList.Count > 0)
@@ -542,7 +520,8 @@ namespace SubRed
 
         private void MoreSettings_Click(object sender, RoutedEventArgs e)
         {
-
+            MoreSettingsWindow moreSettingsWindow = new MoreSettingsWindow();
+            moreSettingsWindow.Show();
         }
     }
 }

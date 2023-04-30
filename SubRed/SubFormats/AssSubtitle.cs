@@ -63,10 +63,10 @@ namespace SubRed.Sub_formats
                     sw.Write(style.ScaleX.ToString() + ",");
                     sw.Write(style.ScaleY.ToString() + ",");
                     sw.Write(style.Spacing.ToString() + ",");
-                    sw.Write(style.Angle.ToString() + ",");
+                    sw.Write(style.Angle.ToString().Replace(',', '.') + ",");
                     sw.Write(style.BorderStyle.ToString() + ",");
-                    sw.Write(style.Outline.ToString() + ",");
-                    sw.Write(style.Shadow.ToString() + ",");
+                    sw.Write(style.Outline.ToString().Replace(',', '.') + ",");
+                    sw.Write(style.Shadow.ToString().Replace(',', '.') + ",");
 
                     int? alignmentNumber = style.HorizontalAlignment;
                     if (style.VerticalAlignment == 1)
@@ -78,7 +78,6 @@ namespace SubRed.Sub_formats
                     sw.Write(style.MarginL.ToString() + ",");
                     sw.Write(style.MarginR.ToString() + ",");
                     sw.Write(style.MarginV.ToString() + ",");
-                    sw.Write(style.AlphaLevel.ToString() + ",");
                     sw.Write(style.Encoding.ToString());
                     sw.WriteLine();
                 }
@@ -89,15 +88,15 @@ namespace SubRed.Sub_formats
                 {
                     sw.Write("Dialogue: ");
                     sw.Write(dialogue.Layer + ",");
-                    sw.Write(dialogue.Start.ToString("hh\\:mm\\:ss\\.ffff") + ",");
-                    sw.Write(dialogue.End.ToString("hh\\:mm\\:ss\\.ffff") + ",");
+                    sw.Write(dialogue.Start.ToString("hh\\:mm\\:ss\\.ff") + ",");
+                    sw.Write(dialogue.End.ToString("hh\\:mm\\:ss\\.ff") + ",");
                     sw.Write(dialogue.Style.Name + ",");
                     sw.Write(dialogue.Name + ",");
                     sw.Write(dialogue.Style.MarginL.ToString() + ",");
                     sw.Write(dialogue.Style.MarginR.ToString() + ",");
                     sw.Write(dialogue.Style.MarginV.ToString() + ",");
                     sw.Write(dialogue.Effect.ToString() + ",");
-                    sw.Write(dialogue.Text + ",");
+                    sw.Write(dialogue.Text);
                     sw.WriteLine();
                 }
             }
@@ -201,30 +200,30 @@ namespace SubRed.Sub_formats
                                         horizontalNumber = alignmentNumber;
 
                                         var style = new SubtitleStyle();
-                                        style.Name = splitStyle[0];
-                                        style.Fontname = splitStyle[1];
-                                        style.Fontsize = Convert.ToInt32(splitStyle[2]);
-                                        style.PrimaryColor = splitStyle[3];
-                                        style.SecondaryColor = splitStyle[4];
-                                        style.OutlineColor = splitStyle[5];
-                                        style.BackColor = splitStyle[6];
-                                        style.Bold = splitStyle[7] == "0" ? false : true;
-                                        style.Italic = splitStyle[8] == "0" ? false : true;
-                                        style.Underline = splitStyle[9] == "0" ? false : true;
-                                        style.StrikeOut = splitStyle[10] == "0" ? false : true;
-                                        style.ScaleX = Convert.ToInt32(splitStyle[11]);
-                                        style.ScaleY = Convert.ToInt32(splitStyle[12]);
-                                        style.Spacing = Convert.ToInt32(splitStyle[13]);
-                                        style.Angle = Convert.ToDouble(splitStyle[14]);
-                                        style.BorderStyle = Convert.ToInt32(splitStyle[15]);
-                                        style.Outline = Convert.ToDouble(splitStyle[16].Replace('.', ','));
-                                        style.Shadow = Convert.ToDouble(splitStyle[17]);
+                                        style.Name = String.Join(" ", splitStyle[0].Split(" ", StringSplitOptions.RemoveEmptyEntries));
+                                        style.Fontname = String.Join(" ", splitStyle[1].Split(" ", StringSplitOptions.RemoveEmptyEntries));
+                                        style.Fontsize = Convert.ToInt32(String.Join(" ", splitStyle[2].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.PrimaryColor = String.Join(" ", splitStyle[3].Split(" ", StringSplitOptions.RemoveEmptyEntries));
+                                        style.SecondaryColor = String.Join(" ", splitStyle[4].Split(" ", StringSplitOptions.RemoveEmptyEntries));
+                                        style.OutlineColor = String.Join(" ", splitStyle[5].Split(" ", StringSplitOptions.RemoveEmptyEntries));
+                                        style.BackColor = String.Join(" ", splitStyle[6].Split(" ", StringSplitOptions.RemoveEmptyEntries));
+                                        style.Bold = String.Join(" ", splitStyle[7].Split(" ", StringSplitOptions.RemoveEmptyEntries)) == "0" ? false : true;
+                                        style.Italic = String.Join(" ", splitStyle[8].Split(" ", StringSplitOptions.RemoveEmptyEntries)) == "0" ? false : true;
+                                        style.Underline = String.Join(" ", splitStyle[9].Split(" ", StringSplitOptions.RemoveEmptyEntries)) == "0" ? false : true;
+                                        style.StrikeOut = String.Join(" ", splitStyle[10].Split(" ", StringSplitOptions.RemoveEmptyEntries)) == "0" ? false : true;
+                                        style.ScaleX = Convert.ToInt32(String.Join(" ", splitStyle[11].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.ScaleY = Convert.ToInt32(String.Join(" ", splitStyle[12].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.Spacing = Convert.ToInt32(String.Join(" ", splitStyle[13].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.Angle = Convert.ToDouble(String.Join(" ", splitStyle[14].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.BorderStyle = Convert.ToInt32(String.Join(" ", splitStyle[15].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.Outline = Convert.ToDouble(String.Join(" ", splitStyle[16].Split(" ", StringSplitOptions.RemoveEmptyEntries)).Replace('.', ','));
+                                        style.Shadow = Convert.ToDouble(String.Join(" ", splitStyle[17].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
                                         style.HorizontalAlignment = horizontalNumber;
                                         style.VerticalAlignment = verticalNumber;
-                                        style.MarginL = Convert.ToInt32(splitStyle[19]);
-                                        style.MarginR = Convert.ToInt32(splitStyle[20]);
-                                        style.MarginV = Convert.ToInt32(splitStyle[21]);
-                                        style.Encoding = splitStyle[22];
+                                        style.MarginL = Convert.ToInt32(String.Join(" ", splitStyle[19].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.MarginR = Convert.ToInt32(String.Join(" ", splitStyle[20].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.MarginV = Convert.ToInt32(String.Join(" ", splitStyle[21].Split(" ", StringSplitOptions.RemoveEmptyEntries)));
+                                        style.Encoding = String.Join(" ", splitStyle[22].Split(" ", StringSplitOptions.RemoveEmptyEntries));
 
                                         project.SubtitleStyleList.Add(style);
                                         break;
