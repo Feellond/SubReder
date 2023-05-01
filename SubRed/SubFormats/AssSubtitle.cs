@@ -1,4 +1,5 @@
 ﻿using Aspose.Words;
+using ControlzEx.Standard;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Stitching;
 using System;

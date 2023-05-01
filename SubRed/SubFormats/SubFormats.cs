@@ -8,7 +8,6 @@ namespace SubRed.Sub_formats
 {
     public static class SubFormats
     {
-
         public static async Task<SubProject> SelectFormat(string filename, SubProject project, bool isLoadFunction, string format = "")
         {
             string[] formatSplit = filename.Split('.');
@@ -22,7 +21,7 @@ namespace SubRed.Sub_formats
                     break;
                 case "ssa":
                     if (isLoadFunction)
-                        SsaSubtitle.Load(filename, project);
+                        project = SsaSubtitle.Load(filename, project);
                     else
                         SsaSubtitle.Save(filename, project);
                     break;
@@ -34,7 +33,7 @@ namespace SubRed.Sub_formats
                     break;
                 case "smi":
                     if (isLoadFunction)
-                        SmiSubtitle.Load(filename, project);
+                        project = SmiSubtitle.Load(filename, project);
                     else
                         SmiSubtitle.Save(filename, project);
                     break;

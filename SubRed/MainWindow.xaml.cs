@@ -591,7 +591,11 @@ namespace SubRed
         private void LoadVideo_Click(object sender, RoutedEventArgs e)
         {
             RestartVideoPlayer();
-            OpenFileDialog openFileDialog = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Media Files|*.mpg;*.avi;*.wma;*.mov;*.wav;*.mp2;*.mp3|All Files|*.*"
+            };
+
             if (openFileDialog.ShowDialog() == true)
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
@@ -1618,6 +1622,11 @@ namespace SubRed
         {
             MainSettingsWindow mainSettingsWindow = new MainSettingsWindow();
             mainSettingsWindow.ShowDialog();
+        }
+
+        private void CurrentTimeVideoTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }

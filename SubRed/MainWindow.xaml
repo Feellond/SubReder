@@ -331,7 +331,7 @@
                     Thumb.DragStarted="SliderDragStarted"  Thumb.DragCompleted="slider_DragCompleted" Thumb.DragDelta="slider_DragDelta"
                     IsMoveToPointEnabled="True" MouseUp="slider_MouseUp" />
                 <TextBlock Name="allTimeTextBlock" Grid.Column="2" Background="Transparent" Foreground="White"
-                       Text="00:00" Margin="5,0"/>
+                       Text="00:00:00:00" Margin="5,0"/>
             </Grid>
             <Grid Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Background="Transparent" Margin="3">
                 <Grid.ColumnDefinitions>
@@ -346,16 +346,16 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Name="LoadVideoButton" Content="Загрузить" Grid.Column="0" Click="LoadVideo_Click"/>
-                <Button Name="StopVideoButton" Content="Стоп" Grid.Column="1" Click="Stop_Click"/>
-                <Button Name="BackVideoButton" Content="Prev 10" Grid.Column="2" Click="BackVideoButton_Click"/>
-                <Button Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="3" Click="StartPausePlay_Click"/>
-                <Button Name="ForwardVideoButton" Content="Next 10" Grid.Column="4" Click="ForwardVideoButton_Click"/>
-                <Button Name="EndVideoButton" Content="ToEnd" Grid.Column="5" Grid.ColumnSpan="2" Click="EndVideoButton_Click"/>
-                <TextBox Name="CurrentTimeVideoTextBox" Text="00:00:00:00" Grid.Column="6"/>
-                <TextBox Name="IdSubtitleTextBox" Text="-1" Grid.Column="7" TextChanged="IdSubtitleTextBox_TextChanged"/>
-                <Button Name="PrevSubtitleButton" Content="Prev" Grid.Column="8" Click="PrevSubtitleButton_Click" PreviewTextInput="NumberValidationTextBox"/>
-                <Button Name="NextSubtitleButton" Content="Next" Grid.Column="9" Click="NextSubtitleButton_Click"/>
+                <Button Name="LoadVideoButton" Content="Загрузить" Grid.Column="0" Click="LoadVideo_Click" Margin="1"/>
+                <Button Name="StopVideoButton" Content="Стоп" Grid.Column="1" Click="Stop_Click" Margin="1"/>
+                <Button Name="BackVideoButton" Content="Prev 10" Grid.Column="2" Click="BackVideoButton_Click" Margin="1"/>
+                <Button Name="StartPausePlayButton" Content="Пауза/Продолжить" Grid.Column="3" Click="StartPausePlay_Click" Margin="1"/>
+                <Button Name="ForwardVideoButton" Content="Next 10" Grid.Column="4" Click="ForwardVideoButton_Click" Margin="1"/>
+                <Button Name="EndVideoButton" Content="ToEnd" Grid.Column="5" Grid.ColumnSpan="2" Click="EndVideoButton_Click" Margin="1"/>
+                <TextBox Name="CurrentTimeVideoTextBox" Text="00:00:00:00" Grid.Column="6" Margin="1" TextChanged="CurrentTimeVideoTextBox_TextChanged"/>
+                <TextBox Name="IdSubtitleTextBox" Text="-1" Grid.Column="7" TextChanged="IdSubtitleTextBox_TextChanged" PreviewTextInput="NumberValidationTextBox" Margin="1"/>
+                <Button Name="PrevSubtitleButton" Content="Prev" Grid.Column="8" Click="PrevSubtitleButton_Click" Margin="1"/>
+                <Button Name="NextSubtitleButton" Content="Next" Grid.Column="9" Click="NextSubtitleButton_Click" Margin="1"/>
             </Grid>
         </Grid>
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="Transparent"></GridSplitter>

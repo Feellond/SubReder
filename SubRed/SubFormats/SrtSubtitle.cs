@@ -10,10 +10,6 @@ namespace SubRed.Sub_formats
 {
     static class SrtSubtitle
     {
-        private static string[] separator = { "&&" };
-        private static string[] separatorForText = { "\\N", "\\n", "\n" };
-        private static string[] textFormatSplit = { "Start", "End", "Text" };
-
         public static void Save(string filename, SubProject project)
         {
             try
