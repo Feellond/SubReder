@@ -36,7 +36,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ProgressBar Grid.Row="0" x:Name="imageProgressBar" HorizontalAlignment="Center" Height="13" VerticalAlignment="Top"
-                         MinWidth="500" Visibility="Hidden" Minimum="0"/>
+                         Width="500" Visibility="Hidden" Minimum="0"/>
             <ScrollViewer Grid.Row="1">
                 <Image x:Name="image" MaxWidth="720" MinHeight="480"/>
             </ScrollViewer>

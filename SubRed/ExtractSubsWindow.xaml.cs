@@ -115,13 +115,14 @@ namespace SubRed
                 minFrameNumber = 0;
                 prevFrame = 0;
                 currentFrame = minFrameNumber;
-                maxFrameNumber = (int)(RangeSlider.UpperValue * fps);
 
                 RangeSlider.Minimum = 0;
                 RangeSlider.Maximum = totalFrames / fps;
 
                 RangeSlider.LowerValue = 0;
                 RangeSlider.UpperValue = totalFrames / fps;
+
+                maxFrameNumber = (int)(RangeSlider.UpperValue * fps);
 
                 imageProgressBar.Maximum = maxFrameNumber;
 
@@ -165,7 +166,7 @@ namespace SubRed
 
                 var subTempimg = sub.FrameImage.ToImage<Gray, Byte>();
 
-                CvInvoke.DestroyAllWindows();
+                //CvInvoke.DestroyAllWindows();
 
                 CvInvoke.AbsDiff(subTempimg, tempimg, subTempimg);
                 CvInvoke.Threshold(subTempimg, subTempimg, 20, 255, ThresholdType.Binary);

@@ -71,6 +71,15 @@ namespace SubRed
                 case "Russian":
                     ocrLanguage = "rus";
                     break;
+                case "Японский":
+                case "Japanese":
+                    ocrLanguage = "jpn";
+                    break;
+                case "Китайский простой":
+                case "Chinese_simple":
+                case "Китайский":
+                    ocrLanguage = "chi_sim";
+                    break;
                 default:
                     ocrLanguage = "eng";
                     break;
@@ -179,21 +188,24 @@ namespace SubRed
 
             return rois;
         }
+
+        static float[,] matrix = new float[3, 3] {
+                { 0, -1, 0},
+                { -1, 4, -1},
+                { 0, -1, 0}
+            };
+        static int Tes_k1 = 2;
+        static int Tes_k2 = 2;
+
         public static string GetRegionsTextTesseract(Image<Gray, Byte> frameRegion, string n = "")
         {
             Image<Gray, Byte> tempPartImage = frameRegion.Clone();
             tempPartImage = tempPartImage.SmoothMedian(meanSeed);
             tempPartImage = tempPartImage.SmoothGaussian(gausSeed);
 
-            int k1 = 2;
-            int k2 = 2;
-            Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
-
-            float[,] matrix = new float[3, 3] {
-                { 0, -1, 0},
-                { -1, 4, -1},
-                { 0, -1, 0}
-            };
+            
+            Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new System.Drawing.Size(Tes_k1, Tes_k2), new System.Drawing.Point(-1, -1));
+                        
             ConvolutionKernelF matrixKernel = new ConvolutionKernelF(matrix);
             CvInvoke.Filter2D(tempPartImage, tempPartImage, matrixKernel, new System.Drawing.Point(-1, -1));
             CvInvoke.Dilate(tempPartImage, tempPartImage, kernel, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());

@@ -90,6 +90,12 @@ namespace SubRed
                     case "rus":
                         comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Русский")];
                         break;
+                    case "chi_sim":
+                        comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Китайский простой")];
+                        break;
+                    case "jpn":
+                        comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[comboBoxLanguage.Items.IndexOf("Японский")];
+                        break;
                     default:
                         comboBoxLanguage.SelectedItem = comboBoxLanguage.Items[0];
                         break;

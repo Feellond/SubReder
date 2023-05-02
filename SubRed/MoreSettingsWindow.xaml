@@ -167,6 +167,8 @@
                 <ComboBox x:Name="comboBoxLanguage">
                     <ComboBoxItem x:Name="English" IsSelected="True" Content="Английский"/>
                     <ComboBoxItem x:Name="Russian" Content="Русский"/>
+                    <ComboBoxItem x:Name="Chinese_simple" Content="Китайский простой"/>
+                    <ComboBoxItem x:Name="Japanese" Content="Японский"/>
                 </ComboBox>
             </Grid>
             <CheckBox x:Name="useEastCheckBox" Grid.Row="2" Content="Использовать EAST detector" Margin="5"/>
