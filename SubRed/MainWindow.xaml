@@ -192,6 +192,9 @@
                                               Click="Delete_OnClick"
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
                                         <Separator/>
+                                        <MenuItem Header="Перевести фразу на русский"
+                                              Click="TranslateRus_OnClick"
+                                              CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>
                                         <MenuItem Header="Перевести фразу на английский"
                                               Click="TranslateEng_OnClick"
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent}"/>

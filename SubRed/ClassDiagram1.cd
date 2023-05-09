@@ -8,16 +8,16 @@
     </TypeIdentifier>
   </Class>
   <Class Name="SubRed.Sub_formats.SmiSubtitle">
-    <Position X="19.25" Y="8" Width="1.5" />
+    <Position X="8.75" Y="9.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAEAAQAAAAAAAAAAABAAA=</HashCode>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>SubFormats\SmiSubtitle.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SubRed.Sub_formats.SrtSubtitle">
-    <Position X="19.25" Y="5.75" Width="1.5" />
+    <Position X="14" Y="9.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAEAAQAAAAAAAAAAABAAA=</HashCode>
+      <HashCode>AAAAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>SubFormats\SrtSubtitle.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -45,7 +45,7 @@
   <Class Name="SubRed.ExtractSubsWindow" BaseTypeListCollapsed="true">
     <Position X="12.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>EAAGQgACgAAAIAgQAAgAAAJwwABAAEgBDBISDACAIAI=</HashCode>
+      <HashCode>EAAGQgACgAAAIAgQAAgAAAIwwABAAEgBBBISDACAIAI=</HashCode>
       <FileName>ExtractSubsWindow.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
@@ -78,7 +78,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SubRed.MoreSettingsWindow" BaseTypeListCollapsed="true">
-    <Position X="15.75" Y="13.5" Width="1.5" />
+    <Position X="12.25" Y="8.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAAAAAAAAAAgAIABAAAAAAAAACAIAAAAAABA=</HashCode>
       <FileName>MoreSettingsWindow.xaml.cs</FileName>
@@ -86,7 +86,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SubRed.MoveTimeWindow" BaseTypeListCollapsed="true">
-    <Position X="15.75" Y="10.25" Width="1.5" />
+    <Position X="17.5" Y="10" Width="1.5" />
     <TypeIdentifier>
       <HashCode>CAACAAAEAAAAAAAAAAAAAAAABAAAEAAAAAIAAAAAAAA=</HashCode>
       <FileName>MoveTimeWindow.xaml.cs</FileName>
@@ -94,7 +94,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SubRed.OldSubtitle">
-    <Position X="12.25" Y="12" Width="1.5" />
+    <Position X="10.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>CAZABEAAQAIAABAAAgAAAgAABAAMAAAIAAQADAABCGA=</HashCode>
       <FileName>OldSubtitle.cs</FileName>
@@ -109,7 +109,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SubRed.SettingsWindow" BaseTypeListCollapsed="true">
-    <Position X="12.25" Y="9" Width="1.5" />
+    <Position X="8.75" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAABAEAQAAAAAABAAAAAAAAAAQQAAAAAE=</HashCode>
       <FileName>SettingsWindow.xaml.cs</FileName>
@@ -125,7 +125,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SubRed.StyleSettingsWindow" BaseTypeListCollapsed="true">
-    <Position X="14" Y="9.5" Width="1.5" />
+    <Position X="10.5" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ADACAIACAgAwCACAAAIgAgIACCAAAAIAAAAAAAAgAAA=</HashCode>
       <FileName>StyleSettingsWindow.xaml.cs</FileName>
@@ -133,7 +133,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SubRed.SubProject" BaseTypeListCollapsed="true">
-    <Position X="19.25" Y="10.25" Width="1.5" />
+    <Position X="8.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ggAAAAECAABAQUAAAAAUAAAAAAICAAAMCAAAIgAEQBA=</HashCode>
       <FileName>SubProject.cs</FileName>
@@ -151,12 +151,12 @@
   <Class Name="SubRed.SubtitleOCR">
     <Position X="14" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIYAAKAAAAQEAAABQYAAwAAAIAAABABAEAAAAAAGEE=</HashCode>
+      <HashCode>AAIYAAKAAAgQEAAABQYAAyAAAIAAABABAEAAAAAAGEE=</HashCode>
       <FileName>SubtitleOCR.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SubRed.SubtitleStyle" BaseTypeListCollapsed="true">
-    <Position X="17.5" Y="10" Width="1.5" />
+    <Position X="19.25" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ZAAAUQAgAAAAACCCsYIEAAQAgAAAAAAAAEAAAgABAhE=</HashCode>
       <FileName>SubtitleStyle.cs</FileName>
@@ -164,7 +164,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SubRed.TranslatorAPI">
-    <Position X="14" Y="14.75" Width="1.5" />
+    <Position X="15.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>CAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
       <FileName>TranslatorAPI.cs</FileName>

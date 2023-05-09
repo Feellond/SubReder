@@ -925,6 +925,19 @@ namespace SubRed
             }
         }
 
+        private void TranslateRus_OnClick(object sender, RoutedEventArgs e)
+        {
+            var clickedItem = FindClickedItem(sender);
+            if (clickedItem != null)
+            {
+                if (SelectedIndexOfSubtitle >= 0)
+                {
+                    TranslateFrase("ru");
+                }
+                else MessageBox.Show("Не выбран элемент, который переводить", "Ошибка перевода фразы", MessageBoxButton.OK, MessageBoxImage.Question);
+            }
+        }
+
         private void TranslateEng_OnClick(object sender, RoutedEventArgs e)
         {
             var clickedItem = FindClickedItem(sender);
@@ -945,7 +958,7 @@ namespace SubRed
             {
                 if (SelectedIndexOfSubtitle >= 0)
                 {
-                    TranslateFrase("zn");
+                    TranslateFrase("zh");
                 }
                 else MessageBox.Show("Не выбран элемент, который переводить", "Ошибка перевода фразы", MessageBoxButton.OK, MessageBoxImage.Question);
             }

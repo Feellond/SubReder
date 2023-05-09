@@ -11,11 +11,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="4*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="2" MinHeight="20">
@@ -40,7 +41,16 @@
             <ScrollViewer Grid.Row="1">
                 <Image x:Name="image" MaxWidth="720" MinHeight="480"/>
             </ScrollViewer>
-            <mah:RangeSlider Grid.Row="2" 
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding LowerValue, ElementName=RangeSlider}"></TextBlock>
+                <TextBlock Grid.Column="2" Text="{Binding UpperValue, ElementName=RangeSlider}"></TextBlock>
+                <mah:RangeSlider
+                    Grid.Column="1"
                              Margin="4"
                              mah:SliderHelper.ChangeValueBy="LargeChange"
                              mah:SliderHelper.EnableMouseWheel="MouseHover"
@@ -53,38 +63,42 @@
                              Orientation="Horizontal"
                              SmallChange="1"
                              x:Name="RangeSlider">
-                <mah:RangeSlider.AutoToolTipRangeValuesTemplate>
-                    <DataTemplate DataType="mah:RangeSliderAutoTooltipValues">
-                        <UniformGrid Columns="2" Rows="2">
-                            <TextBlock HorizontalAlignment="Right" Text="From:" />
-                            <TextBlock HorizontalAlignment="Right" Text="{Binding LowerValue, StringFormat='{}{0:N2}'}" />
-                            <TextBlock HorizontalAlignment="Right" Text="To:" />
-                            <TextBlock HorizontalAlignment="Right" Text="{Binding UpperValue, StringFormat='{}{0:N2}'}" />
-                        </UniformGrid>
-                    </DataTemplate>
-                </mah:RangeSlider.AutoToolTipRangeValuesTemplate>
-            </mah:RangeSlider>
+                    <mah:RangeSlider.AutoToolTipRangeValuesTemplate>
+                        <DataTemplate DataType="mah:RangeSliderAutoTooltipValues">
+                            <UniformGrid Columns="2" Rows="2">
+                                <TextBlock HorizontalAlignment="Right" Text="From:" />
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding LowerValue, StringFormat='{}{0:N2}'}" />
+                                <TextBlock HorizontalAlignment="Right" Text="To:" />
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding UpperValue, StringFormat='{}{0:N2}'}" />
+                            </UniformGrid>
+                        </DataTemplate>
+                    </mah:RangeSlider.AutoToolTipRangeValuesTemplate>
+                </mah:RangeSlider>
+            </Grid>
         </Grid>
-        <Grid Grid.Row="2" Grid.Column="0">
-            <Button x:Name="runButton" Content="Запуск" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunButton_Click" Width="90" Margin="60,10,10,0"/>
-            <Button x:Name="cancelButton" Content="Отмена" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="90" Margin="8,60,0,0" Click="cancelButton_Click"/>
-            <Button x:Name="okButton" Content="OK" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="90" Margin="110,60,0,0" Click="okButton_Click"/>
-            <Button x:Name="pauseResumeButton" Content="Пауза" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunPauseButtonChange" Width="90" Margin="110,10,10,0" Visibility="Hidden"/>
+        <GridSplitter Grid.Row="2" Grid.ColumnSpan="2" Height="5" HorizontalAlignment="Stretch" Background="Transparent"></GridSplitter>
+        <Grid Grid.Row="3" Grid.Column="0">
+            <Grid HorizontalAlignment="Center">
+                <Button x:Name="runButton" Content="Запуск" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunButton_Click" Width="90" Margin="60,10,10,0"/>
+                <Button x:Name="cancelButton" Content="Отмена" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="90" Margin="8,60,0,0" Click="cancelButton_Click"/>
+                <Button x:Name="okButton" Content="OK" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="90" Margin="110,60,0,0" Click="okButton_Click"/>
+                <Button x:Name="pauseResumeButton" Content="Пауза" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Click="RunPauseButtonChange" Width="90" Margin="60,10,10,0" Visibility="Hidden"/>
+            </Grid>
         </Grid>
-        <Grid Grid.Row="2" Grid.Column="1" MinHeight="100" MaxHeight="200" MinWidth="400">
+        <Grid Grid.Row="3" Grid.Column="1" MinHeight="100" MinWidth="400">
             <DataGrid x:Name="SubtitleGrid" ItemsSource="{Binding Subtitle}" AutoGenerateColumns="False"
                         ScrollViewer.CanContentScroll="True" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"  FontFamily="Tahoma"/>
-                    <DataGridTextColumn Header="Начао" Binding="{Binding Start}" Width="100"  FontFamily="Tahoma"/>
-                    <DataGridTextColumn Header="Конец" Binding="{Binding End}" Width="100"  FontFamily="Tahoma"/>
-                    <DataGridTextColumn Header="Длительность" Binding="{Binding Duration}" Width="100"  FontFamily="Tahoma"/>
-                    <DataGridTextColumn Header="Кадр начала" Binding="{Binding FrameBeginNum}" Width="100"  FontFamily="Tahoma"/>
+                    <DataGridTextColumn Header="Начало" Binding="{Binding Start}" Width="90"  FontFamily="Tahoma"/>
+                    <DataGridTextColumn Header="Конец" Binding="{Binding End}" Width="90"  FontFamily="Tahoma"/>
+                    <DataGridTextColumn Header="Длительность" Binding="{Binding Duration}" Width="110"  FontFamily="Tahoma"/>
+                    <DataGridTextColumn Header="Кадр начала" Binding="{Binding FrameBeginNum}" Width="110"  FontFamily="Tahoma"/>
                     <DataGridTextColumn Header="Кадр конца" Binding="{Binding FrameEndNum}" Width="100"  FontFamily="Tahoma"/>
-                    <DataGridTextColumn Header="X координата" Binding="{Binding XCoord}" Width="60"  FontFamily="Tahoma"/>
-                    <DataGridTextColumn Header="Y координата" Binding="{Binding YCoord}" Width="60"  FontFamily="Tahoma"/>
+                    <DataGridTextColumn Header="X координата" Binding="{Binding XCoord}" Width="80"  FontFamily="Tahoma"/>
+                    <DataGridTextColumn Header="Y координата" Binding="{Binding YCoord}" Width="80"  FontFamily="Tahoma"/>
                     <DataGridTextColumn Header="Текст" Binding="{Binding Text}" Width="*" MinWidth="200"  FontFamily="Tahoma">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="{x:Type TextBlock}">

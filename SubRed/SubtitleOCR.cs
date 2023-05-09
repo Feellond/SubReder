@@ -134,7 +134,6 @@ namespace SubRed
             kernel1 = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new System.Drawing.Size(k1, k2), new System.Drawing.Point(-1, -1));
             CvInvoke.Erode(grayFrame, grayFrame, kernel1, new System.Drawing.Point(-1, -1), 1, BorderType.Default, new MCvScalar());
 
-
             Emgu.CV.Util.VectorOfVectorOfPoint contours = new Emgu.CV.Util.VectorOfVectorOfPoint();
             Mat hier = new Mat();
             CvInvoke.FindContours(grayFrame, contours, hier, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);

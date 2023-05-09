@@ -261,6 +261,8 @@ namespace SubRed
         {
             CvInvoke.DestroyAllWindows();
             Mat previousFrame = new Mat();
+            EastDetector eastDetector = new EastDetector();
+            List<System.Drawing.Rectangle> listOfRegions = new List<System.Drawing.Rectangle>();
             if (filePath != null)
             {
                 if (isVideoOpened)
@@ -277,7 +279,7 @@ namespace SubRed
 
                         image.Source = SubtitleOCR.ImageSourceFromBitmap(newFrame.ToBitmap());
 
-                        List<System.Drawing.Rectangle> listOfRegions = new List<System.Drawing.Rectangle>();
+                        listOfRegions.Clear();
                         await Task.Run(() =>
                         {
                             //FrameChanged(newFrame, previousFrame);
@@ -287,7 +289,6 @@ namespace SubRed
 
                         if (listOfSubs.Count == 0)
                         {
-                            EastDetector eastDetector = new EastDetector();
                             foreach (var region in listOfRegions)
                             {
                                 var tempimg = newFrame.ToImage<Gray, Byte>();
@@ -319,7 +320,6 @@ namespace SubRed
                         }
                         else if (listOfRegions.Count > 0)
                         {
-                            EastDetector eastDetector = new EastDetector();
                             foreach (var region in listOfRegions)
                             {
                                 bool IsFoundSub = false;
@@ -400,11 +400,9 @@ namespace SubRed
                 else
                 {
                     Mat img = CvInvoke.Imread(filePath);
-
-                    EastDetector eastDetector = new EastDetector();
                     //var listOfEastRegions = eastDetector.EastDetect(img);
 
-                    var listOfRegions = SubtitleOCR.FindRegions(img);
+                    listOfRegions = SubtitleOCR.FindRegions(img);
                     var index = 0;
                     foreach (var region in listOfRegions)
                     {
