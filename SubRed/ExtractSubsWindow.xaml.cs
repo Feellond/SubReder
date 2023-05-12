@@ -185,11 +185,14 @@ namespace SubRed
                             if (fps / 2 < sumFrameNum && fps * 120 > sumFrameNum) // Если субтитр дольше секунды и меньше 2 минут
                             {
                                 //Запись в глобальную переменную субтитр
+                                TimeSpan start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000));
+                                TimeSpan end = new TimeSpan(0, 0, 0, 0, (int)(currentFrame / fps * 1000));
                                 tempProject.SubtitlesList.Add(new Subtitle()
                                 {
                                     Text = sub.Text,
-                                    Start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000)),
-                                    End = new TimeSpan(0, 0, 0, 0, (int)(currentFrame / fps * 1000)),
+                                    Start = start,
+                                    End = end,
+                                    Duration = end - start,
                                     FrameBeginNum = sub.FrameBeginNum,
                                     FrameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,
@@ -377,11 +380,14 @@ namespace SubRed
                             if (fps / 2 < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                             {
                                 //Запись в глобальную переменную субтитр
+                                TimeSpan start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000));
+                                TimeSpan end = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameEndNum / fps * 1000));
                                 tempProject.SubtitlesList.Add(new Subtitle()
                                 {
                                     Text = sub.Text,
-                                    Start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000)),
-                                    End = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameEndNum / fps * 1000)),
+                                    Start = start,
+                                    End = end,
+                                    Duration = end - start,
                                     FrameBeginNum = sub.FrameBeginNum,
                                     FrameEndNum = currentFrame,
                                     //frameImage = sub.frameImage,

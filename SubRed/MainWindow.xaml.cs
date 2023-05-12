@@ -355,7 +355,7 @@ namespace SubRed
                     ComboBoxItem itemSelected3 = new ComboBoxItem { Name = "Right" };
 
                     StackPanel panelForItem = new StackPanel { Name = "panelUpForItem_" + index.ToString() };
-                    TextBlock blockForPanel = new TextBlock { Text = "Вверх" };
+                    TextBlock blockForPanel = new TextBlock { Text = "Слева" };
                     panelForItem.Children.Add(blockForPanel);
                     itemSelected1.Content = panelForItem;
 
@@ -365,7 +365,7 @@ namespace SubRed
                     itemSelected2.Content = panelForItem;
 
                     panelForItem = new StackPanel { Name = "panelDownForItem_" + index.ToString() };
-                    blockForPanel = new TextBlock { Text = "Низ" };
+                    blockForPanel = new TextBlock { Text = "Справа" };
                     panelForItem.Children.Add(blockForPanel);
                     itemSelected3.Content = panelForItem;
 
@@ -390,7 +390,7 @@ namespace SubRed
                     itemSelected3 = new ComboBoxItem { Name = "Down", IsSelected = true };
 
                     panelForItem = new StackPanel();
-                    blockForPanel = new TextBlock { Text = "Слева" };
+                    blockForPanel = new TextBlock { Text = "Вверх" };
                     panelForItem.Children.Add(blockForPanel);
                     itemSelected1.Content = panelForItem;
 
@@ -400,7 +400,7 @@ namespace SubRed
                     itemSelected2.Content = panelForItem;
 
                     panelForItem = new StackPanel();
-                    blockForPanel = new TextBlock { Text = "Справа" };
+                    blockForPanel = new TextBlock { Text = "Снизу" };
                     panelForItem.Children.Add(blockForPanel);
                     itemSelected3.Content = panelForItem;
 
@@ -821,7 +821,7 @@ namespace SubRed
 
             if (player.SourceProvider.MediaPlayer != null)
                 if (player.SourceProvider.MediaPlayer.Length > 0)
-                    CurrentTimeVideoTextBox.Text = player.SourceProvider.MediaPlayer.Time.ToString();
+                    CurrentTimeVideoTextBox.Text = new TimeSpan(0, 0, (int)(player.SourceProvider.MediaPlayer.Time / 1000)).ToString(@"hh\:mm\:ss");
         }
 
         private static readonly Regex _regex = new Regex("[^0-9]+"); //regex that matches disallowed text

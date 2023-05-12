@@ -59,8 +59,8 @@ namespace SubRed
 
             SubtitlesList = new List<Subtitle>
             {
-                new Subtitle() { Style = SubtitleStyleList[0]},
-                new Subtitle() { Style = SubtitleStyleList[0]}
+                new Subtitle() { Style = SubtitleStyleList[0], Text = "Субтитр 1"},
+                new Subtitle() { Style = SubtitleStyleList[0], Text = "Субтитр 2"}
             };
             SubtitleRenum();
         }
