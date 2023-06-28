@@ -62,6 +62,7 @@ namespace SubRed
         /// <param name="action">Применяемое действие: bold, cursive, underline, strikethrough</param>
         public void ChangeInTextAction(int beginIndex, int endIndex, string action)
         {
+           
             string beginTag = "";
             string endTag = "";
             switch (action)

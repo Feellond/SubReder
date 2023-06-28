@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SubRed
 {
@@ -58,6 +55,7 @@ namespace SubRed
             if (_currentIndex >= 0 && _currentIndex < _entries.Count && _currentIndex != previousIndex)
                 OnUpdateSubtitles(_entries[_currentIndex].Text);
         }
+
 
         private int FindPreviousEntry(TimeSpan timestamp)
         {

@@ -54,6 +54,7 @@
 
   <ItemGroup>
     <Folder Include="SubFormats\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>

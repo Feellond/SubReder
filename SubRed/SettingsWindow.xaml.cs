@@ -1,18 +1,5 @@
-﻿using Emgu.CV.Dnn;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Win32;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SubRed
 {
@@ -30,17 +17,17 @@ namespace SubRed
         public SettingsWindow(SubProject project, MainWindow mainWindow)
         {
             InitializeComponent();
-            this.currentSubRedProject = project;
-            nameTextBox.Text = currentSubRedProject.Title;
-            originalScriptTextBox.Text = currentSubRedProject.OriginalScript;
-            originalTranslationTextBox.Text = currentSubRedProject.OriginalTranslation;
-            scriptTypeTextBox.Text = currentSubRedProject.ScriptType;
-            collisionTextBox.Text = currentSubRedProject.Collisions;
-            timerTextBox.Text = currentSubRedProject.Timer;
-            syncTextBox.Text = currentSubRedProject.SyncPoint;
+            this.currentSubRedProject               = project;
+            nameTextBox.Text                        = currentSubRedProject.Title;
+            originalScriptTextBox.Text              = currentSubRedProject.OriginalScript;
+            originalTranslationTextBox.Text         = currentSubRedProject.OriginalTranslation;
+            scriptTypeTextBox.Text                  = currentSubRedProject.ScriptType;
+            collisionTextBox.Text                   = currentSubRedProject.Collisions;
+            timerTextBox.Text                       = currentSubRedProject.Timer;
+            syncTextBox.Text                        = currentSubRedProject.SyncPoint;
 
-            x_resolutionTextBox.Text = currentSubRedProject.PlayResX;
-            y_resolutionTextBox.Text = currentSubRedProject.PlayResY;
+            x_resolutionTextBox.Text                = currentSubRedProject.PlayResX;
+            y_resolutionTextBox.Text                = currentSubRedProject.PlayResY;
 
             this.mainWindow = mainWindow;
         }

@@ -266,33 +266,81 @@ namespace SubRed
             Mat previousFrame = new Mat();
             EastDetector eastDetector = new EastDetector();
             List<System.Drawing.Rectangle> listOfRegions = new List<System.Drawing.Rectangle>();
-            if (filePath != null)
+
+            if(string.IsNullOrEmpty(filePath))
             {
-                if (isVideoOpened)
+                return;
+            }
+
+            if (isVideoOpened)
+            {
+                imageProgressBar.Value = currentFrame;
+                imageProgressBar.Visibility = Visibility.Visible;
+
+                video.Set(CapProp.PosFrames, currentFrame);
+                while (video.IsOpened && currentFrame <= maxFrameNumber && !isPausedOCR)
                 {
-                    imageProgressBar.Value = currentFrame;
-                    imageProgressBar.Visibility = Visibility.Visible;
+                    Mat newFrame = video.QueryFrame();
+                    if (newFrame == null)
+                        break;
 
-                    video.Set(CapProp.PosFrames, currentFrame);
-                    while (video.IsOpened && currentFrame <= maxFrameNumber && !isPausedOCR)
+                    image.Source = SubtitleOCR.ImageSourceFromBitmap(newFrame.ToBitmap());
+
+                    listOfRegions.Clear();
+                    await Task.Run(() =>
                     {
-                        Mat newFrame = video.QueryFrame();
-                        if (newFrame == null)
-                            break;
+                        //FrameChanged(newFrame, previousFrame);
+                        SubRegionChanged(newFrame);
+                        listOfRegions = SubtitleOCR.FindRegions(newFrame);
+                    });
 
-                        image.Source = SubtitleOCR.ImageSourceFromBitmap(newFrame.ToBitmap());
-
-                        listOfRegions.Clear();
-                        await Task.Run(() =>
+                    if (listOfSubs.Count == 0)
+                    {
+                        foreach (var region in listOfRegions)
                         {
-                            //FrameChanged(newFrame, previousFrame);
-                            SubRegionChanged(newFrame);
-                            listOfRegions = SubtitleOCR.FindRegions(newFrame);
-                        });
+                            var tempimg = newFrame.ToImage<Gray, Byte>();
+                            tempimg.ROI = region;
+                            var text = SubtitleOCR.GetRegionsTextTesseract(tempimg);
 
-                        if (listOfSubs.Count == 0)
+                            bool foundedInEast = true;
+                            if (SubtitleOCR.useEast)
+                            {
+                                foundedInEast = false;
+                                if (eastDetector.EastDetect(tempimg.Mat).Count > 0)
+                                {
+                                    foundedInEast = true;
+                                }
+                            }
+
+                            if (foundedInEast)
+                            {
+                                if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                                    listOfSubs.Add(new Subtitle()
+                                    {
+                                        Text = text,
+                                        FrameBeginNum = currentFrame,
+                                        FrameImage = tempimg.ToBitmap<Gray, Byte>(),
+                                        FrameRegion = region
+                                    });
+                            }
+                        }
+                    }
+                    else if (listOfRegions.Count > 0)
+                    {
+                        foreach (var region in listOfRegions)
                         {
-                            foreach (var region in listOfRegions)
+                            bool IsFoundSub = false;
+                            foreach (var sub in listOfSubs)
+                            {
+                                System.Drawing.Rectangle rectIntersect = sub.FrameRegion;
+                                rectIntersect.Intersect(region);
+                                if (rectIntersect.Height * rectIntersect.Width > sub.FrameRegion.Height * sub.FrameRegion.Width * 0.2) //Если пересекается более чем на 20%
+                                {
+                                    IsFoundSub = true; // нашли субтитр
+                                    break;
+                                }
+                            }
+                            if (!IsFoundSub) // если не нашли пересечение, то потенциально новый текст
                             {
                                 var tempimg = newFrame.ToImage<Gray, Byte>();
                                 tempimg.ROI = region;
@@ -313,7 +361,7 @@ namespace SubRed
                                     if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
                                         listOfSubs.Add(new Subtitle()
                                         {
-                                            Text = text,
+                                            Text = SubtitleOCR.GetRegionsTextTesseract(tempimg),
                                             FrameBeginNum = currentFrame,
                                             FrameImage = tempimg.ToBitmap<Gray, Byte>(),
                                             FrameRegion = region
@@ -321,132 +369,88 @@ namespace SubRed
                                 }
                             }
                         }
-                        else if (listOfRegions.Count > 0)
-                        {
-                            foreach (var region in listOfRegions)
-                            {
-                                bool IsFoundSub = false;
-                                foreach (var sub in listOfSubs)
-                                {
-                                    System.Drawing.Rectangle rectIntersect = sub.FrameRegion;
-                                    rectIntersect.Intersect(region);
-                                    if (rectIntersect.Height * rectIntersect.Width > sub.FrameRegion.Height * sub.FrameRegion.Width * 0.2) //Если пересекается более чем на 20%
-                                    {
-                                        IsFoundSub = true; // нашли субтитр
-                                        break;
-                                    }
-                                }
-                                if (!IsFoundSub) // если не нашли пересечение, то потенциально новый текст
-                                {
-                                    var tempimg = newFrame.ToImage<Gray, Byte>();
-                                    tempimg.ROI = region;
-                                    var text = SubtitleOCR.GetRegionsTextTesseract(tempimg);
-
-                                    bool foundedInEast = true;
-                                    if (SubtitleOCR.useEast)
-                                    {
-                                        foundedInEast = false;
-                                        if (eastDetector.EastDetect(tempimg.Mat).Count > 0)
-                                        {
-                                            foundedInEast = true;
-                                        }
-                                    }
-
-                                    if (foundedInEast)
-                                    {
-                                        if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
-                                            listOfSubs.Add(new Subtitle()
-                                            {
-                                                Text = SubtitleOCR.GetRegionsTextTesseract(tempimg),
-                                                FrameBeginNum = currentFrame,
-                                                FrameImage = tempimg.ToBitmap<Gray, Byte>(),
-                                                FrameRegion = region
-                                            });
-                                    }
-                                }
-                            }
-                        }
-
-                        previousFrame = newFrame.Clone();
-                        currentFrame++;
-                        imageProgressBar.Value = currentFrame;
                     }
-                    if (listOfSubs.Count > 0)
-                    {
-                        for (int index = 0; index < listOfSubs.Count; index++)
-                        {
-                            var sub = listOfSubs[index];
-                            var sumFrameNum = currentFrame - sub.FrameBeginNum;
-                            if (fps / 2 < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
-                            {
-                                //Запись в глобальную переменную субтитр
-                                TimeSpan start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000));
-                                TimeSpan end = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameEndNum / fps * 1000));
-                                tempProject.SubtitlesList.Add(new Subtitle()
-                                {
-                                    Text = sub.Text,
-                                    Start = start,
-                                    End = end,
-                                    Duration = end - start,
-                                    FrameBeginNum = sub.FrameBeginNum,
-                                    FrameEndNum = currentFrame,
-                                    //frameImage = sub.frameImage,
-                                    FrameRegion = sub.FrameRegion,
-                                    XCoord = sub.FrameRegion.X,
-                                    YCoord = sub.FrameRegion.Y
-                                });
 
-                                listOfSubs.Remove(sub);
-                                index--;
-                            }
-                        }
-                        listOfSubs.Clear();
-                    }
+                    previousFrame = newFrame.Clone();
+                    currentFrame++;
+                    imageProgressBar.Value = currentFrame;
                 }
-                else
+                if (listOfSubs.Count > 0)
                 {
-                    Mat img = CvInvoke.Imread(filePath);
-                    //var listOfEastRegions = eastDetector.EastDetect(img);
-
-                    listOfRegions = SubtitleOCR.FindRegions(img);
-                    var index = 0;
-                    foreach (var region in listOfRegions)
+                    for (int index = 0; index < listOfSubs.Count; index++)
                     {
-                        index++;
-                        var tempimg = img.ToImage<Gray, Byte>();
-                        tempimg.ROI = region;
-                        bool foundedInEast = true;
-                        if (SubtitleOCR.useEast)
+                        var sub = listOfSubs[index];
+                        var sumFrameNum = currentFrame - sub.FrameBeginNum;
+                        if (fps / 2 < sumFrameNum && fps * 60 > sumFrameNum) // Если субтитр дольше секунды и меньше минуты
                         {
-                            foundedInEast = false;
-                            if (eastDetector.EastDetect(tempimg.Mat).Count > 0)
+                            //Запись в глобальную переменную субтитр
+                            TimeSpan start = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameBeginNum / fps * 1000));
+                            TimeSpan end = new TimeSpan(0, 0, 0, 0, (int)(sub.FrameEndNum / fps * 1000));
+                            tempProject.SubtitlesList.Add(new Subtitle()
                             {
-                                foundedInEast = true;
-                            }
-                        }
+                                Text = sub.Text,
+                                Start = start,
+                                End = end,
+                                Duration = end - start,
+                                FrameBeginNum = sub.FrameBeginNum,
+                                FrameEndNum = currentFrame,
+                                //frameImage = sub.frameImage,
+                                FrameRegion = sub.FrameRegion,
+                                XCoord = sub.FrameRegion.X,
+                                YCoord = sub.FrameRegion.Y
+                            });
 
-                        if (foundedInEast)
-                        {
-                            var text = SubtitleOCR.GetRegionsTextTesseract(tempimg, index.ToString());
-                            if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
-                                tempProject.SubtitlesList.Add(new Subtitle()
-                                {
-                                    Text = text,
-                                    XCoord = region.X,
-                                    YCoord = region.Y
-                                });
+                            listOfSubs.Remove(sub);
+                            index--;
                         }
                     }
+                    listOfSubs.Clear();
                 }
-
-                if (!isPausedOCR)
-                {
-                    runButton.Visibility = Visibility.Visible;
-                    pauseResumeButton.Visibility = Visibility.Hidden;
-                }
-
-                ViewGrid();
             }
+            else
+            {
+                Mat img = CvInvoke.Imread(filePath);
+                //var listOfEastRegions = eastDetector.EastDetect(img);
+
+                listOfRegions = SubtitleOCR.FindRegions(img);
+                var index = 0;
+                foreach (var region in listOfRegions)
+                {
+                    index++;
+                    var tempimg = img.ToImage<Gray, Byte>();
+                    tempimg.ROI = region;
+                    bool foundedInEast = true;
+                    if (SubtitleOCR.useEast)
+                    {
+                        foundedInEast = false;
+                        if (eastDetector.EastDetect(tempimg.Mat).Count > 0)
+                        {
+                            foundedInEast = true;
+                        }
+                    }
+
+                    if (foundedInEast)
+                    {
+                        var text = SubtitleOCR.GetRegionsTextTesseract(tempimg, index.ToString());
+                        if (text.Replace(Environment.NewLine, "").Replace("\n", "").Replace(" ", "") != "")
+                            tempProject.SubtitlesList.Add(new Subtitle()
+                            {
+                                Text = text,
+                                XCoord = region.X,
+                                YCoord = region.Y
+                            });
+                    }
+                }
+            }
+
+            if (!isPausedOCR)
+            {
+                runButton.Visibility = Visibility.Visible;
+                pauseResumeButton.Visibility = Visibility.Hidden;
+            }
+
+            ViewGrid();
+           
         }
 
         private static readonly Regex _regex = new Regex("[^0-9.-]+"); //regex that matches disallowed text
